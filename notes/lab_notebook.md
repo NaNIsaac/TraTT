@@ -754,7 +754,7 @@ max |I - sin^2(pi alpha_1 t)|:
 | 0.40 | 0.312 | 0.341 | 0.429 | — |
 | >= 0.8 | 0.61–0.95 | 0.74 | — | — |
 
-**Rule for the paper:** alpha / alpha_ac <= 0.1 (equivalently the static
+**Rule for the paper (revised in Entry 19 — use that one):** alpha / alpha_ac <= 0.1 (equivalently the static
 main-line width 2 pi alpha is <= 10 % of the satellite spacing q) keeps the
 centre law within 0.05 absolute. At fixed ratio the error grows slowly with
 alpha — more Pendellösung turns accumulate the neglected off-resonant phase —
