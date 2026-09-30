@@ -808,3 +808,32 @@ against theory 20.5 / 17.9 / 17.2 and the kinematic 5.566/t = 11.1 / 6.9 / 5.8.
   alpha_n (and with it S, via J_n) from the saturated FWHM / 13.4.
 - Earliest times (alpha_n t < 0.1): data FWHM ~4 — the window-limited /
   unfilled-crystal fringe problem of C-1.8, as in Laue. Not usable there.
+
+---
+
+## 2026-09-30 — Entry 18: session 1's overshoot table, explained without a fit
+
+C-1.7(a) reported transient max / steady ratios of the channel integrals at
+alpha_ac = 20 and called their alpha dependence "weak". The collapse law
+predicts ratio = max_{t<=1} F(2 pi alpha_n t) / F(2 pi alpha_n), with
+F(x) = int_0^x J_0. The drive amplitude used in session 1 is not written in
+C-1.7(a); S = 1 is the value used in C-1.7(b) and reproduces the table:
+
+| alpha | n=1 measured (C-1.7a) | n=1 predicted, S=1 | n=2 measured | n=2 predicted |
+|---|---|---|---|---|
+| 1 | 1.06 | 1.02 | 1.09 | 1.00 |
+| 2 | 2.28 | 2.20 | 1.09 | 1.00 |
+| 4 | 1.89 | 1.77 | 1.13 | 1.04 |
+| 6 | 1.63 | 1.49 | 1.59 | 1.64 |
+
+(S = 0.5 gives 1.00 / 1.07 / 2.04 / 1.19 for n = 1 and does not fit.)
+
+**Reading.** Every entry agrees to within ~0.1, the residual being the same
+sign as the static-tail excess of Entry 2. The "weak, irregular alpha
+dependence" was the oscillating function F(2 pi alpha_n) / F_max sampled at a
+few alpha: large when the transit ends near a minimum of F (alpha_1 = 0.88 at
+alpha = 2, where 2 pi alpha_1 = 5.5 is near the first minimum of F at 5.52),
+small otherwise. The n = 2 entries stay ~1 until alpha_2 is large enough to
+reach the first maximum inside the transit (alpha = 6). Nothing in that table
+is unexplained any more. **Confirmed:** the session-1 script uses
+`Drive(S=1.0, alpha_ac=20.0)` (explore/make_feature_figure.py:98).
