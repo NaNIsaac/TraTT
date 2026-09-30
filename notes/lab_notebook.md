@@ -769,7 +769,7 @@ The law fails completely at alpha / alpha_ac >~ 0.4, where channels overlap
 | 10 | S from tau_2 / tau_1 | Entry 13 | **V** (simulated measurement, ~1 %, needs alpha_2 >= 0.5) |
 | 12 | Three-mode two-layer closed model reproduces I(eta, t) near each satellite to 5–10 % of peak, including apparent shifts | Entry 14 | V |
 | 13 | Ramp through the Bessel ladder: 1.5x overshoot at weak coupling (S = 3); dark window (S = 5) | Entry 15 | V |
-| 14 | Validity: alpha / alpha_ac <= 0.1 -> centre error <= 0.05 | Entry 16 | V |
+| 14 | Validity: alpha / alpha_ac <= 0.05 -> centre error <= 0.03; <= 0.1 -> <= 0.08 | Entries 16, 19 (30 random conditions) | V |
 
 ---
 
@@ -837,3 +837,23 @@ small otherwise. The n = 2 entries stay ~1 until alpha_2 is large enough to
 reach the first maximum inside the transit (alpha = 6). Nothing in that table
 is unexplained any more. **Confirmed:** the session-1 script uses
 `Drive(S=1.0, alpha_ac=20.0)` (explore/make_feature_figure.py:98).
+
+---
+
+## 2026-09-30 — Entry 19: random conditions — the law is not a special-point artefact
+
+`explore/nb/e19_random.py`, seed 20260930. 30 conditions: S in [0.3, 3.5],
+alpha in [0.3, 4], **non-integer** alpha_ac in [20, 45], n in {+1, +2, -1},
+rise 0 (half the cases) or U[0, 0.6], 40 random times in [0, 1 + rise].
+Law: accumulated coupling (Entry 5). Max abs error of the centre intensity:
+
+| alpha / alpha_ac | cases | worst | median |
+|---|---|---|---|
+| <= 0.05 | 12 | 0.031 | 0.013 |
+| 0.05–0.10 | 13 | 0.075 | 0.048 |
+| 0.10–0.20 | 5 | 0.112 | 0.078 |
+
+**Reading.** Holds across random, non-integer, ramped conditions; nothing
+depends on integer alpha_ac orthogonality or on special S. The Entry 16 rule
+was slightly optimistic. **Revised rule:** alpha / alpha_ac <= 0.05 for
+errors <= 0.03; <= 0.1 for <= 0.08.
