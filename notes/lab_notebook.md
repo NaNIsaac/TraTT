@@ -720,7 +720,7 @@ four runs. Time series (t = 0 to 2 in steps of 0.2; signed Theta below):
 | 3.0 | 0.00 0.00 0.01 0.08 0.19 0.29 0.38 0.38 0.32 0.27 0.26 | up to +0.42, back to +0.34 | **1.52** |
 | 5.0 | 0.00 0.00 0.03 0.10 0.10 0.05 0.01 0.02 0.16 0.23 0.24 | +0.20, through 0, to -0.33 | 1.00, with a **dark window** at t ~ 1.2 |
 
-rise = 2, S = 5: peak 0.351 at t = 1.28, final 0.242 (peak/final 0.68^-1 = 1.45).
+rise = 2, S = 5: peak 0.351 at t = 1.28, final 0.242 (peak/final = 1.45).
 
 **Reading.**
 - A 50 % overshoot with no dynamical diffraction involved: at alpha = 0.5
@@ -737,3 +737,36 @@ rise = 2, S = 5: peak 0.351 at t = 1.28, final 0.242 (peak/final 0.68^-1 = 1.45)
 - Caveat: S = 3–5 means u0 ~ 0.1–0.15 A for Si 220 (Entry 6 scaling), strain
   ~2–3e-4 at 2 GHz; large but not absurd. The model has no acoustic
   nonlinearity or attenuation.
+
+---
+
+## 2026-09-30 — Entry 16: validity of the filled-depth law
+
+`explore/nb/e16_validity.py`. S = 1.5, n = 1, centre intensity, 101 times,
+max |I - sin^2(pi alpha_1 t)|:
+
+| alpha / alpha_ac | alpha_ac = 5 | 10 | 20 | 40 |
+|---|---|---|---|---|
+| 0.013–0.025 | — | — | 0.005 (alpha .5) | 0.003 / 0.006 |
+| 0.05 | — | 0.011 | 0.010 | 0.013 |
+| 0.10 | 0.023 | 0.026 | 0.035 | 0.052 |
+| 0.20 | 0.063 | 0.107 | 0.146 | 0.175 |
+| 0.40 | 0.312 | 0.341 | 0.429 | — |
+| >= 0.8 | 0.61–0.95 | 0.74 | — | — |
+
+**Rule for the paper:** alpha / alpha_ac <= 0.1 (equivalently the static
+main-line width 2 pi alpha is <= 10 % of the satellite spacing q) keeps the
+centre law within 0.05 absolute. At fixed ratio the error grows slowly with
+alpha — more Pendellösung turns accumulate the neglected off-resonant phase —
+so for many oscillations in transit (alpha_n >~ 3) use <= 0.05.
+The law fails completely at alpha / alpha_ac >~ 0.4, where channels overlap
+(C-1.6).
+
+**Entry 12 claims table — additions.**
+
+| # | Claim | Evidence | Status |
+|---|---|---|---|
+| 10 | S from tau_2 / tau_1 | Entry 13 | **V** (simulated measurement, ~1 %, needs alpha_2 >= 0.5) |
+| 12 | Three-mode two-layer closed model reproduces I(eta, t) near each satellite to 5–10 % of peak, including apparent shifts | Entry 14 | V |
+| 13 | Ramp through the Bessel ladder: 1.5x overshoot at weak coupling (S = 3); dark window (S = 5) | Entry 15 | V |
+| 14 | Validity: alpha / alpha_ac <= 0.1 -> centre error <= 0.05 | Entry 16 | V |
