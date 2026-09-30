@@ -143,3 +143,31 @@ def test_satellite_formation_follows_filled_depth_pendelloesung():
     assert np.allclose(p, p_th, rtol=0.05), (p, p_th)
     centre = I[:, np.argmin(np.abs(eta - n * q))]
     assert np.allclose(centre, np.sin(np.pi * an * t) ** 2, atol=0.05), centre
+
+
+def test_accumulated_coupling_law_all_channels_with_rise():
+    """Centre intensity is sin^2 of the coupling accumulated along the depth,
+    Theta_n = |int_0^1 J_n(S A(t - zeta)) dzeta|. Covers the n = 0 two-layer law
+    (unfilled layer contributes J_0(0) = 1) and a finite rise time."""
+    from scipy.special import jv
+
+    S, alpha = 1.5, 2.0
+    z = np.linspace(0.0, 1.0, 2001)
+    for rise in (0.0, 0.4):
+        d = Drive(S=S, alpha_ac=20.0, rise=rise)
+        t = np.array([0.2037, 0.5037, 0.8037, 1.1037])
+        I = rocking_cube(alpha, d, np.array([0.0, d.q, 2 * d.q]), t, n_z=1200)
+        for j, n in enumerate((0, 1, 2)):
+            Th = [abs(np.trapezoid(jv(n, S * d.envelope(x - z)), z)) for x in t]
+            assert np.allclose(I[:, j], np.sin(np.pi * alpha * np.array(Th)) ** 2, atol=0.06), (rise, n)
+
+
+def test_bragg_satellite_saturates_as_filled_depth_slab():
+    """Bragg: the filled layer is a Bragg slab of coupling pi alpha |J_n(S)|."""
+    from scipy.special import jv
+
+    S, alpha = 1.5, 1.0
+    d = Drive(S=S, alpha_ac=20.0)
+    t = np.array([0.1037, 0.4037, 0.7037])
+    I = rocking_cube(alpha, d, np.array([d.q]), t, geometry="bragg", n_z=1200)[:, 0]
+    assert np.allclose(I, np.tanh(np.pi * alpha * abs(jv(1, S)) * t) ** 2, atol=0.02), I

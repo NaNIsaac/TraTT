@@ -43,7 +43,7 @@ CASES = [(0.5, 2.0, 1), (1.5, 2.0, 1), (1.5, 4.0, 1), (2.0, 4.0, 2), (1.0, 6.0, 
 
 def main(out="figures/satellite_collapse.png"):
     fig, ax = plt.subplots(1, 2, figsize=(12, 4.6), constrained_layout=True)
-    t = np.linspace(0.01, 1.0, 100)
+    t = np.linspace(0.01, 1.0, 100) + 0.0037  # off the acoustic period grid (notebook Entry 2)
     x = np.linspace(0, 2 * np.pi * 3.0, 4000)
     F = cumulative_trapezoid(jv(0, x), x, initial=0.0)
     for (S, alpha, n), c in zip(CASES, HUES):
@@ -53,7 +53,7 @@ def main(out="figures/satellite_collapse.png"):
         I = rocking_cube(alpha, d, eta, t, n_z=1000)
         an = alpha * abs(jv(n, S))
         k0 = np.argmin(np.abs(eta - n * q))
-        p = np.trapezoid(I, eta, axis=1)
+        p = np.trapezoid(I, eta, axis=1)  # raw: no tail correction wins in all cases (notebook Entry 2b)
         lab = rf"$S$={S}, $\alpha$={alpha:g}, $n$={n}  ($\alpha_n$={an:.2f})"
         ax[0].plot(an * t, I[:, k0], "o", ms=2.5, color=c, label=lab)
         ax[1].plot(an * t, p / (np.pi**2 * an), "o", ms=2.5, color=c, label=lab)
