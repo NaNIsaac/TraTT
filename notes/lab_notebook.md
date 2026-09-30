@@ -497,3 +497,109 @@ of the final value.
 **Does not show.** Only centre intensity. Bragg integrated intensity and width
 not checked. Bragg is deprioritised by the user — this was a cheap check to
 test generality, not a full study.
+
+---
+
+## 2026-09-30 — Entry 10: poster summary figure
+
+`explore/make_poster_figure.py` -> `figures/poster_mapping.png`. Four panels,
+closed-form curves, full-TT points, alpha_ac = 20, times off the period grid:
+
+- a Laue centre intensity of 4 (S, alpha, n) cases on sin^2(pi alpha_n t).
+- b Bragg, same cases, on tanh^2(pi alpha_n t).
+- c First-maximum time vs S for n = 1, 2, 3 at alpha = 2, theory
+  1 / (2 alpha |J_n(S)|) and simulated points; S = 3 shows the n = 2, 1, 3 order.
+- d Rise = 0.5, S = 1.5, alpha = 2, n = 0, 1, 2 on the accumulated-coupling law,
+  with the step-onset law for n = 1 dashed — visibly wrong.
+
+Palette: reference categorical order (blue, orange, aqua, yellow), validated
+with the dataviz validator (all PASS; aqua contrast WARN, relieved by marker
+shape + legend on every series).
+
+Worth noticing in panel d: after t = 1 + rise the channels sit at their steady
+values sin^2(pi alpha |J_n(S)|) — here n = 2 near 1 and n = 0 near 0 — so the
+*steady* ladder is the end point of the same law, not a separate result.
+
+---
+
+## 2026-09-30 — Entry 11: absorption — estimate only, NOT simulated
+
+The code is non-absorbing (real alpha). Estimate for planning:
+
+- A common chi_0'' gives exp(-mu L) overall and cancels in shapes.
+- The Borrmann part (chi_h'') gives the two Laue modes absorption
+  mu (1 ± kappa); in the filled layer the satellite's coupling is scaled by
+  J_n, so its modes split by mu kappa |J_n(S)|. The sin^2 then becomes
+  [cosh(mu L kappa |J_n| t) - cos(2 pi alpha_n t)] / 2 up to an overall
+  exp(-mu L) factor, and the oscillation contrast is ~ 1 / cosh(mu L kappa |J_n| t).
+- Si 220, ~8 keV, L = 100 um: mu L ~ 1.4, kappa ~ 0.95 (TO VERIFY), J_1(1.5) = 0.56,
+  so at t = 1 the argument is ~0.75 and the contrast ~0.78. **The oscillation
+  survives absorption at the level relevant for the poster's example.**
+- Thick crystals (mu L >> 1) kill the contrast; the estimate says keep
+  mu L kappa |J_n| <~ 1.
+
+To make this a result: make alpha complex in `core.solve_laue` (the RK4 already
+carries complex state; only the alpha >= 0 check and the signature change, as
+the ponytail note in core.py says) and redo Entry 1 with a complex coupling.
+
+**Entry 11b (same day) — absorption simulated.** `core.solve_laue` now accepts
+a complex alpha (one-line change: the non-negativity check uses the real part;
+docstring states the centrosymmetric assumption chi_h = chi_hbar). Tests: 37 pass.
+`explore/nb/e11_absorb.py`, centre intensity, alpha_ac = 20, 101 times.
+
+Prediction: the mapping is unchanged with a complex coupling,
+I(n q, t) = |sin(pi alpha J_n t)|^2 = [cosh(2 pi alpha'' |J_n| t) - cos(2 pi alpha' |J_n| t)] / 2.
+
+| S, alpha, n | max abs(I - th) | peak sim / th | first minimum sim / th |
+|---|---|---|---|
+| 1.5, 2+0.05i, 1 | 0.048 | 0.983 / 1.001 | 0.005 / 0.006 |
+| 1.5, 2+0.15i, 1 | 0.079 | 0.970 / 1.014 | 0.051 / 0.056 |
+| 3, 2+0.10i, 2   | 0.059 | 0.991 / 1.006 | 0.025 / 0.029 |
+| 1.5, 4+0.10i, 1 | 0.213 | 0.985 / 1.014 | 0.019 / 0.025 |
+
+The mapping survives Borrmann absorption with the same accuracy as without it
+(the alpha = 4 residual is the known alpha/alpha_ac correction of Entry 5).
+Link to the estimate above: 2 pi alpha'' = mu L kappa, so for the Si 220,
+L = 100 um example alpha'' ~ 0.21 — the range simulated here. The oscillation
+minima lift from 0 to ~0.05 at alpha'' = 0.15: contrast stays high.
+Still ignored: the common exp(-mu L), and any difference between chi_h and
+chi_hbar (non-centrosymmetric crystals).
+
+---
+
+## 2026-09-30 — Entry 12: claims and evidence (draft for the poster / paper)
+
+Status key: **V** verified against full TT here, no fit; **E** estimate only;
+**X** withdrawn.
+
+| # | Claim | Evidence | Status |
+|---|---|---|---|
+| 1 | During transit, satellite n is a crystal of the filled depth t with coupling pi alpha abs(J_n(S)) | C-1.10; Entries 1, 4, 9; `figures/poster_mapping.png` | V (resolved channels, alpha/alpha_ac <~ 0.2) |
+| 2 | Laue: centre intensity sin^2(pi alpha_n t) — temporal Pendellösung with period t_tr / alpha_n = Lambda_P / (v_s abs(J_n)) | C-1.10, Entry 1, Entry 6 | V; physics of the main-line analogue is prior art (DeCamp 2001) |
+| 3 | Laue: integrated intensity pi^2 alpha_n int_0^{2 pi alpha_n t} J_0 | C-1.10, Entry 2b | V to ~5–15 % rms of pi^2 alpha_n; static tail limits it |
+| 4 | Bragg: centre intensity tanh^2(pi alpha_n t); 99 % formation time 0.953 t_tr / alpha_n | Entry 9 | V (centre only) |
+| 5 | Formation order set by abs(J_n(S)), reorderable with S (n = 2, 1, 3 at S = 3) | Entry 1, poster panel c | V |
+| 6 | n = 0 main line: sin^2(pi alpha [1 - (1 - J_0) t]); counter-rotation when J_0 < 0 | Entry 1 | V; CW analogue of DeCamp's dividing layer |
+| 7 | Finite rise: sin^2(pi alpha abs(int_0^1 J_n(S A(t - zeta)) dzeta)) for all n | Entry 5, poster panel d | V, residual ~ (alpha/alpha_ac)^2 |
+| 8 | Satellite width narrows to 0.71 of the finite-depth limit at alpha_n t ~ 0.86 | Entry 4 | V for alpha_n t >= 0.5 (raw) and early times (difference observable) |
+| 9 | Survives Borrmann absorption at mu L ~ 1.4 | Entry 11b | V (complex alpha); common exp(-mu L) ignored |
+| 10 | S calibrated in situ from tau_2 / tau_1 = abs(J_1 / J_2) | Entry 6 | E (algebra; no simulated "measurement" yet) |
+| 11 | Timescales ns, strain ~1e-4, GHz: storage-ring accessible | Entry 6 | E (material constants TO VERIFY) |
+| — | Peak position shifts dynamically | Entry 3 | X — kinematic interference |
+| — | ±n asymmetry is a transit/dynamical effect | Entry 8 | X — first-acoustic-wavelength effect, ∝ 1/alpha_ac |
+| — | "No additional timescale" (session 1, C-1.9) | C-1.10 | X — t_tr / alpha_n exists |
+
+**One-sentence story.** A travelling acoustic wave does not switch satellites
+on; it grows, behind its front, a crystal whose satellite reflections have
+extinction lengths Lambda / abs(J_n(S)) — so each satellite replays its
+static thickness curve in time, Pendellösung in Laue and extinction
+saturation in Bragg, and the order, timing and width of their appearance are
+fixed by the Bessel ladder.
+
+**Open before submission.**
+- Read DeCamp 2001 and the ultrasonic-superlattice papers in full; decide the
+  exact novelty sentence.
+- Verify Lambda_P, kappa and v_T for the chosen reflection with X0h/XOP.
+- Width beyond alpha_n t = 1 (split line), and integrated width observable.
+- Non-resonant analytic line shape for the whole I(eta, t) near each satellite
+  (Entry 4 did the width only).

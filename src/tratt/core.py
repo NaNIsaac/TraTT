@@ -87,7 +87,7 @@ def _phase_factor(phi, zeta: float) -> NDArray[np.complex128]:
 
 
 def solve_laue(
-    alpha: float,
+    alpha: complex,
     eta: ArrayLike = 0.0,
     phi: PhaseField | None = None,
     n_z: int = 512,
@@ -96,8 +96,12 @@ def solve_laue(
 
     Vectorized over ``eta``: the phase profile is shared, so a whole rocking
     curve costs one sweep. Returns the exit amplitudes ``(D0, Dh)``.
+
+    A complex ``alpha`` models the Borrmann part of absorption in a
+    centrosymmetric crystal (``chi_h = chi_hbar``, so the same coupling enters
+    both equations). The common ``exp(-mu z)`` of ``chi_0''`` is still gauged out.
     """
-    if alpha < 0:
+    if np.real(alpha) < 0:
         raise ValueError(f"alpha must be non-negative, got {alpha}")
     if n_z < 1:
         raise ValueError(f"n_z must be >= 1, got {n_z}")
