@@ -603,3 +603,137 @@ fixed by the Bessel ladder.
 - Width beyond alpha_n t = 1 (split line), and integrated width observable.
 - Non-resonant analytic line shape for the whole I(eta, t) near each satellite
   (Entry 4 did the width only).
+
+---
+
+## 2026-09-30 — Entry 13: in-situ S calibration from two periods (claim 10 tested)
+
+**Setup.** `explore/nb/e13_calib.py`. Simulated measurement: centre intensity
+of n = 1 and n = 2, 81 times in [0, 1], multiplied by an unknown gain (0.37)
+and 3 % multiplicative noise. Each trace fitted with c sin^2(pi f t),
+c and f free, multi-start in f. Then S from J_2(S)/J_1(S) = f_2/f_1 on the
+branch S < 3.83. **alpha and the gain are not used.**
+
+**Result.**
+
+| S true | alpha | f_1 fit (theory) | f_2 fit (theory) | S recovered | error |
+|---|---|---|---|---|---|
+| 1.0 | 3 | 1.329 (1.320) | 0.383 (0.345) | 1.094 | +9.4 % |
+| 1.5 | 3 | 1.676 (1.674) | 0.707 (0.696) | 1.518 | +1.2 % |
+| 2.0 | 3 | 1.726 (1.730) | 1.070 (1.059) | 2.018 | +0.9 % |
+| 2.5 | 4 | 1.971 (1.988) | 1.796 (1.784) | 2.519 | +0.8 % |
+
+**Reading.**
+- Claim 10 upgraded from E to **V (in simulation)**: ~1 % on S from periods
+  alone, gain-free and thickness-free, whenever both channels complete at least
+  half an oscillation in the transit (alpha_n >~ 0.5).
+- The S = 1 failure is understood: alpha_2 = 0.35, the n = 2 trace shows
+  only the rising third of one sin^2, and frequency is degenerate with the
+  unknown gain. Rule for an experiment: choose L so that alpha |J_2(S)| >= 0.5.
+- Small systematic bias (+1 %) comes from the alpha/alpha_ac corrections
+  (fitted f_2 slightly above theory in every row).
+
+---
+
+## 2026-09-30 — Entry 14: a closed three-mode, two-layer model of I(eta, t)
+
+**Model.** `explore/nb/e14_threemode.py`. Near channel n keep, in the filled
+layer, the forward beam D0 and two diffracted harmonics: H0 (the main-line
+tail, coupling pi alpha J_0, detuning eta) and Hn (the satellite, coupling
+pi alpha J_{-n} e^{∓ i n q t}, detuning eta - n q). Constant coefficients in the
+rotating frame -> one 3x3 matrix exponential. The unfilled layer is the exact
+2x2 unmodulated Laue matrix over 1 - t. No fit parameter.
+
+Sign convention checked by trying all four (J_{±n}, e^{±inqt}) variants:
+(J_{-n}, e^{+inqt}) is best in every case (e.g. S 0.5, alpha 2, n 1:
+0.085 vs 0.33–0.71 for the others) — consistent with the kinematic expansion in
+`Drive.eta_channel`.
+
+**Result 1 — line shape.** max |I_model - I_TT| / peak over the window
+|eta - n q| < q/2, t in {0.31, 0.50, 0.70, 0.90}:
+
+| S, alpha, n | three-mode | satellite only (no H0) |
+|---|---|---|
+| 1.5, 2, +1 | 0.025–0.105 | 0.062–0.191 |
+| 0.5, 2, +1 | 0.053–0.085 | 0.238–0.267 |
+| 1.5, 1, -1 | 0.019–0.048 | 0.011–0.056 |
+| 3, 2, 2    | 0.017–0.060 | 0.011–0.049 |
+
+The tail mode matters exactly when the satellite is weak relative to the main
+line (J_0 large, J_n small: second row, 0.25 -> 0.07). Residual 5–10 % of the
+peak remains; candidates are D0's own harmonics and the other satellites'
+tails, not included.
+
+**Result 2 — the "peak shift" of Entry 3 is reproduced.** t = 0.3137, S = 1.5,
+peak position minus n q (n = +1 / -1):
+
+| alpha_ac | alpha | three-mode | full TT |
+|---|---|---|---|
+| 20 | 0.5 | +0.201 / +2.857 | +0.222 / +2.828 |
+| 20 | 1.0 | +0.135 / +2.869 | +0.137 / +2.849 |
+| 40 | 0.5 | +1.548 / +1.145 | +1.444 / +1.234 |
+| 40 | 1.0 | +1.474 / +1.154 | +1.354 / +1.252 |
+| 80 | 0.5 | -0.553 / -1.061 | -0.562 / -0.925 |
+| 80 | 1.0 | -0.539 / -0.986 | -0.553 / -0.837 |
+
+Sign flips with alpha_ac are reproduced; values within ~0.15.
+
+**Reading.**
+- The apparent peak shift is now explained quantitatively, not just
+  classified: it is interference between the satellite Hn and the main-line
+  tail H0 + unfilled-layer tail, whose relative phase e^{i n q t} runs with the
+  drive. The same phase produces the acoustic-period micromotion of Entry 2 and
+  is the mechanism behind the first-wavelength asymmetry of Entry 8.
+- So all four "anomalies" found so far (Entries 2, 3, 8, and the +12 % of
+  C-1.10) are one mechanism: coherent overlap of a satellite with the main
+  line's off-Bragg tail. They scale as alpha / alpha_ac (tail over
+  satellite spacing) and vanish for well-separated channels.
+- For the paper: the three-mode model is a compact, closed-form description of
+  the whole time-resolved rocking curve near each satellite, good to ~5–10 %
+  of the peak. The collapse law (claim 1) is its satellite-only limit.
+
+---
+
+## 2026-09-30 — Entry 15: a ramp through the Bessel ladder — overshoot and a dark window at weak coupling
+
+**Hypothesis.** With a finite rise, the depth profile of the modulation runs
+from 0 to S. The local satellite coupling J_n(S A) is not monotonic in S A:
+J_1 peaks at 1.841 and changes sign at 3.832. The accumulated-coupling law
+(Entry 5) then predicts, even at weak coupling where sin^2 is monotonic in
+Theta:
+- S beyond the maximum of J_n: while the ramp is inside the crystal, part of
+  the depth has *stronger* coupling than the final one -> overshoot.
+- S beyond the zero of J_n: positive and negative coupling regions cancel ->
+  the satellite appears, goes dark, and reappears.
+
+**Setup.** `explore/nb/e15_cancel.py` and an inline scan. alpha = 0.5 (weak:
+pi alpha Theta < pi/2 throughout, so no Pendellösung), alpha_ac = 20,
+n = 1, rise = 1 (and 2), centre intensity.
+
+**Result.** Law check: max |I - sin^2(pi alpha Theta_1)| = 0.006–0.013 in all
+four runs. Time series (t = 0 to 2 in steps of 0.2; signed Theta below):
+
+| S | I(t) | signed Theta_1(t) | peak / final |
+|---|---|---|---|
+| 1.5 | 0.00 0.00 0.00 0.03 0.10 0.23 0.38 0.50 0.57 0.59 0.59 | monotone to +0.56 | 1.00 |
+| 2.0 | 0.00 0.00 0.01 0.05 0.15 0.30 0.46 0.57 0.62 0.62 0.62 | monotone to +0.58 | 1.00 |
+| 3.0 | 0.00 0.00 0.01 0.08 0.19 0.29 0.38 0.38 0.32 0.27 0.26 | up to +0.42, back to +0.34 | **1.52** |
+| 5.0 | 0.00 0.00 0.03 0.10 0.10 0.05 0.01 0.02 0.16 0.23 0.24 | +0.20, through 0, to -0.33 | 1.00, with a **dark window** at t ~ 1.2 |
+
+rise = 2, S = 5: peak 0.351 at t = 1.28, final 0.242 (peak/final 0.68^-1 = 1.45).
+
+**Reading.**
+- A 50 % overshoot with no dynamical diffraction involved: at alpha = 0.5
+  the satellite is nearly kinematic. The overshoot comes from the drive's own
+  Bessel ladder sampled across the ramp. This is a *second, independent*
+  overshoot mechanism, distinct from the Pendellösung overshoot (claim 3,
+  first maximum of int J_0 = 1.47x). A measurement must separate them: vary
+  the rise (this one moves and changes size; the Pendellösung one does not,
+  C-1.7(b)) or vary L at fixed S (this one does not depend on alpha).
+- The dark window at S = 5 is a clean, qualitative prediction: a satellite
+  that switches off for part of the ramp transit and switches back on. Its
+  timing is set by where S A(s) = 3.832 sits in the ramp, i.e. by the
+  transducer's rise profile — a possible diagnostic of the rise shape itself.
+- Caveat: S = 3–5 means u0 ~ 0.1–0.15 A for Si 220 (Entry 6 scaling), strain
+  ~2–3e-4 at 2 GHz; large but not absurd. The model has no acoustic
+  nonlinearity or attenuation.
