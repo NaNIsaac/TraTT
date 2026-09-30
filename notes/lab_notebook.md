@@ -770,3 +770,41 @@ The law fails completely at alpha / alpha_ac >~ 0.4, where channels overlap
 | 12 | Three-mode two-layer closed model reproduces I(eta, t) near each satellite to 5–10 % of peak, including apparent shifts | Entry 14 | V |
 | 13 | Ramp through the Bessel ladder: 1.5x overshoot at weak coupling (S = 3); dark window (S = 5) | Entry 15 | V |
 | 14 | Validity: alpha / alpha_ac <= 0.1 -> centre error <= 0.05 | Entry 16 | V |
+
+---
+
+## 2026-09-30 — Entry 17: Bragg satellite width — narrowing stops at the satellite Darwin width
+
+**Hypothesis.** Satellite n in Bragg is a non-absorbing Bragg slab of coupling
+a = pi alpha_n and thickness t (u = (eta - n q)/2):
+|u| < a: R = a^2 sinh^2(s t) / (s^2 + a^2 sinh^2(s t)), s = sqrt(a^2 - u^2);
+|u| > a: sinh -> sin with s = sqrt(u^2 - a^2).
+Thin: t FWHM -> 5.566 (kinematic). Thick: the total-reflection band
+|eta - n q| < 2 pi alpha_n, full width 4 pi alpha_n = 12.6 alpha_n.
+
+**Setup.** `explore/nb/e17_bragg_width.py`. alpha_ac = 20, n_z = 1500,
+eta step 0.03, 39 times, raw I, same `peak_fwhm` on data and theory.
+
+**Result.**
+
+| S, alpha | alpha_n | max rel. dev. (alpha_n t > 0.3) | FWHM / alpha_n at t = 1, sim / th |
+|---|---|---|---|
+| 1.5, 1 | 0.56 | 1.4 % | 18.38 / 18.38 |
+| 1.5, 2 | 1.12 | 6.1 % | 15.18 / 15.20 |
+| 1.5, 4 | 2.23 | 11.5 % (earliest point) | 13.37 / 13.49 |
+
+Example (1.5, 2): alpha_n t = 0.56 / 0.90 / 1.06 gives FWHM 20.1 / 17.9 / 17.2
+against theory 20.5 / 17.9 / 17.2 and the kinematic 5.566/t = 11.1 / 6.9 / 5.8.
+
+**Reading.**
+- In Bragg the width leaves the kinematic 1/t law early (already 2x at
+  alpha_n t ~ 0.5) and **saturates** at the satellite's own Darwin width,
+  approaching 13.4 alpha_n (thick-slab value, a little above the 4 pi alpha_n
+  band because FWHM includes the edges).
+- So in both geometries the width carries the dynamical timescale:
+  Laue — narrowing below the finite-depth limit, minimum 0.71x at
+  alpha_n t ~ 0.86 (Entry 4); Bragg — narrowing stops at t ~ 1/alpha_n.
+- A width measurement in Bragg is therefore a second, independent way to read
+  alpha_n (and with it S, via J_n) from the saturated FWHM / 13.4.
+- Earliest times (alpha_n t < 0.1): data FWHM ~4 — the window-limited /
+  unfilled-crystal fringe problem of C-1.8, as in Laue. Not usable there.
