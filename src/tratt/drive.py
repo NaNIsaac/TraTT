@@ -97,6 +97,28 @@ class Drive:
 
         return _phi
 
+    def steady_phi(self, t: float):
+        """Same-phase steady reference profile, the envelope removed.
+
+        ``phi_full(zeta; t) = S sin(q zeta - q t)``: the diffraction the crystal
+        would show if the acoustic wave had *already* filled it, evaluated at the
+        same drive phase as ``phi(t)``. This is the baseline the formation time is
+        measured against.
+
+        Comparing against a period-*averaged* steady value is wrong: the steady
+        state itself oscillates, so that residual never settles. Comparing at
+        equal phase does settle -- and for ``rise = 0`` it settles exactly, since
+        ``A(t - zeta) = 1`` for all ``zeta`` once ``t >= 1``, making the two
+        profiles identical. ``rise`` deliberately does not enter here.
+        """
+        S, q = self.S, self.q
+
+        def _phi(zeta):
+            zeta = np.asarray(zeta, dtype=np.float64)
+            return S * np.sin(q * zeta - q * t)
+
+        return _phi
+
     def eta_channel(self, n: int) -> float:
         """Center of diffraction channel ``n`` on the ``eta`` axis: ``eta_n = n*q``.
 

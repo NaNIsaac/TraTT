@@ -15,7 +15,7 @@ Layout::
 See DESIGN.md for the physics conventions and the analytic ground truth.
 """
 
-from dftt.core import required_nz, rocking, solve_bragg, solve_laue
-from dftt.drive import Drive
+from tratt.core import required_nz, rocking, solve_bragg, solve_laue
+from tratt.drive import Drive
 
 __all__ = ["Drive", "required_nz", "rocking", "solve_bragg", "solve_laue"]

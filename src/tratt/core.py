@@ -44,7 +44,8 @@ from typing import Callable, Protocol
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-__all__ = ["PhaseField", "ZERO_PHASE", "required_nz", "solve_laue", "solve_bragg", "rocking"]
+__all__ = ["PhaseField", "ZERO_PHASE", "required_nz", "solve_laue", "solve_bragg",
+           "amplitude", "rocking"]
 
 
 class PhaseField(Protocol):
@@ -68,6 +69,19 @@ def required_nz(alpha: float, alpha_ac: float, per_cycle: int = 20) -> int:
     return max(256, int(per_cycle * max(alpha, alpha_ac)))
 
 
+def _state_shape(eta_a: NDArray[np.float64], phase) -> tuple[int, ...]:
+    """Broadcast shape of the integrator state.
+
+    A phase profile that returns a scalar per depth gives the plain ``eta`` shape.
+    A profile that returns an extra leading axis -- e.g. ``Drive.phi`` handed a
+    column of times ``t[:, None]`` -- gives ``(n_t,) + eta.shape``, so one RK4
+    sweep produces a whole time series instead of one snapshot. That matters: the
+    per-step cost is dominated by Python loop overhead, not by array width.
+    """
+    probe = np.asarray(phase(np.float64(0.0)), dtype=np.float64)
+    return np.broadcast_shapes(eta_a.shape, probe.shape)
+
+
 def _phase_factor(phi, zeta: float) -> NDArray[np.complex128]:
     return np.exp(1j * np.asarray(phi(np.float64(zeta)), dtype=np.float64))
 
@@ -89,9 +103,10 @@ def solve_laue(
         raise ValueError(f"n_z must be >= 1, got {n_z}")
 
     eta_a = np.asarray(eta, dtype=np.float64)
-    D0 = np.ones(eta_a.shape, dtype=np.complex128)
-    Dh = np.zeros(eta_a.shape, dtype=np.complex128)
     phase = ZERO_PHASE if phi is None else phi
+    shape = _state_shape(eta_a, phase)
+    D0 = np.ones(shape, dtype=np.complex128)
+    Dh = np.zeros(shape, dtype=np.complex128)
     c = 1j * np.pi * alpha
     h = 1.0 / n_z
 
@@ -128,8 +143,8 @@ def solve_bragg(
         raise ValueError(f"n_z must be >= 1, got {n_z}")
 
     eta_a = np.asarray(eta, dtype=np.float64)
-    R = np.zeros(eta_a.shape, dtype=np.complex128)
     phase = ZERO_PHASE if phi is None else phi
+    R = np.zeros(_state_shape(eta_a, phase), dtype=np.complex128)
     c = 1j * np.pi * alpha
     h = -1.0 / n_z  # backward
 
@@ -150,6 +165,31 @@ def solve_bragg(
     return R
 
 
+def amplitude(
+    alpha: float,
+    eta: ArrayLike,
+    phi: PhaseField | None = None,
+    geometry: str = "laue",
+    n_z: int = 512,
+) -> NDArray[np.complex128]:
+    """Complex diffracted amplitude whose squared modulus is the intensity.
+
+    ``geometry='laue'`` gives ``Dh(L)``; ``'bragg'`` gives ``R(0)``.
+
+    The phase matters for more than bookkeeping. Subtracting the unmodulated
+    solution at the *amplitude* level, ``Dh(S) - Dh(0)``, cancels the part of the
+    crystal the acoustic wave has not reached: in the kinematic limit the
+    integrand becomes ``(e^{-i phi} - 1)``, which is identically zero ahead of the
+    wavefront, so the difference is supported only on the filled depth. The same
+    subtraction done on intensities does not cancel anything.
+    """
+    if geometry == "laue":
+        return solve_laue(alpha, eta, phi=phi, n_z=n_z)[1]
+    if geometry == "bragg":
+        return solve_bragg(alpha, eta, phi=phi, n_z=n_z)
+    raise ValueError(f"geometry must be 'laue' or 'bragg', got {geometry!r}")
+
+
 def rocking(
     alpha: float,
     eta: ArrayLike,
@@ -161,9 +201,4 @@ def rocking(
 
     ``geometry='laue'`` returns ``|Dh(L)|^2``; ``'bragg'`` returns ``|R(0)|^2``.
     """
-    if geometry == "laue":
-        _, Dh = solve_laue(alpha, eta, phi=phi, n_z=n_z)
-        return np.abs(Dh) ** 2
-    if geometry == "bragg":
-        return np.abs(solve_bragg(alpha, eta, phi=phi, n_z=n_z)) ** 2
-    raise ValueError(f"geometry must be 'laue' or 'bragg', got {geometry!r}")
+    return np.abs(amplitude(alpha, eta, phi=phi, geometry=geometry, n_z=n_z)) ** 2
