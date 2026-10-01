@@ -1700,3 +1700,82 @@ only. Bragg was not repeated here (Entry 28 showed the same law; not re-checked
 under non-idealities). Test:
 `tests/test_formation.py::test_transient_only_contrast_set_by_accumulated_coupling`
 (41 pass).
+
+---
+
+## 2026-10-01 — Entry 36: same amplitude, up vs down — the whole rocking curve (mostly a negative result)
+
+**Question (user's review).** At two moments with the same transducer
+amplitude, one on the way up a triangular pulse and one on the way down, the
+depth profile inside the crystal differs. Does the *whole* I(eta) differ, and
+how? Classification fixed in advance:
+1. only relative satellite intensities differ -> history-dependent intensity;
+2. widths / splitting / fringes differ visibly -> history-dependent line shape;
+3. new peak positions or combination structure -> genuinely new.
+Extra test: is each channel's line shape that of a *uniform* crystal with the
+same accumulated coupling Theta_n (Laue slab of thickness 1, coupling
+pi alpha Theta_n)? If yes, the depth history is compressed into one number per
+channel.
+
+**Setup.** `explore/nb/e36_updown.py`; figure `explore/make_updown_figure.py` ->
+`figures/updown_rocking.png`. Laue, S_max = 3, alpha_ac = 40, eta step 0.25 over
+±3.5 q, n_z from the extended rule. Per channel n = -3..3: window integral,
+centre, FWHM, FWHM of the uniform-Theta line, an area-normalised shape
+difference, local maxima; plus a search for peaks > 2 % of the maximum farther
+than q/4 from any channel.
+
+**A first run was confounded and is kept for the record** (`python e36_updown.py
+partial`): with T = 1, A = 0.6 the "up" moment is t = 0.6, when the crystal is
+only 60 % filled. Up-state widths of 11–16 (vs 5.5 down) and apparent "peaks
+outside channels" at ±0.26–0.44 q (alpha = 2, T = 0.5) are the finite-depth sinc
+fringes of a partly filled crystal (C-1.8), not history. **Rule: compare only
+moments at which the crystal is fully filled (t_up = A T >= 1).**
+
+**Result (both moments fully filled).** alpha = 2, T = 2, S A = 2.4
+(t_up = 1.60, t_down = 2.40):
+
+| n | window p up / down | centre up / down | FWHM up / down | uniform-Theta FWHM up / down |
+|---|---|---|---|---|
+| ±1 | 7.6–8.1 / 8.1–8.4 | 0.05–0.06 / 0.06 | 5.25 / 4.25–4.5 | 5.25 / 4.25–4.5 |
+| ±2 | 8.0–8.1 / 4.9–5.2 | **0.99 / 0.08** | 5.75 / 4.25–4.5 | 5.0–5.25 / 4.5 |
+| ±3 | 2.5–2.6 / 6.4 | **0.28 / 0.99** | 7.0–7.5 / 6.0 | 5.75 / 5.25 |
+| 0 | 7.4 / 4.7 | 0.25 / 0.31 | 6.0 / 13.3 | 4.0 / 5.75 |
+
+alpha = 2, S A = 1.8 (t_up = 1.20, t_down = 2.80): n = ±3 window 0.5–0.6 / 6.7,
+centre 0.04 / 0.95; FWHM 8.5–9.25 / 6.0 (uniform 5.75 / 5.25–5.5).
+alpha = 0.5, S A = 1.8: n = ±3 window 0.03–0.04 / 0.76; FWHM 8.5–9.5 / 6.25
+(uniform 5.75 / 5.75); n = ±1 shape difference 0.05–0.07 (identical within noise).
+Peaks outside channels: none, except one at 0.26 q in one case, a sinc fringe of
+the broad n = 0 line (FWHM 11.5).
+
+**Reading — classification.**
+- **Level 1: yes, strongly.** Which satellite is brightest is different on the
+  way up and down at the same transducer amplitude (S A = 2.4: n = ±2 on the
+  way up, n = ±3 on the way down); integrated intensities differ up to ~11x
+  (n = ±3, S A = 1.8).
+- **Level 2: visible, but almost entirely compressible into Theta_n.** The n = 2
+  line is single-peaked on the way up and split around a dark centre on the
+  way down (figure b) — a striking difference, but the uniform-crystal line
+  with the same Theta_2 reproduces both. What Theta_n does *not* capture is
+  modest: up-state high orders are 20–60 % broader than their uniform-Theta
+  line (n = ±3: 7.0–9.5 vs 5.75), and their side lobes are washed out. The
+  reason is where the coupling sits: on the way up, the large amplitudes (which
+  drive high orders) are only in the shallow, most recently filled layer, so the
+  effective diffracting thickness is smaller and the line broader. Width
+  therefore carries one extra piece of information — the depth extent of the
+  coupling — beyond Theta_n.
+- **Level 3: no.** No new peak positions, no combination structure.
+- **Verdict:** "history-dependent satellite intensities (large, order-reordering),
+  with mildly history-dependent line shapes." As the user anticipated, this is
+  the resolved-channel structure at work: each channel is compressed to
+  Theta_n plus a weak width correction. Not a reason to promote "memory" to the
+  main story; it supports the travelling-front formation dynamics as the core.
+
+**Possible follow-up (not done).** Inverse problem: the set {Theta_n} are Bessel
+moments of the distribution of amplitudes inside the crystal,
+Theta_n = int J_n(x) rho(x) dx; the widths add the depth extent. Whether a
+pattern determines the recent drive history (and how uniquely — Bessel moments
+do not fix the depth *order*) is a well-posed question for later.
+
+**Caveats.** One pulse shape (triangle), S_max = 3, Laue only; FWHM on a 0.25 eta
+grid (±0.25 resolution).
