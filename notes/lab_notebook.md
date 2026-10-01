@@ -1539,3 +1539,164 @@ n_z from the extended rule), final / transient maximum of I_1:
 - Unmodelled risks for an experiment: acoustic nonlinearity at S ~ 4 (strain
   ~ S d / Lambda_ac ~ 7e-5 for Si 440 at ~1 GHz — modest), depth-inhomogeneous
   amplitude beyond simple attenuation, transducer ringing.
+
+---
+
+## 2026-10-01 — Entry 35: robustness and failure boundary of the transient-only satellite
+
+**Hypothesis.** The transient-only character (n = 1 bright during formation,
+dark at the end, S_f = j_11) survives realistic departures from the ideal
+envelope A(t - zeta) as long as the *final accumulated coupling*
+Theta_1(final) stays small compared with its transient maximum. Different
+non-idealities should fall into two classes: those that raise the final
+background (break Theta_1(final) = 0) and those that only reshape the transient.
+
+**Setup.** New module `explore/nb/nonideal.py` (`GeneralDrive(Drive)`; no core
+change): phase phi = S A(s, zeta) sin(theta) + m2(s, zeta) sin(2 theta + psi2),
+theta = q (zeta - t), s = t - zeta. Models (one at a time):
+1. attenuation A -> A exp(-gamma zeta); reported as amplitude loss 1 - exp(-gamma) across L;
+2. dispersion: envelope convolved with a Gaussian of width sig1 sqrt(zeta)
+   (diffusive spreading; the precursor ahead of the front is kept — a non-causal
+   tail, acknowledged);
+3. nonlinearity: second harmonic m2 = eps2 zeta S A^2 (grows with distance and
+   with amplitude squared — minimal steepening model), psi2 = 0 and pi/2;
+4. ringing after the ramp: R exp(-x/tau) sin(2 pi f x + psi), x = s - T;
+5. combinations.
+Law: Theta_n(t) = int_0^1 c_{-n}(S A, m2) dzeta, with c the Fourier coefficient
+of exp(-i(a sin + b sin 2)); it reduces to J_n when m2 = 0. Script
+`explore/nb/e35_robust.py` (sections base / atten / disp / nl / ring / combo /
+retune / integ); figure `explore/make_robust_figure.py` ->
+`figures/robust_contrast.png`. Laue, n = 1, alpha_ac = 40, n_z from the extended
+rule (3865), 81 transient samples + 16 over the final acoustic period
+(I_fin = their mean, which avoids the ripple nodes of Entry 25).
+Cases: FAST (alpha 1, T 0.5 — the genuine transient, T < t_tr), MID (alpha 0.5,
+T 2 — Entry 28), STEP (alpha 1, T 0 — control), SLOW (alpha 0.5, T 8 — adiabatic
+reference, not a transient effect).
+
+**Baseline and controls.**
+
+| case | I_max | I_fin | contrast | law err |
+|---|---|---|---|---|
+| FAST | 0.290 | 3.1e-8 | 9.4e6 | 0.014 |
+| MID | 0.539 | 4.8e-10 | 1.1e9 | 0.006 |
+| STEP (control) | **0.0018** | 3.1e-8 | — | 0.002 |
+| SLOW | 0.621 | 4.8e-10 | 1.3e9 | 0.002 |
+| reference S_f = 2.5 (J_1 = 0.50), FAST | 1.000 | 1.000 | 1.0 | 0.008 |
+
+Convergence: doubling n_z leaves I_max and I_fin unchanged to 5 digits (FAST,
+STEP). The step control is not exactly zero during the transit: 0.0018 is the
+acoustic-period tail ghost ~ (alpha/alpha_ac)^2 of Entry 25 — the floor any
+"transient peak" must exceed.
+
+**1. Attenuation (contrast).**
+
+| loss | 1 % | 3 % | 5 % | 10 % | 20 % | 40 % | 60 % |
+|---|---|---|---|---|---|---|---|
+| FAST | 511 | 59 | 22 | 6.1 | 2.0 | 1.0 | 1.0 |
+| MID | 3640 | 395 | 139 | 33 | 7.9 | 2.1 | 1.1 |
+| SLOW | 4200 | 457 | 162 | 39 | 9.4 | 2.5 | 1.4 |
+
+I_max barely changes (FAST even grows, 0.29 -> 0.49 at 20 %); only I_fin rises.
+Law error 0.014–0.016 throughout. STEP control: I_max ~ I_fin at every loss —
+no transient-only peak without a ramp.
+
+**2. Dispersion.** I_fin stays at the floor (3e-8) for every sig1 up to 0.8:
+behind the packet A -> 1 and J_1(S_f) = 0 is untouched. The transient peak grows
+(FAST 0.29 -> 0.99 at sig1 = 0.8). **The STEP control becomes bright too**
+(0.0018 -> 0.035 / 0.12 / 0.34 / 0.97 at sig1 = 0.05 / 0.1 / 0.2 / 0.8): dispersion
+turns the step into a ramp inside the crystal. Law error <= 0.016.
+
+**3. Second harmonic (contrast).**
+
+| eps2 | 0.005 | 0.01 | 0.02 | 0.05 | 0.1 | 0.2 |
+|---|---|---|---|---|---|---|
+| FAST | 7790 | 1920 | 490 | 86 | 25 | 8.7 |
+| MID | 54900 | 13700 | 3460 | 577 | 156 | 47 |
+
+I_fin ~ eps2^2 (3.8e-5 / 1.5e-4 / 6.2e-4 for 0.005 / 0.01 / 0.02). psi2 = pi/2
+gives the same background within 10 % (TT only). With the correct harmonic sign
+(c_{-1}, see corrections) the law holds to 0.015 up to eps2 = 0.2.
+
+**4. Ringing.** In a fixed measurement window (t = 1 + T + 0.5) the background
+rises only when the ringing outlives the transit (tau >= 1: contrast ~2000–2300
+FAST, ~15000–17000 MID); short (tau = 0.05–0.2) or fast (f = 10) ringing is
+averaged away by the depth integral (contrast 1e5–1e6). Once the ringing has died
+(t = 1 + T + 0.5 + 6 tau) the background returns to the floor in every case.
+I_max is unaffected (0.289–0.315).
+
+**5. Combined.** FAST: atten 10 % + ringing R 0.05 -> 5.9; dispersion 0.1 + NL
+0.02 -> 581; atten 5 % + NL 0.02 + ringing 0.02 -> 15. MID: 33 / 3460 / 96.
+Combinations behave like the sum of their Theta_1(final) contributions; the law
+holds to 0.015.
+
+**6. Essence test — local Bessel zero or depth integral?** With attenuation,
+retune S so that int_0^1 J_1(S exp(-gamma zeta)) dzeta = 0 (S* = 4.039 / 4.284 /
+4.958 for 10 / 20 / 40 % loss). Contrast, FAST:
+
+| loss | S = j_11 | S* (fraction of depth with abs(J_1) > 0.05) |
+|---|---|---|
+| 10 % | 6.1 | **1.1e5** (38 %) |
+| 20 % | 2.0 | **2.4e4** (71 %) |
+| 40 % | 1.0 | **3.8e3** (87 %) |
+
+The satellite is dark at the end although J_1 is far from zero over most of the
+crystal: positive and negative coupling regions cancel in the depth integral.
+STEP with S* is also dark at the end (I_max 0.0065–0.089, from the moving front).
+
+**7. Integrated satellite (window abs(eta - q) < q/2), FAST.** Ideal: integrated
+contrast 119 (centre 9.4e6); atten 20 %: 2.5 (centre 2.0); NL 0.05: 67 (86);
+ringing R 0.1: 120 (1e5). The integrated contrast tracks the centre one when the
+satellite background dominates, and is capped at ~120 otherwise by the
+main-line tail inside the window (Entry 2) — not by the satellite. The
+transient-only character is not a centre-intensity artefact.
+
+**Reading.**
+- **One control parameter.** Every non-ideality collapses onto
+  r = abs(Theta_1(final)) / max_t abs(Theta_1(t)), with contrast ~ 1/r^2 over six
+  decades (figure panel a). **30:1 needs r <= 0.18; 10:1 needs r <= 0.32.**
+  Example: FAST, 3 % loss: r = 0.13, predicted 59, measured 58.
+- **Two classes.** Attenuation, second harmonic and long ringing *raise the
+  final background* (they break Theta_1(final) = 0); none of them destroys the
+  transient peak (it stays or grows). Dispersion leaves the background alone and
+  *reshapes* the transient — it even creates one from a step. Nothing tried
+  destroys the transient peak itself.
+- **Failure boundaries in physical terms** (Theta_1(final) ~ 0.78 x loss and
+  ~ 0.38 eps2 for small values): 30:1 holds for loss <= 0.23 max Theta_1 and
+  eps2 <= 0.47 max Theta_1. FAST (max Theta_1 = 0.18): loss <~ 4 %, eps2 <~ 0.09.
+  MID (0.52): loss <~ 12 %, eps2 <~ 0.25. A larger transient Theta (longer ramp,
+  larger alpha) buys robustness — but the longer the ramp, the closer to the
+  trivial adiabatic scan.
+- **The essence is the accumulated coupling, not the Bessel zero.** The Bessel
+  zero is one way to make Theta_1(final) = 0; spatial cancellation is another
+  (section 6). A transient Theta_1 != 0 needs a spatially non-uniform amplitude
+  inside the crystal — a ramp or a dispersed front; a sharp step gives only the
+  floor.
+
+**Corrections to earlier claims.**
+- Claims 22/23 and Entry 34: phrase the condition as Theta_1(final) = 0, not
+  "S_f at a Bessel zero". Entry 34's tolerances (±5 % in S, 10 % loss -> 30:1)
+  were for the MID case; for the fast ramp (T < t_tr) the tolerance is ~3x
+  tighter (loss ~4 %).
+- The step-onset control is not exactly zero during the transit: floor 0.0018
+  at alpha / alpha_ac = 0.025.
+- `nonideal.theta_law` uses c_{-n}: with a second harmonic c_{-n} != ±c_n, and the
+  +n channel reads harmonic -n (as J_{-n} in Entry 14). A first run with c_{+n}
+  gave law errors up to 0.3 at eps2 = 0.2; fixed and checked (error 0.014).
+
+**Realism of the acoustic parameters (all E).**
+- Attenuation of GHz shear waves in Si at room temperature, order 1–5 dB/cm
+  (textbook order, not looked up) -> 0.3–1.7 % amplitude loss over 0.3 mm:
+  inside the 30:1 region even for the fast ramp.
+- Second harmonic eps2 ~ 0.01 (from beta ~ 5, strain ~ 7e-5, k L ~ 250) ->
+  contrast ~2000 (FAST).
+- Bulk-phonon dispersion at Lambda_ac ~ 5 um is negligible; the dispersion
+  model stands in for any front broadening (transducer bandwidth, beam
+  diffraction — not modelled).
+- Ringing amplitude and decay are transducer-specific.
+
+**Caveats.** All non-idealities are phenomenological; acoustic diffraction,
+mode conversion and lateral inhomogeneity are absent. psi2 != 0 is checked by TT
+only. Bragg was not repeated here (Entry 28 showed the same law; not re-checked
+under non-idealities). Test:
+`tests/test_formation.py::test_transient_only_contrast_set_by_accumulated_coupling`
+(41 pass).

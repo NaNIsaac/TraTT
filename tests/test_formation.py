@@ -217,3 +217,32 @@ def test_history_law_transient_only_and_phase_coded_packet():
     I = rocking_cube(alpha, d, np.array([d.q, 2 * d.q]), t, n_z=1600)
     assert I[1, 0] < 1e-3 and I[0, 0] > 0.1 and I[2, 0] > 0.1, I[:, 0]   # n = 1 cancels, revives
     assert I[1, 1] > 0.07, I[:, 1]                                          # n = 2 adds meanwhile
+
+
+def test_transient_only_contrast_set_by_accumulated_coupling():
+    """Non-ideal drives (attenuation, second harmonic) raise the final n = 1 background
+    exactly as the accumulated-coupling law says (channel +q reads harmonic -1), and
+    with attenuation it is the depth integral of J_1, not a local Bessel zero, that
+    must vanish: retuning S restores the transient-only contrast (notebook Entry 35)."""
+    import sys
+    from pathlib import Path
+
+    from scipy.optimize import brentq
+    from scipy.special import jn_zeros, jv
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "explore" / "nb"))
+    from nonideal import GeneralDrive, ramp, theta_law
+
+    Z, alpha, aac, g = jn_zeros(1, 1)[0], 1.0, 40.0, -np.log(0.8)
+    t = np.array([0.9937, 2.0037])                     # transient peak region, final state
+    nz = required_nz(alpha, aac, S=1.6 * Z, eta_max=2 * np.pi * aac)
+    for kw in (dict(gamma=g), dict(eps2=0.1)):
+        d = GeneralDrive(S=Z, alpha_ac=aac, amp=ramp(0.5), **kw)
+        I = rocking_cube(alpha, d, np.array([d.q]), t, n_z=nz)[:, 0]
+        law = np.sin(np.pi * alpha * np.abs(theta_law(d, 1, t))) ** 2
+        assert np.allclose(I, law, atol=0.02), (kw, I, law)
+    z = np.linspace(0, 1, 2001)
+    Sst = brentq(lambda S: np.trapezoid(jv(1, S * np.exp(-g * z)), z), 3.5, 6.0)
+    d = GeneralDrive(S=Sst, alpha_ac=aac, amp=ramp(0.5), gamma=g)
+    I = rocking_cube(alpha, d, np.array([d.q]), t, n_z=nz)[:, 0]
+    assert I[1] < 1e-3 * I[0], I
