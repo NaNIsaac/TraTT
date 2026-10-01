@@ -977,3 +977,69 @@ curve I(eta, t)" with its analytic counterpart next to it.
   (X0h, Entry 20); c44 and transducer feasibility remain estimates. The example
   changes to Si 440 at 17–30 keV, ~1–2 GHz (Entry 20).
 - Claim 12 (three-mode model): add the map, 6.5 % max deviation at ratio 0.05.
+
+---
+
+## 2026-10-01 — Entry 23: at the dark point the satellite is not gone — fringes flow inward in eta
+
+**Question (from the user's review).** At alpha_n t = 1 the centre is dark.
+Does the satellite vanish, or is its intensity redistributed in reciprocal
+space? And how do the side lobes move?
+
+**Setup.** `explore/nb/e23_dark.py`. Laue, n = 1, (S, alpha, alpha_ac) =
+(1.5, 3, 60) and (1.5, 2, 40) (ratio 0.05). eta step 0.1 over ±2.5 q,
+39 times. Tracked: centre I(nq), window integral p (|eta - nq| < q/2), total
+over all eta, and the highest local maximum on each side of nq. Theory: the
+Laue slab line shape of the satellite, same peak finder.
+
+**Result (case 1.5, 3, 60; alpha_1 = 1.674).**
+
+| alpha_n t | centre (th) | p / (pi^2 alpha_n) (th) | side lobes (eta - nq) t, sim (th) |
+|---|---|---|---|
+| 0.341 | 0.772 (0.770) | 1.439 (1.452) | — (single peak) |
+| 0.425 | 0.946 (0.945) | **1.450** (1.453) max | -8.41 / +8.18 (±8.58) |
+| 0.508 | **0.999** (0.999) max | 1.335 (1.331) | -8.16 / +7.91 (±8.40) |
+| 0.843 | 0.220 (0.224) | 0.674 (0.677) | -7.09 / +7.02 (±7.26) |
+| 0.927 | 0.050 (0.052) | **0.669** (0.684) min | -6.96 / +6.66 (±6.85) |
+| 1.010 | **0.002** (0.001) dark | 0.755 (0.774) | -6.74 / +6.42 (±6.36) |
+| 1.262 | 0.542 (0.536) | 1.188 (1.198) | -4.20 / +4.17 (±4.23) |
+| 1.345 | 0.787 (0.782) | 1.252 (1.263) | -2.95 / +2.84 (±3.06) |
+| 1.513 | 0.998 (0.998) | 1.153 (1.179) | -12.35 / +12.05 (±12.18) — next pair |
+
+Second case (1.5, 2, 40) agrees to the same level; at its dark point
+(alpha_n t = 1.008): centre 0.001, p = 0.751 pi^2 alpha_n (th 0.771),
+lobes -6.46 / +6.28 (th ±6.37).
+
+**Reading.**
+1. **The satellite does not vanish at the dark point.** The centre is at
+   0.1–0.2 % of its maximum while the window integral is 52 % of its maximum
+   (0.755 / 1.450). The intensity sits in two side lobes at
+   (eta - nq) t ~ ±6.4. *Formation defined as "growth of the peak intensity" is
+   the wrong definition*: the peak blinks, the satellite does not.
+2. **The line shape evolves by inward flow of Pendellösung fringes.** The
+   maxima of the Laue slab sit where t sqrt(a^2 + u^2) = (k + 1/2) pi, i.e.
+   approximately (eta - nq) t = 2 pi sqrt((k + 1/2)^2 - (alpha_n t)^2). As alpha_n t
+   grows, each fringe k moves toward nq and merges into the centre at
+   alpha_n t = k + 1/2 — **each centre maximum is the arrival of a fringe**,
+   and the dark point is the moment between arrivals, when the next fringe
+   pair is still at ±6.4 / t. The fringe pair at 1.345 (±3.0) merges at ~1.43,
+   and a new pair appears from outside (±12.2 at 1.513). So it is not a
+   bifurcation of the central peak: it is a conveyor of fringes.
+   The approximate formula gives 6.97 at the dark point vs 6.4–6.7 measured
+   (the 1/(a^2 + u^2) envelope shifts the true maxima inward); the exact line
+   shape (theory column) matches the simulation to ~5 % in (eta - nq) t.
+3. **Integrated and centre clocks are out of phase.** Integral maxima at
+   2 pi alpha_n t = zeros of J_0 (alpha_n t = 0.383, 1.377), centre maxima at
+   alpha_n t = 0.5, 1.5: the integral leads by ~1/8 of a period, and its
+   minimum (0.88–0.93) comes *before* the centre's zero (1.0). The integral
+   oscillation is damped (J_0 envelope ~ (alpha_n t)^(-1/2)), the centre's is not.
+   Same period, different phase and damping — so "the formation time" depends
+   on the observable, and the two must not be mixed.
+4. The total over all eta is dominated by the n = 0 channel and the main-line
+   tail; it is reported in the script output but carries no satellite-specific
+   message.
+
+**Measurement artefact.** For alpha_n t < 0.4 the side-lobe finder returns
+values near 0 — it catches the shoulder of the central peak (tail asymmetry)
+rather than the first sinc side lobe at ±8.99 / t. Rows before the first
+fringe arrival are therefore marked "single peak".
