@@ -1137,3 +1137,48 @@ alpha_ac and lands on a node; with alpha_ac = 60.5, I(1) = 1.2e-3.
   (alpha_1 = 0.37 at S - Z = -0.3, not yet one oscillation) to pure t^2 growth.
 - Not to be called critical slowing-down: nothing collective, just
   tau_1 ~ 1 / |S - Z| near a simple zero (J_1 linear in S - Z).
+
+---
+
+## 2026-10-01 — Entry 26: regime map — accuracy and clock are separate knobs
+
+**Idea (user's review).** In the dimensionless model v_s enters only through
+t_tr. Two ratios should then control two different things:
+x = Lambda_ac / Lambda_P = alpha / alpha_ac (how clean the filled-depth mapping
+is) and alpha_n = L |J_n| / Lambda_P (how many satellite Pendellösung turns fit
+in the transit, i.e. the clock in units of t_tr).
+
+**Setup.** `explore/make_regime_map.py` -> `figures/regime_map.png`. Laue,
+n = 1, S = 1.5 fixed; 7 x 7 log grid x in [0.0125, 0.4], alpha_1 in [0.25, 4];
+alpha = alpha_1 / J_1, alpha_ac = alpha / x; 121 times; colour = max_t of
+|I(q, t) - sin^2(pi alpha_1 t)|.
+
+**Result.** Error by column (x), all seven alpha_1 rows:
+
+| x | 0.0125 | 0.022 | 0.040 | 0.071 | 0.126 | 0.22 | 0.40 |
+|---|---|---|---|---|---|---|---|
+| range over alpha_1 | 0.005–0.013 | 0.007–0.019 | 0.012–0.035 | 0.015–0.062 | 0.030–0.113 | 0.050–0.193 | 0.18–0.40 |
+| typical | 0.01 | 0.02 | 0.03 | 0.06 | 0.10 | 0.18 | 0.36 |
+
+**Reading.**
+- **The error is set by x alone**, to a good approximation
+  max error ~ 0.9 x = 0.9 Lambda_ac / Lambda_P, with no systematic trend in
+  alpha_1 from 0.25 to 4 turns. The two knobs separate: x fixes how faithful the
+  mapping is; alpha_n fixes what the satellite does in time.
+- Physically: at fixed material (v_s fixed) the drive frequency moves x only —
+  higher f, cleaner mapping — while the clock tau_n = Lambda_P / (v_s |J_n|)
+  does not depend on f at all. The thickness L moves alpha_n only. S moves
+  alpha_n only (through J_n). So an experiment can tune cleanliness and clock
+  independently, which promotes the design rule of Entry 20 to a regime
+  statement.
+- Scatter below the typical value comes from near-integer alpha_ac cells
+  (e.g. alpha_1 = 0.25, x = 0.22 has alpha_ac = 2.0: error 0.050 instead of
+  ~0.18) — the finite-slab orthogonality of integer alpha_ac suppresses the
+  tail at the satellite centre. Real crystals will not sit on integers; quote
+  the typical value.
+- This revises Entry 16's remark that the error "grows slowly with alpha at
+  fixed ratio": at fixed S it does not; the Entry 16 trend came from
+  alpha_1 and the integer-alpha_ac structure varying together.
+- Caveat: stroboscopic model. Any genuine dependence on v_s beyond t_tr
+  (e.g. the X-ray response time, quasi-static breakdown, handoff 7.5) is outside
+  this map by construction.
