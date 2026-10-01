@@ -1499,3 +1499,43 @@ can dominate it, equal strains give different patterns on the way up and down,
 and a pi-coded packet can erase and restore a satellite. The step-onset
 results (temporal Pendellösung, collapse, fringe flow) are the special case
 of a record that is a single step.
+
+---
+
+## 2026-10-01 — Entry 34: is the transient-only satellite real? Robustness and honest framing
+
+User's question: should the transient-only peak be claimed as existing?
+Quick checks (inline run, Laue, alpha = 0.5, alpha_ac = 40, ramp T = 2,
+n_z from the extended rule), final / transient maximum of I_1:
+
+| perturbation | transient max | final | final / max |
+|---|---|---|---|
+| none (S_f = j_11) | 0.537 | 0.0000 | 0.000 |
+| S_f off by ±2 % | 0.541 / 0.534 | 0.0024 / 0.0023 | 0.004 |
+| S_f off by ±5 % | 0.546 / 0.528 | 0.0152 / 0.0138 | 0.03 |
+| acoustic amplitude loss 5 % across L | 0.533 | 0.0039 | 0.007 |
+| loss 10 % | 0.528 | 0.0161 | 0.03 |
+| loss 20 % | 0.517 | 0.0663 | 0.13 |
+
+(attenuation modelled as S e^{-gamma zeta} with S at the zero at the entrance.)
+
+**Verdict.**
+- Within the model it is real and robust: full TT, law-exact, both
+  geometries, and a > 30:1 transient-to-final contrast survives a 5 % error in S
+  or 10 % acoustic loss across the crystal. S can be set to ~1 % with the
+  period-ratio calibration (Entry 13).
+- Its novelty must be framed carefully. For a slow ramp (T >> t_tr) it is just
+  the steady-state Bessel ladder sampled on the way to a zero — any amplitude
+  sweep shows n = 1 at intermediate S. What the transient adds is (i) the
+  t_tr memory (the satellite reports the drive t_tr / 2 late and smoothed),
+  (ii) the fast-ramp regime (T <~ t_tr) where it is a flash set by the ramp
+  profile inside the crystal, and (iii) that a step onset gives *exactly zero*
+  at all times — so the peak is a signature of the amplitude gradient inside the
+  crystal, not of the final state.
+- Claim it as: "the steady-state pattern does not determine the transient
+  one: an order forbidden at the final amplitude can be the brightest line
+  during formation", with the slow-ramp limit stated as the trivial
+  (adiabatic) end of it. Do not claim it as a new kind of peak.
+- Unmodelled risks for an experiment: acoustic nonlinearity at S ~ 4 (strain
+  ~ S d / Lambda_ac ~ 7e-5 for Si 440 at ~1 GHz — modest), depth-inhomogeneous
+  amplitude beyond simple attenuation, transducer ringing.
