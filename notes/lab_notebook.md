@@ -1043,3 +1043,35 @@ lobes -6.46 / +6.28 (th ±6.37).
 values near 0 — it catches the shoulder of the central peak (tail asymmetry)
 rather than the first sinc side lobe at ±8.99 / t. Rows before the first
 fringe arrival are therefore marked "single peak".
+
+---
+
+## 2026-10-01 — Entry 24: one front, three satellites at different stages
+
+`explore/make_ladder_map.py` -> `figures/poster_ladder_map.png`. Laue, S = 3
+(J_1 = 0.339, J_2 = 0.486, J_3 = 0.309), alpha = 3, alpha_ac = 60 (ratio 0.05),
+alpha_n = 1.02 / 1.46 / 0.93. I(eta, t) in ±40 around each n q on a shared
+colour scale and t axis; centre cuts against sin^2(pi alpha |J_n| t).
+
+At the two marked moments (centre value, window integral over ±40):
+
+| t | n = 1 | n = 2 | n = 3 |
+|---|---|---|---|
+| 0.344 (n = 2 at its maximum) | 0.788, 13.7 | **0.996**, 17.0 | 0.687, 11.8 |
+| 0.684 (n = 2 dark) | 0.674, 8.0 (falling) | **0.000**, 8.8 | 0.807, 8.4 (rising to max) |
+
+**Reading.**
+- Under one acoustic front the three orders sit at different stages of the
+  same evolution: at t = 0.684 the n = 2 line is split around a dark centre
+  while n = 3 is a single narrow line approaching its maximum and n = 1 is
+  past its maximum. This is tau_n = Lambda_P / (v_s |J_n(S)|) shown in one
+  picture, and it is a stronger statement than the formation-order plot:
+  the orders are not just ordered in time, they are in *different line-shape
+  phases* simultaneously.
+- The dark n = 2 line still holds 52 % of its maximal window integral
+  (8.8 / 17.0) — Entry 23 again, now with neighbours as an internal reference.
+- n = 3 centre runs ~3 % below its law near its maximum (0.96 vs 1.00);
+  n = 3 is closest to the edge of the eta grid used for the other orders'
+  tails and is the weakest; not investigated.
+- Poster candidate: this figure, or panel d of it, could replace panel c of
+  `poster_mapping.png`.
