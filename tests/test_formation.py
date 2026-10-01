@@ -279,3 +279,41 @@ def test_two_domains_cancel_at_centre_but_add_in_the_integral():
         res[key] = (I[np.argmin(np.abs(eta - q))], np.trapezoid(I - I0, eta))
     assert res["both"][0] < 1e-4 * res["one"][0]                       # centre cancels
     assert abs(res["both"][1] / (res["one"][1] + res["two"][1]) - 1) < 0.03   # integrals add
+
+
+def test_chirp_landau_zener_plateau_and_phase_wall_integral():
+    """Dephasing lifts satellite extinction (notebook Entries 38-39):
+    (a) a spatially chirped acoustic wave gives a satellite plateau of Landau-Zener height
+        1 - exp(-2 pi Gamma), Gamma = (pi alpha J_1)^2 / (q0 beta);
+    (b) a pi acoustic phase wall leaves the kinematic (Parseval) integral unchanged but
+        raises the dynamical integral."""
+    import sys
+    from pathlib import Path
+
+    from scipy.special import jv
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "explore" / "nb"))
+    from qmod import PhaseDrive, kinematic, phase_wall, spatial_chirp
+
+    S, aac, t = 1.5, 40.0, 1.5037
+    q0 = 2 * np.pi * aac
+    alpha, beta = 2.0, 0.2
+    eta = np.arange(0.85 * q0, 1.15 * q0, 0.2)
+    nz = required_nz(alpha, aac * 1.1, S=S, eta_max=eta.max())
+    d = PhaseDrive(S=S, alpha_ac=aac, theta_fn=spatial_chirp(q0, beta))
+    I = rocking(alpha, eta, phi=d.phi(t), n_z=nz) - rocking(alpha, eta, n_z=nz)
+    G = (np.pi * alpha * abs(jv(1, S))) ** 2 / (q0 * beta)
+    mid = np.abs(eta - q0) < 0.3 * q0 * beta / 2
+    assert abs(np.median(I[mid]) - (1 - np.exp(-2 * np.pi * G))) < 0.06
+
+    eta = np.arange(0.6 * q0, 1.4 * q0, 0.2)
+    nz = required_nz(alpha, aac, S=S, eta_max=eta.max())
+    I0 = rocking(alpha, eta, n_z=nz)
+    K0 = kinematic(alpha, PhaseDrive(S=0.0, alpha_ac=aac), eta, t)
+    p, k = {}, {}
+    for dphi in (0.0, np.pi):
+        d = PhaseDrive(S=S, alpha_ac=aac, theta_fn=phase_wall(q0, dphi, t - 0.3))
+        p[dphi] = np.trapezoid(rocking(alpha, eta, phi=d.phi(t), n_z=nz) - I0, eta)
+        k[dphi] = np.trapezoid(kinematic(alpha, d, eta, t) - K0, eta)
+    assert abs(k[np.pi] / k[0.0] - 1) < 0.02     # Parseval: phase wall changes nothing kinematically
+    assert p[np.pi] / p[0.0] > 2.0               # dynamically the integral more than doubles

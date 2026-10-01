@@ -1867,3 +1867,304 @@ the wall position selects which order goes dark.
 time: the wall becomes a ramp, which leaves the centre cancellation intact but
 changes the profile). No acoustic reflection at the wall (same material). S2 =
 5.33 is a large drive (strain ~1e-4 for Si 440 at ~1 GHz, E).
+
+---
+
+## 2026-10-01 — Entry 38: chirped acoustic waves — a Landau–Zener plateau, no focusing
+
+**Goal (user, overnight exploratory brief).** Look for transient diffraction
+phenomena that are *not* centre-intensity changes, ordinary Pendellösung,
+finite-depth sinc fringes, adiabatic Bessel-ladder scans, or Parseval-conserving
+redistributions. Change the local acoustic wavevector instead of the amplitude.
+
+**Framework.** `explore/nb/qmod.py`: `PhaseDrive(Drive)` with an arbitrary
+acoustic phase theta(zeta, t) (phi = S A(s) sin theta, no core change) and
+`kinematic()`, the first-Born line with the full e^{-i phi} (all harmonics) —
+the control for "is it just a Fourier transform". Sanity: PhaseDrive with
+uniform q equals Drive to 7e-15; kinematic equals TT to 0.04 % at alpha = 0.02.
+
+**Two bounds that frame everything below (derived before running).**
+In the kinematic limit the satellite amplitude is the Fourier transform of the
+coupling profile c(zeta) = (e^{-i phi})_n. (i) The peak obeys
+|int c dzeta|^2 <= (int |c| dzeta)^2: **a uniform phase maximises the peak** — no
+acoustic profile can "focus" a satellite kinematically. (ii) The integral is
+fixed by Parseval, 2 pi (pi alpha)^2 int |c|^2 dzeta, and does not depend on any
+phase profile. So qualitatively new *spectral weight* can only be dynamical.
+
+**A1 — spatial chirp** q(zeta) = q0 [1 + beta (zeta - 1/2)] (graded medium at fixed
+frequency; the front is kept at zeta = t, an approximation), fully filled crystal
+(t = 1.5), n = 1, S = 1.5 (J_1 = 0.558), alpha_ac = 40. `explore/nb/e38_chirp.py A1`.
+Prediction: the local resonance sweeps at kappa = d eta_c / d zeta = q0 beta; the
+satellite is a two-level Landau–Zener crossing with coupling a = pi alpha J_1, so a
+flat plateau of height P = 1 - exp(-2 pi Gamma), **Gamma = a^2 / kappa**, over the
+swept range (kinematic: 2 pi Gamma).
+
+| alpha | beta | Gamma | LZ P | TT plateau | TT integral (uniform) | kinematic integral |
+|---|---|---|---|---|---|---|
+| 0.05 | 0 – 0.4 | — | — | — | **0.048 for every beta** | 0.048 |
+| 0.5 | 0.2 | 0.015 | 0.092 | 0.096 | 4.58 (3.70) | 4.79 |
+| 1 | 0.2 | 0.061 | 0.319 | 0.327 | 16.0 (6.62) | 19.2 |
+| 1 | 0.4 | 0.031 | 0.175 | 0.181 | 17.4 (6.62) | 19.1 |
+| 2 | 0.1 | 0.49 | 0.954 | 0.918 | 25.6 (10.1) | 76.7 |
+| 2 | 0.2 | 0.24 | 0.785 | 0.754 | 40.0 (10.1) | 76.7 |
+| 2 | 0.4 | 0.12 | 0.536 | 0.563 | 53.5 (10.1) | 76.6 |
+| 4 | 0.1 | 1.96 | 1.000 | 0.987 | 33.1 (22.9) | 307 |
+| 4 | 0.4 | 0.49 | 0.954 | 0.910 | 94.0 (22.9) | 306 |
+
+Figure `figures/dephasing_extinction.png` (a: alpha = 2 lines; b: plateau vs Gamma).
+
+- Kinematic limit: the chirp only spreads the line; the integral is conserved
+  exactly (0.048 for all beta) — Parseval, as bound (ii) says.
+- **Dynamical: the chirp raises the integrated satellite intensity** by up to
+  5.3x (alpha = 2) and 4.1x (alpha = 4) over the uniform crystal, towards (never
+  above) the kinematic value: the chirp removes extinction. The plateau height
+  follows Landau–Zener with no fit for Gamma <~ 0.3. For Gamma >~ 0.5 the points
+  scatter below the curve: the crossing is not complete inside the slab when
+  q0 beta is not >> 2 pi alpha J_1 (e.g. alpha = 4, beta = 0.05: kappa = 12.6 vs
+  2a = 14), and the line keeps Pendellösung structure.
+- **Classification: DYNAMICAL** (kinematic model off by up to 9x in the
+  integral). Dimensionless control: Gamma = (pi alpha J_n)^2 / (n q0 beta) =
+  (sweep length of the resonance) / (satellite extinction length)^2 scale — the
+  "detuning change over one extinction length vs Darwin width" the user asked
+  for. Orders differ: Gamma_n ~ J_n^2 / n, so a chirp can be adiabatic for one
+  order and diabatic for another.
+- **Precedent (not verified in the literature tonight):** this is the
+  Landau–Zener / Penning–Polder physics of X-rays in bent or strain-graded
+  crystals (Takagi; Chukhovskii & Petrashen — names from memory). The acoustic
+  version only replaces the bend by a chirp and the coupling by pi alpha J_n(S).
+  Expect it to be known in kind.
+
+**A2 — frequency chirp at the transducer** (theta = -Psi(t - zeta),
+Psi' = q0 (1 + b s)): `e38_chirp.py A2`. The satellite centroid tracks the mean local
+wavevector over the filled depth to ±1–3 in eta for b = 0.1, 0.3, alpha = 0.5 and 2
+(e.g. alpha 0.5, b 0.3, t = 1.5: +75.7 measured vs +75.7 predicted); the line
+broadens to the swept range once the crystal is full. **Kinematic, ordinary**: a
+moving satellite that maps the chirp.
+
+**E — focusing search** (theta = q0 (zeta - t) + c2 (zeta - 1/2)^2 + c3 (zeta - 1/2)^3,
+13 x 9 grid, `e38_chirp.py E`): at alpha = 0.05, 0.5, 1 the best peak/integral and the
+narrowest FWHM are at c2 = c3 = 0 — the uniform profile, exactly as bound (i) says.
+At alpha = 2 a cubic phase raises peak/integral by 1.33x and narrows the envelope
+from 16.0 to 11.9 — but only because the uniform alpha = 2 line at t = 1.5 is past its
+first Pendellösung zero (split); its value (0.086) stays below what a uniform
+crystal reaches at its own best thickness (0.153 at alpha = 1). **No focusing.**
+
+---
+
+## 2026-10-01 — Entry 39: acoustic domain walls — q-jump and phase jump
+
+**Setup.** `explore/nb/e39_walls.py`. The transducer emits q1 (phase 0) for one
+transit, then q2 (phase dphi); for t in [1, 2] the wall is at depth zeta_b = t - 1.
+Controls: the **incoherent** sum of the two sides alone (other side unmodulated),
+the **kinematic** model, and the wall **smoothed** over one and three acoustic
+wavelengths. n = 1 unless stated, S = 1.5, alpha_ac = 40, static tail subtracted.
+
+**B — q-wall at depth 0.5, q2 = q1 + 2 pi dc.**
+
+| alpha | dc | npk both / incoh. / kin | integral both / incoh. | shape dev. TT vs kin |
+|---|---|---|---|---|
+| 0.05 | 0.1 – 10 | 1–4 / 1–2 / same as TT | 0.048 / 0.047–0.048 | <= 0.001 |
+| 0.5 | 0.1 | 1 / 1 / 1 | 3.68 / 4.43 | 0.06 |
+| 0.5 | 4 | 4 / 2 / 4 | 4.45 / 4.44 | 0.01 |
+| 2 | 0.1 | 8 / 3 / 1 | **9.84 / 25.3** | 1.36 |
+| 2 | 1 | 6 / 3 / 3 | 16.5 / 24.9 | 0.76 |
+| 2 | 2 | 7 / 4 / 3 | 19.9 / 25.4 | 0.38 |
+| 2 | 4 | 5 / 4 / 4 | 23.6 / 25.5 | 0.26 |
+| 2 | 10 | 7 / 7 / 2 | 25.6 / 25.6 | 0.34 |
+
+Smoothing over one wavelength changes nothing (e.g. alpha 2, dc 1: 16.48 vs 16.54).
+- Kinematic: the line differs from the incoherent sum only by the coherent cross
+  term between the two halves (centre doubled when dc -> 0, i.e. a thicker
+  crystal); TT = kinematic. Ordinary Fourier optics.
+- Dynamical (alpha = 2): when the two domains share a resonance (dc small) the
+  coherent crystal is extinguished (9.8) far below two independent halves (25.3);
+  detuning the domains by more than the satellite Darwin width (2 pi dc >~ 4 pi
+  alpha_1 ~ 14) decouples them and the integral returns to the incoherent sum.
+  **Same physics as A1** — dephasing lifts extinction — with a step instead of a
+  gradient.
+- Moving wall (`Bt`, dc = 1, alpha = 2): the integral rises from 9.8 (wall at an
+  end) to 16.5 (wall in the middle) and back; the envelope width alternates
+  15.9 / 5.4 / 15.5 / 5.4 / 15.9 as the effective sub-crystal thickness passes
+  through the first Pendellösung maximum. Non-monotonic but explained by the
+  sub-crystal thicknesses. No peak between the two satellite structures, no
+  avoided crossing, no anomalously narrow feature.
+
+**C — phase wall (same q), integrated satellite vs dphi, wall at depth 0.5.**
+
+| alpha | n | dphi = 0 | pi/4 | pi/2 | 3pi/4 | pi | 3pi/2 | kinematic (all dphi) |
+|---|---|---|---|---|---|---|---|---|
+| 0.05 | 1 | 0.048 | 0.048 | 0.048 | 0.048 | 0.048 | 0.048 | 0.048 |
+| 0.5 | 1 | 3.70 | 3.77 | 3.96 | 4.14 | 4.19 | 3.94 | 4.78–4.83 |
+| 2 | 1 | 10.1 | 10.8 | 12.1 | 13.0 | 13.4 | 11.8 | 76.4–77.2 |
+| 2 | 2 | 6.49 | 7.88 | **9.45** | 8.09 | **6.50** | 9.43 | 13.3–13.7 |
+| 2 | 3 | 0.85 | 0.88 | 0.88 | 0.85 | 0.93 | 0.98 | 0.89–1.01 |
+
+**Wall-depth scan, dphi = pi, n = 1** (`Cz`; figure panel c): at alpha = 2 the
+integrated satellite rises to **2.58x** the no-wall value at zeta_b = 0.3 and 0.7,
+with a dip to 1.33x at 0.5; at alpha = 0.5 at most 1.17x. The centre follows
+|Theta_1| = alpha_1 |1 - 2 zeta_b| (Entry 30 law): maxima 0.97 at zeta_b ~ 0.28, 0.72,
+zeros at 0.05, 0.5, 0.95.
+Is it just two independent sub-crystals? Integral with the wall vs the sum of the
+two sides alone: 23.2 / 20.0 (zeta_b 0.2), 26.1 / 23.3 (0.3), **13.4 / 25.7 (0.5)**,
+26.1 / 23.2 (0.7). Not an incoherent sum: at zeta_b = 0.5 the two halves rotate in
+opposite senses by equal angles and near resonance the second half undoes the
+first (a Pendellösung "echo"), suppressing the satellite to half of two
+independent halves; off the midpoint the wall adds 12–16 % over independence.
+Smoothing: one wavelength leaves the effect (26.1 at zeta_b 0.3; 13.7 at 0.5);
+three wavelengths weaken it (22.2; 11.8).
+
+- **Odd / even:** the wall acts through n dphi. n = 2 is blind to a pi wall
+  (6.50 vs 6.49) and maximally affected by pi/2 (1.46x); n = 1 is maximally
+  affected by pi. n = 3 (alpha_3 = 0.12, kinematic) does not change.
+- **Classification: DYNAMICAL** (kinematic integral independent of dphi). Needs
+  alpha_n >~ 0.5.
+- **Precedent (not verified tonight):** an acoustic phase wall is an "acoustic
+  stacking fault / antiphase boundary" for the satellite with fault phase
+  n dphi; stacking-fault contrast in dynamical X-ray diffraction (fringes vs
+  fault depth, changed integrated intensity) is classic. Expect known in kind;
+  the acoustic, order-selective, movable version may not be.
+- No localised "defect-state" line was found: the wall produces doublets and
+  fringe changes, not a new narrow feature at a new eta.
+
+---
+
+## 2026-10-01 — Entry 40: coarse automated anomaly search
+
+**Setup.** `explore/nb/e40_search.py`, results `explore/nb/e40_search.json`,
+figure `explore/make_search_figure.py` -> `figures/search_summary.png`.
+250 cases = 25 profiles x alpha {0.05, 0.5, 1, 2, 4} x S {1, 2.5}, n = 1, filled
+crystal (t = 1.5). Profiles: spatial chirp beta {0.02–0.4}; q-wall dc {0.3, 1, 2, 4}
+at depth {0.25, 0.5, 0.75}; phase wall {pi/2, pi} at the same depths; amplitude
+ramp T {0.3, 1}. Each case: full-TT and kinematic satellite lines (static
+subtracted) reduced to features (peak count, envelope FWHM, peak, integral,
+centroid, skew, centre) and scored against the uniform-q control at the same
+(alpha, S): topology change, |ln integral ratio|, the dynamical part of it
+(TT minus kinematic), narrowing, concentration (peak / integral).
+
+**Result.**
+- **Top 15 by dynamical change of spectral weight: all are chirps, q-walls or
+  phase walls at alpha = 2–4**, integral 3.5–6.9x the uniform control while the
+  kinematic integral changes by 0.000–0.036 (log). One mechanism (Entries 38–39).
+- **Top by topology / narrowing / concentration:** (i) strong chirps (beta = 0.4)
+  give 13–23 peaks and an 81-wide envelope — at every alpha including 0.05, i.e.
+  Fourier spreading; (ii) "narrowing" cases (ramp T = 1 at alpha 4: FWHM 8.6 vs
+  32.4; q-wall dc 4 at alpha 4: 6.1 vs 32.4; phase wall pi/2 at alpha 2: 4.5 vs 18)
+  are all relative to a control that is itself split by Pendellösung at strong
+  alpha; the profile reduces the effective accumulated coupling and returns a
+  single line. Explained by Theta compression (Entry 36) / sub-crystal thickness.
+- **Narrowest line in the whole search: 4.5** (phase wall pi/2, alpha 2) — above the
+  dynamical-narrowing floor 0.71 x 5.566 = 3.96 of a uniform crystal (Entry 4).
+  No super-narrow feature.
+- **No profile reduced the integrated satellite by more than 16 %**
+  (q-wall dc 1, alpha 4: 0.84x); phase profiles almost always increase it.
+- No peak at a new eta position outside the swept local resonances; no
+  avoided-crossing signature; no feature that strengthens with alpha other than
+  the extinction relief.
+
+---
+
+## 2026-10-01 — Entry 41: validation, classification, and a conservative summary of Entries 38–40
+
+**Validation** (`explore/nb/e41_validate.py`; integral / peak):
+
+| candidate | base | 2 n_z | eta step / 2 | window x 1.5 | wall smoothed 1 wl / 3 wl | kinematic integral |
+|---|---|---|---|---|---|---|
+| uniform control alpha 2 / 4 | 10.11 / 22.91 | | | | | |
+| chirp beta 0.4, alpha 2 | 54.30 / 0.726 | 54.30 | 54.30 | 56.79 | — | 77.3 |
+| chirp beta 0.1, alpha 4 | 33.22 / 0.999 | 33.22 | 33.22 | 33.53 | — | 307 |
+| pi wall zb 0.3, alpha 2 | 25.99 / 0.982 | 25.99 | 25.99 | 26.16 | 26.08 / 22.19 | 76.4 |
+| pi wall zb 0.5, alpha 2 | 13.31 / 0.500 | 13.30 | 13.31 | 13.49 | 13.69 / 11.76 | 76.4 |
+| q wall dc 2 zb 0.5, alpha 2 | 20.19 / 0.892 | 20.19 | 20.19 | 20.24 | 20.15 / 20.39 | 76.8 |
+
+Converged to 4–5 digits in n_z and eta step; the window enlargement adds
+< 1 % except for the widest chirp (+4.6 %, its plateau extends beyond the base
+window). Smoothing the walls over one acoustic wavelength leaves every effect
+intact; over three wavelengths the pi-wall gain drops from 2.6x to 2.2x (still
+large). Not artefacts of sharp discontinuities. Kinematic integrals are the same
+(~76.8 for alpha = 2) for every profile — Parseval — so every change of spectral
+weight above is dynamical. Test:
+`tests/test_formation.py::test_chirp_landau_zener_plateau_and_phase_wall_integral`
+(43 pass).
+
+**Kinematic vs dynamical classification.**
+
+| effect | kinematic? | dynamical content | control parameter |
+|---|---|---|---|
+| chirp broadening, multi-peak envelope | yes (identical at alpha = 0.05) | none | q0 beta vs 5.566 / L |
+| moving satellite under a frequency chirp | yes | none | b |
+| q-wall interference between two halves | yes at alpha <~ 0.5 | none | dc |
+| phase wall: centre-dark doublet | yes (Fourier) | — | n dphi |
+| **chirp: integral x up to 5–7, Landau–Zener plateau** | no | **extinction relief by adiabatic passage** | Gamma = (pi alpha J_n)^2 / (n q0 beta) |
+| **q-wall: integral recovers to the incoherent sum when 2 pi dc > Darwin width** | no | **decoupling of domains** | 2 pi dc / (4 pi alpha_n) |
+| **pi phase wall: integral x 2.6 at zb 0.3, echo dip at zb 0.5** | no | **rotation reversal ("acoustic stacking fault")** | alpha_n, n dphi, zb |
+| "focusing" / super-narrow line | no gain found | — | — |
+
+**Physical interpretation (one sentence).** All new spectral weight found
+tonight is one dynamical mechanism: a strong satellite (alpha_n >~ 0.5) is
+extinction-limited, and anything that dephases the satellite resonance along the
+depth — a gradient (chirp), a step in q (domain wall) or a step in phase (phase
+wall) — breaks the coherent extinction and moves the integral towards its
+kinematic (Parseval) value, by amounts set by Landau–Zener (gradients) or by
+sub-crystal rotations (steps).
+
+**Experimental plausibility (E unless stated).** A transducer frequency chirp
+(A2) or a frequency step / phase step in an RF burst is standard; a spatial chirp
+needs a graded crystal. For Gamma ~ 0.1–0.5 at alpha_1 ~ 1 (Si 440 at 17–30 keV,
+L ~ 1–2 Lambda_P), q0 beta ~ 2 pi alpha_1 ... 20 alpha_1, i.e. a relative frequency
+sweep of order 5–30 % across one transit — feasible for a broadband transducer
+(E). The pi phase wall needs only an RF phase flip. All effects need resolved
+channels (alpha / alpha_ac <~ 0.05, Entry 19) and alpha_n >~ 0.5.
+
+**Strongest positive result.** The Landau–Zener plateau of a chirped satellite:
+TT matches 1 - exp(-2 pi Gamma) without a fit over Gamma = 0.01–0.3 and four
+values of alpha, with the integral raised up to 5.3x (alpha 2) — a quantitative,
+dynamical, order-selective (Gamma_n ~ J_n^2 / n) effect.
+
+**Strongest negative result.** No acoustic phase profile focuses a satellite:
+kinematically impossible by Cauchy–Schwarz (proved), and dynamically no profile
+gave a line narrower than the uniform crystal's own dynamical minimum (4.5 vs
+floor 3.96) or a peak / integral above the uniform optimum. No transient peak at
+a new eta, no avoided crossing, no defect-like line.
+
+**What to test next.**
+1. Literature: Landau–Zener / Penning–Polder in bent and graded crystals; stacking
+   fault and antiphase-boundary contrast in dynamical X-ray theory — decide
+   whether the acoustic, order-selective, time-dependent versions add anything
+   publishable.
+2. Transient versions: a chirped *front* entering the crystal (resonance-crossing
+   point appearing inside the slab) — does the LZ plateau form in time t_tr / ...?
+   (not run tonight beyond A2's centroid).
+3. Bragg geometry for the chirp (bent-crystal Bragg reflectivity is known to rise
+   with strain gradient; check the satellite version).
+
+### Brutally conservative summary
+
+**A. Genuinely interesting and worth pursuing:** none qualitatively new. The
+closest candidate is the *order-selective, tunable* Landau–Zener extinction relief
+of acoustic satellites (Gamma_n ~ (pi alpha J_n(S))^2 / (n q0 beta)) — quantitative and
+dynamical, but its physics is very likely the known bent/graded-crystal
+Landau–Zener problem. Worth one literature check before investing more.
+
+**B. Real but probably ordinary:**
+- chirp -> Landau–Zener plateau and integral increase (bent-crystal analogue);
+- q-wall -> domain decoupling restores the incoherent sum (bilayer / mosaic analogue);
+- pi phase wall -> integral x 2.6 and an echo dip at the midpoint, odd/even
+  selectivity via n dphi (stacking-fault / antiphase-boundary analogue);
+- moving satellite under a frequency chirp (maps the chirp; kinematic).
+
+**C. Artefact / already explained:**
+- multi-peak, wide lines under strong chirps (Fourier spreading, identical at
+  alpha = 0.05);
+- apparent narrowing and concentration at alpha >= 2 (control split by
+  Pendellösung; profile reduces Theta);
+- apparent focusing gain at alpha = 2 (same reason);
+- centre-dark doublets from phase walls (Fourier; Entry 37's Parseval argument).
+
+**D. Unresolved:**
+- the pi-wall integral exceeding the sum of the two sides alone by 12–16 % off the
+  midpoint (coherent cross-term; mechanism plausible, not derived);
+- whether any of B survives in Bragg geometry and with absorption;
+- the transient formation of the LZ plateau behind a chirped front.
+
+**Nothing qualitatively new appeared tonight.** Every non-trivial effect reduces
+to dynamical extinction being relieved by dephasing, with known analogues.
