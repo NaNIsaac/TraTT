@@ -2168,3 +2168,495 @@ Landau–Zener problem. Worth one literature check before investing more.
 
 **Nothing qualitatively new appeared tonight.** Every non-trivial effect reduces
 to dynamical extinction being relieved by dephasing, with known analogues.
+
+---
+
+## 2026-10-02 — Entry 42: an exact Floquet solver for the uniform travelling wave
+
+**Project (user brief, multi-hour run).** Map the breakdown of the resolved
+Floquet-channel picture for the simplest field — uniform S, single q, perfect
+sinusoid, no envelope tricks — by driving the satellite spacing into the
+dynamical width. Crystal fully filled unless stated (steady state); Laue,
+non-absorbing.
+
+**Method.** `src/tratt/floquet.py`. Expand D0 = sum_k a_k e^{+ikq zeta},
+Dh = sum_m b_m e^{-imq zeta}; the TT equations become a constant-coefficient
+system x' = i H x with
+
+    H[a_k,a_k] = -k q,   H[b_m,b_m] = eta + m q,
+    H[a_k,b_m] = pi alpha J_{k+m}(S) e^{-i(k+m) q t},   H Hermitian.
+
+The series is redundant at zeta = 0; a_k(0) = delta_k0, b_m(0) = 0 satisfies the
+boundary conditions, so by uniqueness the truncated series converges to the exact
+solution. Channel eta = n q = resonance of b_{-n} with a_0 (direct coupling
+J_{-n}); couplings can be masked to remove individual paths. A cheaper solver for
+scans is still full TT (RK4); the scan driver picks the cheaper of the two.
+
+**Validation** (`tests/test_floquet.py`, 7 tests): Floquet vs full TT, max
+abs difference 1.6e-6 – 1.3e-5 over (alpha, alpha_ac, S) = (1, 20, 1.5), (2, 5, 3),
+(3, 2, 2), (5, 1, 4), (2, 0.5, 6) (the RK4 error level); K + 4 changes nothing
+(<= 3e-7); |D0|^2 + |Dh|^2 = 1 to <= 3e-7; S = 0 reproduces the Laue formula to
+1e-10; all couplings masked -> 0.
+
+**Exact two-band structure** (`explore/nb/e46_bands.py`). The TT system is a 2x2
+ODE with coefficients periodic in zeta (period 2 pi / q), so it has exactly two
+Floquet exponents lambda_1, lambda_2 with lambda_1 + lambda_2 = eta (mod q),
+obtained from the one-period monodromy (unitary: |det M| - 1 <= 6e-7). This is
+the X-ray band structure of the acoustic superlattice; satellites are its gaps at
+eta = n q. The truncated Floquet matrix carries copies of the same two branches
+shifted by multiples of q.
+
+---
+
+## 2026-10-02 — Entry 43: the regime map — and most of the "breakdown" at one phase is micromotion
+
+**Setup.** `explore/nb/e43_phase.py`, 1200 points: alpha in {0.05 ... 10} (10),
+alpha_ac in {0.5 ... 40} (12), S in {0 ... 8} (10); full spectra over all orders
+|n| <= ceil(S) + 4 (eta step 0.3); cached JSON per point in `cache_e43/` (acoustic
+phase t = 0) and `cache_e43_ph4/` (average over 4 phases, `E43_NPHASE=4`).
+Independent-channel prediction: every order a separate thickness-1 Laue slab of
+coupling pi alpha |J_n| at n q, orders added in intensity. Metrics: E_pop
+(order-window populations), E_spec (whole line), E_ctr (centres), participation
+ratio PR (vs Bessel PR_ind), total diffracted intensity, peak count, flux
+(max |I + I0 - 1| <= 1.7e-3 over all points; RK4 at the coarsest grids).
+Figure `explore/make_phase_figure.py` -> `figures/regime_phase_diagram.png`.
+
+**First (single-phase) map was misleading.** At t = 0, E_pop is 0.04–0.10 even
+at R = 0.05 and 0.2–0.45 for alpha_ac < 2 at any alpha. Averaging over the acoustic
+phase changes this completely:
+
+| case | E_pop, t = 0 | E_pop, phase-averaged |
+|---|---|---|
+| alpha 0.25, alpha_ac 5, S 1.5 (R 0.05) | 0.043 | 0.001 |
+| alpha 1, alpha_ac 5 (R 0.2) | 0.065 | 0.017 |
+| alpha 2.5, alpha_ac 5 (R 0.5) | 0.217 | 0.145 |
+| alpha 5, alpha_ac 5 (R 1) | 0.563 | 0.425 |
+
+Reason: channel n carries the phase e^{i n q t}; cross terms between channels
+(overlapping tails, or overlapping sincs when alpha_ac <~ 1) oscillate with the
+acoustic phase and average out. **A phase-locked (stroboscopic) measurement sees
+the coherent cross terms; a phase-averaging measurement restores additivity of
+the orders.** The +-n asymmetry of single-phase spectra (up to 0.35 at R = 1) is
+the same micromotion: it reverses sign over the acoustic period and averages to
+~0 (checked at 8 phases), consistent with the third-order theory being +-n
+symmetric (C_{-n} flips sign with J_{-n}).
+
+**Phase-averaged result** (alpha_ac >= 2; median E_pop):
+
+| R = alpha / alpha_ac = Lambda_ac / Lambda_P | <= 0.05 | 0.05–0.2 | 0.2–0.5 | 0.5–1 | 1–3 | > 3 |
+|---|---|---|---|---|---|---|
+| E_pop | 0.002 | 0.009 | 0.038 | 0.21 | 0.53 | 0.72 |
+| total / independent | 1.00 | 1.00 | ~0.99 | 0.88 | 0.48 | 0.31 |
+
+alpha_ac < 2 behaves the same after phase averaging (0.019 at R <= 0.05).
+Regime boundaries (phase-averaged E_pop = 0.05 / 0.2 / 0.5): **R ~ 0.3 / 0.75 / 2**.
+The boundaries move to larger R with S (single-phase medians: E_pop = 0.2 at
+R = 0.57 for S <= 3, 0.95 for S >= 5), as expected from the natural variable
+X = 4 R max_n |J_n(S)| (gap of the strongest order / half zone; Entry 46): binned
+by X the per-S medians collapse (e.g. X 0.3–0.6: 0.05–0.09). Global fits:
+log E_pop = 0.70 log R - 1.32 (scatter x1.7); adding alpha_ac and S: x1.5.
+Phase-averaged, below the knee E_pop ~ 0.1 R.
+
+**Proposed regimes** (phase-averaged):
+- **A, resolved (R <~ 0.3):** independent orders, errors <~ 4 %.
+- **B, perturbative overlap (0.3 <~ R <~ 0.75):** indirect couplings through
+  forward-beam sidebands matter (Entry 44); dark orders reappear (Entry 45).
+- **C, strong hybridisation (0.75 <~ R <~ 2):** gaps fold at q/2, lines leave the
+  channel positions, dark windows (Entries 46–48); total intensity drops.
+- **D, R >~ 2:** acoustic wavelength longer than the extinction length; the
+  spectrum is no longer organised by orders (E_pop ~ 0.7).
+Plus, for phase-locked measurements only, a kinematic coherence regime at
+alpha_ac <~ 1–2 (orders overlap as sincs).
+
+**Strong S** (Part 7; S up to 8 in the map, S = 12, 16 at alpha_ac = 5):
+PR / PR_ind = 1.00 for R < 0.3 at every S, 0.8–1.3 at R > 1; at S = 12 / 16 the
+rms order is 8.43 / 8.43 (R 0.2), 8.82 / 8.74 (R 1), 8.63 / 8.65 (R 2) and
+11.2 / 11.2, 11.7 / 11.7, 11.7 / 11.6 vs the Bessel values — even where E_pop = 0.3.
+Larger S is more robust (E_pop at R = 2: 0.30–0.35 vs the 0.53 median).
+**Negative result: no localisation, diffusion or concentration in order space
+beyond the Bessel distribution;** the breakdown is in line shapes and positions,
+not in which orders are populated.
+
+---
+
+## 2026-10-02 — Entry 44: what fails first — a hierarchy of Floquet paths
+
+**Setup.** `explore/nb/e44_mechanism.py`, `e44b_sidebands.py`
+(`e44b_sidebands.json`); figure `figures/reduced_model_convergence.png`.
+Reduced models in the Floquet basis vs the converged one (single phase t = 0):
+IND (independent two-level channels, intensities added), STAR (a_0 + all b_m:
+one shared forward beam, no forward sidebands), A1 / A2 (forward sidebands
+|k| <= 1 / 2 added).
+
+**Result (E_pop vs converged, S = 1.5).**
+
+| alpha_ac | R | IND | STAR | A1 | A2 |
+|---|---|---|---|---|---|
+| 5 | 0.05 | 0.042 | 0.002 | 0.000 | 0.000 |
+| 5 | 0.2 | 0.066 | 0.030 | 0.005 | 0.001 |
+| 5 | 0.5 | 0.269 | 0.211 | 0.043 | 0.013 |
+| 5 | 1 | 1.185 | 1.202 | 0.345 | 0.116 |
+| 5 | 2 | 1.770 | 1.238 | 0.516 | 0.184 |
+
+(alpha_ac = 2 and S = 4 rows follow the same pattern.) Total intensity:
+IND and STAR over-predict by 1.2–2.5x at R >= 1; sidebands remove the excess.
+
+Forward sidebands required for E_pop < 0.02 (all b_m kept):
+
+| R | 0.02–0.1 | 0.2–0.35 | 0.5 | 0.75 | 1 | 1.5–3 |
+|---|---|---|---|---|---|---|
+| k_req, S = 1.5 | 0 | 1 | 2 | 3–4 | 4 | 4–5 (saturates) |
+| k_req, S = 4 | 0 | 0–1 | 2–4 | 5 | 7 | > 8 |
+
+**Reading — the order in which the picture fails.**
+1. First (R <~ 0.1, single phase): the *coherence between off-resonant tails*
+   of different orders, which the intensity sum drops. Kinematic, first order in
+   R, and phase-dependent (it is what averages out in Entry 43). One shared
+   forward beam (STAR) already fixes it.
+2. Next (R ~ 0.2–0.5): **indirect paths through forward-beam Floquet sidebands
+   a_{+-1}** — X-rays scattered into a neighbouring satellite and back into a
+   sideband of the forward beam before reaching the channel. This is the same
+   path that resurrects dark orders (Entry 45).
+3. Then (R >~ 0.75): higher sidebands, roughly k_req ~ 4 R, saturating at the Bessel
+   width of the drive (auto_K(S) ~ S + 3) — at that point every Floquet mode
+   participates and no reduced model is useful.
+The two-beam reduction per satellite (IND) is therefore not what fails first in
+a phase-averaged measurement: it is exact to O(R) after averaging, and fails at
+O(R^2) through the forward sidebands.
+The three-mode model of Entry 14 (a_0, b_0, b_{-n} per channel) sits between IND
+and STAR; it was not re-run here.
+
+---
+
+## 2026-10-02 — Entry 45: Bessel-zero resurrection — a third-order indirect coupling, and a renormalised zero
+
+**Theory (derived before the runs).** H couples a's only to b's (bipartite), so
+there is no second-order path from a_0 to b_{-n}. Löwdin elimination of the
+off-resonant states (a_k at -kq, b_m at (m + n) q) gives at third order
+
+    g_eff = pi alpha [ J_{-n}(S) - (pi alpha / q)^2 C_n(S) ],
+    C_n(S) = sum_{k != 0, m != -n} J_{k-n} J_{k+m} J_m / (k (m + n)),
+
+(pi alpha / q = R / 2); the remaining third-order terms are proportional to
+J_{-n} and vanish at its zero. At S = j (J_n(j) = 0) the channel population is
+sin^2|g_eff| ~ (pi alpha)^2 (R/2)^4 C_n^2, i.e. ~ alpha^6 / alpha_ac^4.
+C_0(j_01) = +0.604, C_1(j_11) = -0.358, C_2(j_21) = +0.259.
+
+**Result 1 — scaling, no fit** (`explore/nb/e45_zero.py scan`; figure
+`explore/make_zero_figure.py` -> `figures/bessel_zero_resurrection.png`).
+Channel population = max over eta near n q of |b_{-n}(1)|^2 (exact Floquet):
+
+| n | alpha | alpha_ac = 40 | 10 | 5 | 3 | 2 | 1.5 | 1 |
+|---|---|---|---|---|---|---|---|---|
+| 0 | 1 | 8.8e-8 (1.000) | 2.2e-5 (0.991) | 3.5e-4 (0.964) | 2.5e-3 (0.904) | 1.1e-2 (0.80) | 3.7e-2 (0.85) | 8.8e-2 (0.42) |
+| 1 | 1 | 3.1e-8 (1.000) | 7.8e-6 (0.994) | 1.2e-4 (0.976) | 9.1e-4 (0.936) | 4.2e-3 (0.86) | 1.4e-2 (0.88) | 4.2e-2 (0.55) |
+| 2 | 1 | 1.6e-8 (1.000) | 4.1e-6 (0.995) | 6.5e-5 (0.981) | 4.9e-4 (0.949) | 2.3e-3 (0.89) | 7.4e-3 (0.90) | 2.5e-2 (0.62) |
+
+(ratio to the third-order prediction in brackets; alpha = 0.5 and 2 in the script
+output follow the same pattern; alpha = 2, alpha_ac = 1.5 reaches 0.90 for n = 0.)
+Exact to <1 % for R <= 0.1, within 10 % to R ~ 0.3, failing at R >~ 0.5 (higher
+orders). **A nominally dark order becomes fully bright at R ~ 1.**
+
+**Result 2 — the path** (`e45_zero.py paths`). Largest terms of C_n:
+n = 1: (m, k) = (-2, -1), i.e. **a_0 -> b_{-2} (the n = 2 satellite) -> a_{-1} (first
+forward sideband) -> b_{-1}**, weight J_2^2 J_3 = 0.068; n = 0: the symmetric pair
+through the n = +-1 satellites; n = 2: through n = 3. Removal tests (alpha 1,
+alpha_ac 3): removing that b_m or that a_k halves the population (the mirror path
+remains); keeping only that path's three couplings gives 3.78e-5 vs its predicted
+3.54e-5 (n = 1). The indirect coupling goes through the *outer* neighbour and the
+forward sideband.
+
+**Result 3 — renormalised zero** (`e45b_shifted_zero.py`). Because g_eff is real,
+S alone can make it vanish, at S* = j + (R/2)^2 C_n(j) / J'_{-n}(j):
+
+| n | R | S* full | S* predicted | population at S* (at j) |
+|---|---|---|---|---|
+| 0 | 0.20 | 2.39292 | 2.39319 | 1.4e-7 (3.5e-4) |
+| 0 | 0.67 | 2.26814 | 2.27556 | 7.4e-5 (1.1e-1) |
+| 0 | 1.00 | 2.06652 | 2.11397 | 2.0e-3 (3.0e-1) |
+| 1 | 0.20 | 3.82263 | 3.82283 | 5.8e-8 (1.2e-4) |
+| 1 | 0.67 | 3.72790 | 3.73305 | 6.1e-5 (4.7e-2) |
+
+The darkest amplitude moves by ~R^2 and the darkness is restored 3–4 orders deeper
+than at the bare zero.
+
+**Result 4 — what an experiment sees** (`e45_zero.py phys` + inline check).
+For integer alpha_ac the physical intensity at eta = n q equals the channel
+population and the prediction (e.g. alpha 1: 4.93e-7 / 7.85e-6 / 1.24e-4 at
+alpha_ac 20 / 10 / 5). For non-integer alpha_ac and in window integrals the
+off-resonant tails (first order in R, phase dependent) dominate in the resolved
+regime (window max 6e-4 vs 5e-7 at alpha_ac 20): the resurrection is a centre /
+phase-locked observable there, and becomes a window-scale effect only at R >~ 0.5.
+Gap picture (Entry 46): at J_1 = 0 the n = 1 gap reopens as 0.02, 0.34, 2.50, 5.87
+for R = 0.2, 0.5, 1, 2.
+
+---
+
+## 2026-10-02 — Entry 46: Floquet bands, gap folding, mixing-point annihilation, peak trajectories
+
+**Setup.** `explore/nb/e46_bands.py` (monodromy, two exact branches),
+`e48_trajectories.py` (phase-averaged spectral maxima and the eta where a Bloch
+mode is 50/50 forward / diffracted, alpha_ac = 2, S = 0.5, 1, 2.3, R = 0.05–2);
+figure `explore/make_floquet_figures.py` -> `figures/floquet_structure.png`.
+
+**Gaps at eta = n q vs the independent 2 pi alpha |J_n|** (alpha_ac = 5):
+
+| S | R | n = 0 | n = 1 | n = 2 | n = 3 |
+|---|---|---|---|---|---|
+| 1.5 | 0.05 | 0.80 / 0.80 | 0.88 / 0.88 | 0.37 / 0.36 | 0.10 / 0.10 |
+| 1.5 | 0.5 | 7.08 / 8.04 | 8.91 / 8.76 | 4.18 / 3.65 | 1.76 / 0.96 |
+| 1.5 | 1 | 8.32 / 16.08 | 13.18 / 17.53 | 10.60 / 7.29 | 6.02 / 1.92 |
+| 3.83 (J_1 = 0) | 0.2 / 0.5 / 1 | — | 0.02 / 0.34 / 2.50 | — | — |
+
+**Reading.**
+- The independent picture is "isolated gaps of width 2 pi alpha |J_n|". In the
+  reduced zone a gap cannot exceed q/2; the measured gaps follow the independent
+  line and **fold back at q/2** (n = 1 reaches 0.49 q at R ~ 0.85 and then
+  decreases). The breakdown condition is therefore precisely
+  **R |J_n(S)| ~ 1/2** for each order, i.e. X = 4 R max|J_n| ~ 2 for the spectrum —
+  the natural variable of Entry 43. n = 0 departs earlier (max 0.28 q at R ~ 0.8)
+  because more paths feed it.
+- Weak orders gain gap through indirect paths (n = 3 at R = 1: 3.1x).
+- **Mixing points:** at R -> 0 a Bloch mode becomes 50/50 only at eta = n q. With
+  increasing R one mixing point moves out from eta = 0 (S = 1: 0.002, 0.048, 0.173,
+  0.433 q at R = 0.05, 0.25, 0.45, 0.65) while another moves in from the zone edge;
+  they meet and annihilate (S = 1 near R ~ 0.55; S = 0.5 around R ~ 1), after which
+  no 50/50 point exists in that half-zone. (Points pinned at exactly q/2 are a
+  branch-sorting artefact and are excluded.)
+- **Peak trajectories:** phase-averaged maxima leave the channel positions:
+  S = 1, the n = 1 peak moves 1.00 q -> 0.94 (R 0.45) -> 0.87 (0.65) -> 0.75 (0.85);
+  the main peak at eta = 0 disappears for R ~ 0.85–1.25 (Entry 47). The spectrum
+  reorganises around non-integer positions (e.g. S = 1, alpha 2, alpha_ac 2:
+  maxima at +-0.617 q and +-1.373 q).
+- Is it a true eigenmode hybridisation or overlapping finite peaks? The folding
+  and the mixing-point annihilation are properties of the exact two-band
+  structure, so the reorganisation is genuine band hybridisation, not a
+  superposition artefact. It is, however, the generic behaviour of a two-band
+  periodic (Hill-type) problem once gaps reach the zone size; nothing
+  exceptional-point-like was found (the problem is Hermitian; branches never
+  coalesce).
+
+---
+
+## 2026-10-02 — Entry 47: dark windows with strong coupling — multi-path interference at the X-ray–acoustic resonance
+
+**Setup.** Candidates from the cache (darkest orders with |J_n| > 0.2);
+`explore/nb/e47_dark.py` (diagnosis of alpha 2, alpha_ac 2, S 1, n = 0),
+`e47b_darkmap.py` (maps of D_n = p_n / p_n^ind over R in [0.05, 1.5] x S in [0.2, 6],
+alpha_ac = 2 and 5, n = 0, 1, 2, 4 phases), figure `explore/make_darkmap_figure.py`
+-> `figures/darkmap.png`.
+
+**Main-line dark state (alpha 2, alpha_ac 2, S 1; J_0 = 0.765, pi alpha J_0 = 4.8).**
+Window |eta| < q/2 holds 0.0185 of the independent value (0.006–0.023 at every one of
+8 acoustic phases). Sensitivity: sharp minimum in S (0.90: 0.164, 1.00: 0.019,
+1.10: 0.022, 1.20: 0.131), alpha_ac (1.9: 0.153, 2.0: 0.019, 2.1: 0.130) and alpha
+(2.2: 0.007, 2.5: 3.2). **Path removal:** no forward sidebands -> 1.18; no b_{+-1}
+(the n = +-1 satellites) -> 1.05; no b_{+-2} -> 0.034 (still dark); a_0 + b_0 only ->
+1.00. The darkness needs the direct path and the indirect paths through the
+neighbouring satellites and forward sidebands, and disappears when either of them
+is removed. Bands: the gap at eta = 0 is 6.23 ~ q/2 = 6.28 (maximal) and the two
+Bloch modes there are 99.5 % / 0.5 % diffracted — unmixed, so the incident beam
+projects on one mode and does not Pendellösung-oscillate. Where the weight went:
+0.17 inside the window vs 4.79 in q/2 < |eta| < 3q/2 (independent total 19.1), with
+maxima at +-0.617 q and +-1.373 q (Entry 46).
+
+**Maps.** n = 0 dark valley at R ~ 1–1.35 for both alpha_ac (darkest D = 0.002 at
+alpha_ac 5, R 1.05, S 0.8); its locus satisfies R J_0(S) ~ 0.8–1.2, i.e. the main-line
+gap 2 pi alpha J_0 equals q — the main-line Pendellösung length equals the
+acoustic wavelength. n = 1 dark valley at S ~ 2.3, R 1.15–1.35 (D 0.06; near the
+J_0 zero), n = 2 at S ~ 3.4–3.6, R ~ 1.5 (D 0.05). Path removal for n = 1 (S 2.3,
+R 1.25): removing the *outer* neighbour b_{-2} -> 0.46, the inner neighbour -> 0.14,
+forward sidebands -> 0.99; n = 2 likewise (outer neighbour -> 0.65). The
+third-order renormalised-zero branches (dotted in the figure) are separate from
+these valleys. Bright counterparts: the Bessel-zero columns (D >> 1).
+
+**Time domain** (Entry 49, case 5, alpha_ac 5, R 1.05, S 0.8): the main window
+empties monotonically as the front fills the crystal: 21.4 (t = 0, unmodulated
+reflection) -> 11.2 (0.5) -> 0.9 (0.9).
+
+**Reading.** A genuine multi-path effect in the sense of the brief: individual
+couplings are large, and the window darkens because the direct and indirect
+paths interfere; removing one interfering path restores it. Physically it is the
+regime where the acoustic wavevector matches the dispersion-surface gap of the
+reflection — **the X-ray(neutron)–acoustic resonance k_s ~ Delta K_0** of Entin,
+Iolin–Entin and Raitman et al. (Entry 51), here in a non-absorbing Laue crystal
+with the gap renormalised by J_0(S). "Dark" means the reflection has moved out of
+its angular window (lines displaced to non-integer positions), not that the
+crystal stops diffracting.
+
+---
+
+## 2026-10-02 — Entry 48: time-resolved formation across the regimes
+
+**Setup.** `explore/nb/e49_time.py`, travelling step front, alpha_ac = 5, window
+integrals p_n(t) and centres, t in [0, 1) every 1/(16 alpha_ac); compared with the
+independent formation law (window integral of a Laue slab of thickness t,
+coupling pi alpha |J_n|); FFT of the traces. Figure `figures/time_regimes.png`.
+Regimes: 1 resolved (alpha 0.5, S 1.5, R 0.1); 2 onset (2.5, 1.5, R 0.5); 3 strong
+overlap (5, 1.5, R 1); 4 J_1 = 0 (5, 3.83, R 1); 5 dark main line (5.25, 0.8, R 1.05).
+
+**A first version was wrong and is recorded:** it averaged over each acoustic
+period (8 samples) to remove micromotion; the period is 0.2 t_tr, which
+coarse-grained time to 0.2 and quantised every frequency and peak time.
+
+**Result.** Relative deviation from the independent formation law (integrated
+over the transit): regime 1: n = 1 0.075 (n = 0 2.3, n = 2 0.30 — weak/main windows
+dominated by tails); regime 2: 0.19–0.78; regime 3: 0.33–0.58; regime 5: 0.31–0.77.
+Spectral content (resolution ~1 cycle per t_tr — set by the transit itself):
+regime 1: slow ~1 plus acoustic harmonics 5, 10, 15; regime 2: also 4, 6, 7, 11, 12
+~ m alpha_ac +- alpha_n (alpha_n ~ 1.4); regime 3: 3 (~ alpha_n = 2.8), 7, 8, 14, 17 ~
+m alpha_ac +- alpha_n.
+
+**Reading.**
+- In the overlap regime the formation clock alpha_n = R |J_n| alpha_ac approaches
+  the acoustic clock alpha_ac; **slow formation and micromotion cease to be
+  separable in time**, and traces carry Floquet combination frequencies
+  m alpha_ac +- alpha_n. This is the time-domain image of the band structure
+  (quasi-energy differences + m q), i.e. "ultrasound-induced Pendellösung
+  beatings" (known in kind, Entry 51) — not a new effect.
+- No non-Bessel formation order or population transfer between orders was
+  found beyond what the band structure implies; the main-window emptying of
+  regime 5 is the one qualitatively visible transient (Entry 47).
+- Limitation: a single transit gives ~1 cycle per t_tr resolution; nearby
+  frequencies cannot be separated in principle.
+
+---
+
+## 2026-10-02 — Entry 49: anomaly ranking against two reference models
+
+**Setup.** `explore/nb/e50_anomaly.py` over the phase-averaged cache
+(alpha_ac >= 2), results `e50_anomaly.json`, figure `figures/anomaly_summary.png`.
+References: IND, and G3 = independent channels with the third-order couplings
+|g_n| = pi alpha |J_{-n} - (R/2)^2 C_n| (level shifts and the J_{-n}-proportional
+third-order terms omitted).
+
+**Result.** Median E_pop, IND / G3: R <= 0.1: 0.0026 / 0.022; 0.1–0.3: 0.016 / 0.075;
+0.3–0.6: 0.065 / 0.13; 0.6–1: 0.23 / 0.23; 1–2: 0.52 / 0.53; > 2: 0.66 / 0.81.
+Top anomalies (largest E_g3, darkest strong orders, brightest near-zero orders) all
+lie at R >= 1–1.5; the darkest strong orders are n = 0 windows (main-line
+displacement, Entry 47: alpha 2, alpha_ac 2, S 1 is second) and the brightest
+near-zero orders are J_2 ~ 0 at S = 5 with R 1.5–3.5, where windows are no longer
+channels.
+
+**Reading.**
+- **Negative:** the naive third-order model is *worse* than IND away from Bessel
+  zeros: the omitted level shifts and J_{-n}-proportional third-order terms are of
+  the same order and compensate. G3 is valid at zeros only (where those terms
+  vanish); a consistent global perturbative model was not built tonight.
+- No anomaly at R < 1 survives beyond the mechanisms of Entries 43–47. Everything
+  ranked high is regime C/D reorganisation.
+
+(Entry 45 addendum: S* for n = 2: R 0.20: 5.12783 full vs 5.12799 predicted (population
+3.0e-8 vs 6.5e-5 at j); R 0.33: 5.11342 vs 5.11442; R 0.67: 5.04666 vs 5.05082; R 1.00:
+4.92908 vs 4.94483. n = 1, R 0.5: 3.77306 vs 3.77621; R 1.0: 3.58646 vs 3.60974.)
+
+---
+
+## 2026-10-02 — Entry 50: prior art for the overlap regime
+
+Read in full: Polikarpov & Skadorov 1987 / 1988 (Entry 29); Raitman, Gavrilov &
+Ekmanis, "Neutron diffraction on acoustic waves in a perfect and deformed single
+crystals", InTech (2013), pp. 49–54 (theory section). Abstracts / snippets only:
+Iolin & Entin, JETP 85, 1692 (1983); "Suppression of anomalous X-ray transmission
+under the effect of periodic nonresonance deformations" (Crystallogr. Rep., ~2001);
+acousto-optics (Klein–Cook parameter; deviations from the Raman–Nath Bessel law).
+
+What is known:
+- Raitman et al. state the regime structure explicitly: below the
+  "neutron(X-ray)–acoustic resonance" (acoustic wavevector k_s below the
+  dispersion-surface gap Delta K_0 = 2 pi / tau, tau = extinction length) the
+  ultrasound is a perturbation with corrections ~ (H w)^2; near k_s ~ Delta K_0 the
+  ultrasound mixes Bloch states, opens new gaps, causes **resonant ultrasonic
+  suppression of the Borrmann transmission** and **ultrasound-induced Pendellösung
+  beatings** (refs. to Entin, Iolin–Entin). Our R = Lambda_ac / Lambda_P ~ 1 is
+  this resonance.
+- Iolin–Entin and successors: superlattice period exceeding the extinction length
+  (our R > 1) — analytical theory of Borrmann suppression in thick absorbing
+  crystals.
+- Polikarpov & Skadorov: multiwave Floquet treatment with J_n couplings, emphasis
+  on non-resonant waves modifying extinction lengths; weak deformation xi << 1,
+  three-wave truncation, steady state.
+- Acousto-optics: finite Klein–Cook Q makes diffraction efficiencies deviate from
+  the Raman–Nath Bessel law (zeros included) — a structural analogue of the
+  resurrection, in a different (optical, thin/thick-grating) setting.
+
+Classification of tonight's results:
+
+| result | class |
+|---|---|
+| regime boundary at Lambda_ac ~ extinction length (R ~ 1) | **KNOWN** (X-ray/neutron–acoustic resonance) |
+| suppression / emptying of the main reflection near resonance (Entry 47) | **DIRECT EXTENSION OF KNOWN** (non-absorbing Laue, J_0-renormalised condition 2 pi alpha J_0 ~ q, path-resolved) |
+| combination frequencies in time traces (Entry 48) | **KNOWN** in kind (ultrasound-induced Pendellösung beatings) |
+| gap folding at q/2, mixing-point annihilation (Entry 46) | **DIRECT EXTENSION** (standard two-band Floquet / Hill structure) |
+| Bessel-zero resurrection with g_eff = pi alpha (R/2)^2 C_n, alpha^6/alpha_ac^4 law, dominant path through the outer neighbour and forward sideband (Entry 45) | **POSSIBLY NEW** for X-rays (Polikarpov's xi << 1 truncation cannot reach zeros; acousto-optic analogue exists) |
+| renormalised Bessel zero S* - j = (R/2)^2 C_n / J'_{-n} (Entry 45) | **POSSIBLY NEW** (same caveat) |
+| phase averaging restores order additivity; single-phase cross terms and +-n micromotion (Entry 43) | **UNCLEAR** (elementary, probably unremarked) |
+| total diffracted intensity deficit collapsing on R (Entry 43) | **DIRECT EXTENSION** |
+| no dynamical localisation in order space (Entry 43) | negative result |
+
+Nothing here may be called new without reading Entin (JETP Lett. 26, 392 (1977);
+JETP 77, 214 (1979)) and Iolin–Entin (1983) in full.
+
+---
+
+## 2026-10-02 — Entry 51: summary of the overlap-regime project
+
+**What replaces the independent-satellite picture?** The exact two-band Floquet
+structure of the X-ray in the acoustic superlattice. Satellites are its gaps; they
+stay isolated and Bessel-weighted while R |J_n| << 1/2 (R = Lambda_ac / Lambda_P);
+corrections come first from coherence between orders (phase-locked only), then
+from indirect paths through forward-beam Floquet sidebands (O(R^2)); gaps fold at
+q/2 when R |J_n| ~ 1/2, lines leave the channel positions, and near R ~ 1 the main
+window empties at the X-ray–acoustic resonance. The population of orders keeps
+the Bessel distribution throughout.
+
+**A. Strongest genuinely interesting result.** Bessel-zero resurrection: a
+nominally dark order is restored by a third-order indirect coupling
+g_eff = pi alpha (R/2)^2 C_n(S), confirmed without a fit over four decades
+(<1 % for R <= 0.1) for J_0, J_1, J_2 zeros, with the dominant path identified
+(n = 1: through the n = 2 satellite and the first forward sideband) and a
+renormalised zero S* - j = (R/2)^2 C_n / J'_{-n} (verified to <0.3 % at R <= 0.67).
+
+**B. Strongest result likely already known.** The main-reflection dark window at
+R J_0(S) ~ 1 (path-resolved multi-path interference, emptied as the front fills)
+— the non-absorbing face of the known X-ray/neutron–acoustic resonance
+(Entin; Iolin–Entin; Raitman et al.).
+
+**C. Strongest negative result.** No dynamical localisation, diffusion or
+concentration in Floquet-order space: the rms order equals the Bessel value to
+two decimals even at S = 16, R = 2 where line shapes are badly broken. Also: the
+naive third-order model is not a better global model (only at zeros), and the
+single-phase "kinematic overlap" breakdown is micromotion that averages away.
+
+**D. Cleanest scaling law.** Resurrected population P = sin^2[pi alpha (R/2)^2 C_n(S)]
+~ alpha^6 / alpha_ac^4 (figure b of `bessel_zero_resurrection.png`). Second: total
+diffracted intensity / independent prediction collapses on R for all S
+(1.00 below R ~ 0.3, ~0.5 at R ~ 1–2). Regime boundaries (phase-averaged
+E_pop = 0.05 / 0.2 / 0.5): R ~ 0.3 / 0.75 / 2, shifting to larger R with S as
+X = 4 R max|J_n| suggests.
+
+**E. Best candidate for the paper.** The validity map plus the resurrection law:
+"the resolved Floquet picture holds for Lambda_ac < 0.3 Lambda_P (phase-averaged);
+its first quantitative failure is the reappearance of Bessel-dark satellites with
+a computable indirect coupling and a shifted dark amplitude". It fits the poster
+as the boundary of the formation results (all earlier claims assumed
+R <~ 0.05–0.1, now justified).
+
+**F. Best candidate for a future project.** A consistent perturbative theory of
+the overlap regime (including level shifts and the J-proportional third-order
+terms) that reproduces the population errors for 0.1 < R < 0.5, and its comparison
+with the Entin / Iolin–Entin resonance theory; plus the transient formation of a
+resurrected channel (its clock is 1 / |g_eff|, i.e. very slow, so it lives on the
+steady side of the transit).
+
+**G. What should NOT be investigated further.** (i) Ranking dark/bright windows at
+R > 1 — windows are no longer channels there; (ii) order-space localisation at
+large S — absent; (iii) single-phase metrics as evidence of breakdown — they are
+dominated by micromotion; (iv) caustic positions of outer peaks at large R by peak
+picking (the simple S q + pi alpha law failed; the main-line Darwin width dominates).
+
+**Deliverables.** Figures: `regime_phase_diagram.png` (1, 2), `bessel_zero_resurrection.png` (3),
+`floquet_structure.png` (4), `darkmap.png` (5), `time_regimes.png` (6),
+`anomaly_summary.png` (7), `reduced_model_convergence.png` (8). Code:
+`src/tratt/floquet.py`; `explore/nb/e43_phase.py` ... `e50_anomaly.py`; caches
+`cache_e43/`, `cache_e43_ph4/`. Tests: `tests/test_floquet.py` (7), 50 total pass.
