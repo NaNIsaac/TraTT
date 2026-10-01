@@ -1211,3 +1211,67 @@ whose extinction length is Lambda_P / abs(J_n(S)); its line shape is therefore a
 conveyor of Pendellösung fringes flowing toward the satellite centre, so the
 peak blinks while the integrated satellite persists, and different orders
 under the same front are caught at different stages of the same evolution.
+
+---
+
+## 2026-10-01 — Entry 28: a transient-only satellite, and the transiently dominant forbidden order
+
+**Framework (new, `explore/nb/memory_drive.py`).** At time t the crystal holds
+the drive history s = t - zeta over the last t_tr: it is a spatial record of
+the transducer signal. Satellite n reads its Bessel-weighted integral
+Theta_n(t) = int_0^1 J_n(S A(t - zeta)) sign_n dzeta (sign_n = (-1)^n where the
+carrier is flipped by pi). Readout at exact resonance:
+- Laue: sin^2(pi alpha |Theta_n|) — rotations about one axis add.
+- **Bragg: tanh^2(pi alpha |Theta_n|), exact** — the Riccati equation at
+  resonance, dR/dzeta = -i kappa(zeta) (1 + R^2), is solved by
+  R = -i tanh(int kappa) for any real depth-dependent kappa.
+So Theta_n is geometry-independent; geometry only picks the readout function.
+`HistoryDrive` subclasses `Drive` with an arbitrary envelope and an optional
+pi carrier flip (no core change).
+
+**Setup.** `explore/nb/e28_transient_only.py`. S_f = j_{1,1} = 3.8317 (J_1 = 0),
+linear ramp of length T in {0.25, 0.5, 1, 2, 4}, alpha_ac = 40, alpha in
+{0.5, 2}, Laue and Bragg, centre intensities of n = 1–3 (n = 1–4 in a second run),
+161 times to t = 1 + T + 0.3.
+
+**Result — transient-only satellite.** n = 1, Laue (Bragg in brackets):
+
+| alpha | T | max_t I_1 (law) | FWHM lifetime | final I_1 | law max err |
+|---|---|---|---|---|---|
+| 0.5 | 0.25 | 0.023 (0.021) [0.023] | 0.92 | 5e-10 | 0.002 |
+| 0.5 | 1 | 0.302 (0.296) [0.274] | 0.73 | 5e-10 | 0.007 |
+| 0.5 | 4 | 0.606 (0.603) [0.506] | 2.12 [2.22] | 5e-10 | 0.003 |
+| 2 | 0.5 | 0.855 (0.833) [0.686] | 0.92 | 2e-6 | 0.029 |
+| 2 | 4 | 0.998 (1.000) [0.997] | 3.45 [3.35] | 2e-6 | 0.010 |
+
+I_1 = 0 before the front, > 0.5 at its peak, and back to 1e-10–1e-6 once the
+ramp has left the crystal (Theta_1 -> J_1(S_f) = 0). Max intensity grows with T
+and saturates at the quasi-static value sin^2(pi alpha max J_1) = 0.62
+(alpha = 0.5); lifetime grows with T for T >~ 1.
+
+**Result — forbidden order transiently dominant.** Max over time vs final:
+
+| geometry, alpha, T | max_t I_n, n = 1 / 2 / 3 / 4 | final I_n |
+|---|---|---|
+| Laue, 0.5, 4 | **0.606** / 0.464 / 0.370 / 0.140 | **0** / 0.349 / 0.370 / 0.139 |
+| Laue, 0.5, 2 | **0.535** / 0.421 / 0.370 / 0.140 | **0** / 0.349 / 0.370 / 0.139 |
+| Bragg, 0.5, 4 | **0.506** / 0.401 / 0.330 / 0.134 | **0** / 0.313 / 0.330 / 0.133 |
+| Laue, 2, 1 | 0.999 / 0.997 / 0.978 / 0.916 | 0 / 0.329 / 0.226 / 0.914 |
+
+At weak coupling the order that is absent from the final pattern is the
+strongest of all orders during the transient (n = 1 leads in ~60 % of the
+samples for T = 4). At alpha = 2 every order saturates near 1 and the
+comparison stops discriminating.
+
+**Reading.**
+- **The steady-state pattern does not predict the transient's dominant
+  channel.** A satellite forbidden in steady state (Bessel zero) can be the
+  brightest line while the ramp is inside the crystal.
+- The effect is identical in Laue and Bragg (law error <= 0.03 in both): it is
+  a property of the time-dependent acoustic coupling Theta_n, not of
+  Pendellösung. It also exists at alpha = 0.5, where nothing oscillates.
+- Memory parameter: T vs t_tr. For T >> 1 the crystal is nearly uniform and
+  I_1 tracks the instantaneous J_1(S A(t)) (adiabatic); for T << 1 the
+  satellite is a short flash whose size ~ (pi alpha T <J_1>)^2.
+- Caveat: S = 3.83 is a large drive (Entry 20 scaling: u0 ~ 0.6 A for
+  Si 440). Acoustic nonlinearity is outside the model.
