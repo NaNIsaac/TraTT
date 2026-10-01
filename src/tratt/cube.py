@@ -39,7 +39,7 @@ def rocking_cube(
     reference. Everything else is held fixed.
     """
     if n_z is None:
-        n_z = required_nz(alpha, drive.alpha_ac)
+        n_z = required_nz(alpha, drive.alpha_ac, S=drive.S, eta_max=float(np.max(np.abs(eta))))
     phase = drive.steady_phi if steady else drive.phi
     times = np.asarray(times, dtype=np.float64)
     eta = np.asarray(eta, dtype=np.float64)
@@ -71,7 +71,7 @@ def front_and_full(
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """The two cubes a formation-time analysis needs, on identical grids."""
     if n_z is None:
-        n_z = required_nz(alpha, drive.alpha_ac)
+        n_z = required_nz(alpha, drive.alpha_ac, S=drive.S, eta_max=float(np.max(np.abs(eta))))
     kw = dict(geometry=geometry, n_z=n_z)
     return (
         rocking_cube(alpha, drive, eta, times, steady=False, **kw),
@@ -107,7 +107,7 @@ def satellite_cube(
     difference, and read widths off it rather than off the raw window.
     """
     if n_z is None:
-        n_z = required_nz(alpha, drive.alpha_ac)
+        n_z = required_nz(alpha, drive.alpha_ac, S=drive.S, eta_max=float(np.max(np.abs(eta))))
     phase = drive.steady_phi if steady else drive.phi
     times = np.asarray(times, dtype=np.float64)
     eta = np.asarray(eta, dtype=np.float64)

@@ -59,14 +59,25 @@ def ZERO_PHASE(zeta):
     return np.zeros_like(np.asarray(zeta, dtype=np.float64))
 
 
-def required_nz(alpha: float, alpha_ac: float, per_cycle: int = 20) -> int:
-    """Depth steps needed to resolve both oscillations in the integrand.
+def required_nz(
+    alpha: float,
+    alpha_ac: float,
+    per_cycle: int = 20,
+    S: float = 0.0,
+    eta_max: float = 0.0,
+) -> int:
+    """Depth steps needed to resolve the fastest oscillation in the integrand.
 
-    The phase grating turns over ``alpha_ac`` times across the slab and the
-    Pendelloesung solution turns over ``alpha`` times; RK4 needs a handful of
-    steps per cycle of the faster one.
+    The grating turns over ``alpha_ac`` times across the slab and the
+    Pendelloesung solution ``alpha`` times. But the integrand also carries
+    ``e^{-i phi}``, whose phase sweeps up to ``S q`` per unit depth, and
+    ``e^{i eta zeta}``, which turns ``eta / 2 pi`` times; at large ``S`` and
+    high channels these dominate. Pass ``S`` and the largest ``|eta|`` to
+    include them: e.g. ``S = 6`` read at ``eta = 5 q`` needs ~4x the steps the
+    ``alpha_ac`` rule gives (notebook Entry 31).
     """
-    return max(256, int(per_cycle * max(alpha, alpha_ac)))
+    cycles = max(alpha, alpha_ac, eta_max / (2.0 * np.pi) + S * alpha_ac)
+    return max(256, int(per_cycle * cycles))
 
 
 def _state_shape(eta_a: NDArray[np.float64], phase) -> tuple[int, ...]:

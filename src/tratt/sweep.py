@@ -33,7 +33,7 @@ class Grid:
     eta_span: float = 3.0  # in units of q
     t_max: float = 2.0
     per_period: int = 32
-    n_z: int | None = None  # None -> required_nz(alpha, alpha_ac)
+    n_z: int | None = None  # None -> required_nz(alpha, alpha_ac, S=S, eta_max=eta_span*q)
 
 
 def condition(
@@ -48,8 +48,8 @@ def condition(
 ) -> list[dict]:
     """Formation times for one parameter point, one row per channel."""
     d = Drive(S=S, alpha_ac=alpha_ac, rise=rise)
-    n_z = grid.n_z or required_nz(alpha, alpha_ac)
     eta = np.linspace(-grid.eta_span * d.q, grid.eta_span * d.q, grid.n_eta)
+    n_z = grid.n_z or required_nz(alpha, alpha_ac, S=S, eta_max=grid.eta_span * d.q)
     times = d.times(t_max=grid.t_max, per_period=grid.per_period)
 
     I_front, I_full = front_and_full(alpha, d, eta, times, geometry=geometry, n_z=n_z)

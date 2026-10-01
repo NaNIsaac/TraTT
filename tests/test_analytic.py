@@ -107,3 +107,18 @@ def test_constant_phase_offset_leaves_intensity_unchanged():
     I1 = rocking(alpha, eta, phi=lambda z: np.full_like(np.asarray(z, float), 0.9),
                  geometry="laue", n_z=1024)
     assert np.allclose(I0, I1, atol=1e-10)
+
+
+def test_required_nz_resolves_large_S_high_channel():
+    """The alpha_ac rule alone under-resolves e^{-i phi} at large S and e^{i eta zeta}
+    at high channels (notebook Entry 31). The extended rule must give a result that
+    does not move when n_z is doubled."""
+    from tratt.drive import Drive
+
+    d = Drive(S=6.0, alpha_ac=10.0)
+    eta = np.array([5 * d.q])
+    nz = required_nz(1.0, d.alpha_ac, S=d.S, eta_max=float(eta.max()))
+    assert nz > required_nz(1.0, d.alpha_ac)
+    a = rocking(1.0, eta, phi=d.phi(0.7), n_z=nz)
+    b = rocking(1.0, eta, phi=d.phi(0.7), n_z=2 * nz)
+    assert np.allclose(a, b, atol=1e-4), (a, b)

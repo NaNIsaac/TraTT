@@ -1381,3 +1381,56 @@ length equal to the transit time and the memory kernel known in closed form.
 framework). Real transducers: arbitrary A(s) with a pi phase flip is a
 standard RF burst technique, but its fidelity inside the crystal (dispersion,
 attenuation) is not modelled. S up to 10 is a very large drive.
+
+---
+
+## 2026-10-01 — Entry 31: the brightest order switches in time, lagging the drive by t_tr / 2 — and a grid-rule bug
+
+**Setup.** `explore/nb/e31_switch.py`. Linear ramp to S = 6 over T (4 and 1),
+alpha = 0.5, alpha_ac = 40, Laue, centre intensity of n = 1..5; "brightest order"
+= argmax_n (ignored while all < 0.02). Compared with the history law and with
+the instantaneous ladder sin^2(pi alpha J_n(S A(t))) (no memory).
+
+**Result (converged grid).** Law error 0.005. Switch times (from -> to):
+
+| T | full TT | history law | instantaneous J_n(S A(t)) |
+|---|---|---|---|
+| 4 | 1->2 at 2.26, 2->3 at 3.01, 3->4 at 3.74, 4->5 at 4.83 | identical | 1.76, 2.52, 3.27, 4.00 |
+| 1 | 0.75–0.76 (with one flicker), 0.97, 1.20, 1.91 | 0.76, 0.97, 1.20, 1.91 | 0.45, 0.63, 0.82, 1.00 |
+
+**Reading.**
+- Yes: the brightest satellite changes identity n = 1 -> 2 -> 3 -> 4 -> 5 during
+  the ramp, at weak coupling, in the full simulation.
+- For the slow ramp the switches lag the instantaneous Bessel ladder by
+  0.50, 0.49, 0.47 t_tr: when a linear ramp covers the whole crystal, the depth
+  average of S A(t - zeta) is S A(t - 1/2) exactly, so the crystal reports the
+  drive **half a transit late**. The last switch (4 -> 5) lags more (0.83)
+  because the transducer stops ramping at t = 4 while the crystal is still
+  filling. For the fast ramp (T = 1) the lag is 0.31–0.38 and the order
+  sequence is compressed.
+- A clean experimental observable: the sequence of brightest orders is set by
+  the drive's Bessel ladder, the delay of each switch by t_tr / 2.
+
+**Bug found and fixed while doing this.** A first run (n_z = 2400) gave law
+error 0.09 at n = 5 and missed the last switch; the error *grew* with alpha_ac,
+which ruled out the alpha/alpha_ac correction. Convergence: max error at n = 5
+was 0.089 / 0.0031 / 0.0004 / 0.0004 for n_z = 2400 / 4800 / 9600 / 19200.
+Cause: `core.required_nz` counted only alpha and alpha_ac, but e^{-i phi}
+sweeps up to S q per unit depth and e^{i eta zeta} turns eta / 2 pi times — at
+S = 6 read at eta = 5 q that is ~11 alpha_ac cycles, not alpha_ac.
+**Fix:** `required_nz(alpha, alpha_ac, per_cycle, S=0, eta_max=0)` now uses
+max(alpha, alpha_ac, eta_max / 2 pi + S alpha_ac); `cube.*` and
+`sweep.sweep_point` pass S and max |eta|. Test
+`test_analytic.py::test_required_nz_resolves_large_S_high_channel`; 40 pass.
+
+**Impact on earlier entries (re-checked).**
+- Entry 28 (S = 3.83, n_z = 2400): n = 1 unchanged (max 0.605, final 0); n = 3, 4
+  move slightly (max 0.370 -> 0.376, 0.139 -> 0.153). Conclusion unchanged:
+  the forbidden n = 1 is still the brightest (0.605 > 0.462).
+- Entry 30(c) (S = 10, n = 1): law error 0.0073 at both n_z = 2400 and 9600 —
+  converged (low channel).
+- Entries with S <= 3 and n <= 3 used n_z >= 40–60 alpha_ac by hand, which meets
+  the new rule within a factor ~1.5; not re-run.
+- Session 1's sweep (C-1.5) used the old default at S up to 3, windows to ±3 q.
+  Its t_f values were already judged uninformative; if they are ever used,
+  re-run with the new rule.
