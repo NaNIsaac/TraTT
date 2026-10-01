@@ -857,3 +857,51 @@ Law: accumulated coupling (Entry 5). Max abs error of the centre intensity:
 depends on integer alpha_ac orthogonality or on special S. The Entry 16 rule
 was slightly optimistic. **Revised rule:** alpha / alpha_ac <= 0.05 for
 errors <= 0.03; <= 0.1 for <= 0.08.
+
+---
+
+## 2026-10-01 — Entry 20: experiment mapping with verified X0h constants
+
+**Source.** X0h (x-server.gmca.aps.anl.gov), Si, sigma, symmetric Laue,
+queried 2026-10-01 via `x0h_form.pl` (parameters in the script). Convention
+checked by hand: X0h's Laue extinction length is lambda cos(theta_B) / |chi_rh|
+(Si 220, 8 keV: 1.5498 A x 0.91495 / 9.3209e-6 = 15.21 um vs 15.203 reported),
+which is the intensity Pendellösung period — the code's Lambda_P
+(I = sin^2(pi L / Lambda_P)). Entry 6's guess of 15 um is confirmed.
+Shear speed v_T = sqrt(c44 / rho) = sqrt(79.6 GPa / 2329 kg m^-3) = 5846 m/s
+(c44 textbook value, not from X0h).
+
+**Key identity.** alpha / alpha_ac = Lambda_ac / Lambda_P. The validity rule
+(Entry 19) is a bound on the **acoustic wavelength relative to the
+Pendellösung length**, and the minimum drive frequency
+f_min = v_T / (r Lambda_P), r = 0.05 or 0.1, does not depend on L.
+
+**Table.** `explore/nb/e20_units_x0h.py`. S = 1.5, L = 3 Lambda_P (alpha = 3,
+alpha_1 = 1.67 oscillations in transit). Strain at r = 0.1 is K u0 = S d / Lambda_ac.
+Contrast = 1 / cosh(2 pi alpha'' J_1(S)) at t = 1 with alpha''/alpha' = chi_ih/chi_rh.
+Transmission = exp(-mu0 L / cos theta_B) (the common factor the code gauges out).
+
+| E keV | hkl | Lambda_P um | L um | t_tr ns | tau_1 ns | f_min GHz (r .05 / .1) | strain (r .1) | kappa | contrast | transmission |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 8 | 220 | 15.20 | 45.6 | 7.8 | 4.7 | 7.7 / 3.9 | 1.9e-4 | 0.962 | 0.93 | 0.49 |
+| 8 | 440 | 15.42 | 46.2 | 7.9 | 4.7 | 7.6 / 3.8 | 9.3e-5 | 0.866 | 0.87 | 0.32 |
+| 17.48 | 220 | 36.29 | 109 | 18.6 | 11.1 | 3.2 / 1.6 | 7.9e-5 | 0.965 | 1.00 | 0.85 |
+| 17.48 | 440 | 54.34 | 163 | 27.9 | 16.7 | 2.2 / 1.1 | 2.7e-5 | 0.867 | 0.99 | 0.78 |
+| 30 | 220 | 63.34 | 190 | 32.5 | 19.4 | 1.9 / 0.9 | 4.5e-5 | 0.966 | 1.00 | 0.95 |
+| 30 | 440 | 98.76 | 296 | 50.7 | 30.3 | 1.2 / 0.6 | 1.5e-5 | 0.872 | 1.00 | 0.92 |
+
+(400 rows in the script output; they sit between 220 and 440.)
+
+**Reading.**
+- **Correction to Entry 6.** Its 2 GHz plan for Si 220 at 8 keV used
+  alpha_ac = max(20, 5 alpha), i.e. r = 0.2 — outside the rule (error up to
+  ~0.17). At 8 keV the resolved regime needs 4–8 GHz.
+- **Higher energy and higher order are better on every axis.** Lambda_P grows,
+  so the required frequency and strain fall, tau_n rises to tens of ns (easy
+  timing at a storage ring, even with ~100 ps bunches), and absorption
+  disappears (alpha'' / alpha' < 0.4 %). **Recommended poster example: Si 440
+  at 17–30 keV, L ~ 150–300 um, shear wave ~1–2 GHz, strain ~2–3e-5.**
+- tau_1 = Lambda_P / (v_T J_1(S)) is confirmed thickness-independent in the
+  table (L changes, tau_1 tracks Lambda_P only).
+- Still unverified: c44 (textbook), whether a clean ~1 GHz shear wave can be
+  launched through 0.2–0.3 mm of Si, acoustic attenuation at GHz.
