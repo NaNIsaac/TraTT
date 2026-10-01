@@ -223,7 +223,9 @@ def test_transient_only_contrast_set_by_accumulated_coupling():
     """Non-ideal drives (attenuation, second harmonic) raise the final n = 1 background
     exactly as the accumulated-coupling law says (channel +q reads harmonic -1), and
     with attenuation it is the depth integral of J_1, not a local Bessel zero, that
-    must vanish: retuning S restores the transient-only contrast (notebook Entry 35)."""
+    must vanish *at the satellite centre*: retuning S restores the centre contrast
+    (notebook Entry 35). The eta-integrated satellite is not restored (Parseval,
+    Entry 37), so this test checks the centre only."""
     import sys
     from pathlib import Path
 
@@ -246,3 +248,34 @@ def test_transient_only_contrast_set_by_accumulated_coupling():
     d = GeneralDrive(S=Sst, alpha_ac=aac, amp=ramp(0.5), gamma=g)
     I = rocking_cube(alpha, d, np.array([d.q]), t, n_z=nz)[:, 0]
     assert I[1] < 1e-3 * I[0], I
+
+
+def test_two_domains_cancel_at_centre_but_add_in_the_integral():
+    """Two acoustic domains with opposite J_1 cancel the centre exactly when their
+    accumulated couplings balance, while the eta-integrated satellite is the sum of the
+    two domains' integrals (kinematic Parseval: integral ~ int J_1^2 dzeta)."""
+    import sys
+    from pathlib import Path
+
+    from scipy.optimize import minimize_scalar
+    from scipy.special import jv
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "explore" / "nb"))
+    from memory_drive import HistoryDrive
+
+    S1 = minimize_scalar(lambda s: -jv(1, s), bounds=(1, 3), method="bounded").x
+    S2 = minimize_scalar(lambda s: jv(1, s), bounds=(4, 7), method="bounded").x
+    r = jv(1, S2) / (jv(1, S2) - jv(1, S1))
+    alpha, aac = 0.1, 40.0
+    q = 2 * np.pi * aac
+    eta = np.linspace(0.5 * q, 1.5 * q, 2001)
+    nz = required_nz(alpha, aac, S=S2, eta_max=1.5 * q)
+    ts = 1.0 + r + 0.0037
+    I0 = rocking(alpha, eta, n_z=nz)
+    res = {}
+    for key, a2, a1 in (("both", S2, S1), ("one", 0.0, S1), ("two", S2, 0.0)):
+        d = HistoryDrive(S=1.0, alpha_ac=aac, env=lambda s, a2=a2, a1=a1: np.where(s < 1.0, a2, a1))
+        I = rocking(alpha, eta, phi=d.phi(ts), n_z=nz)
+        res[key] = (I[np.argmin(np.abs(eta - q))], np.trapezoid(I - I0, eta))
+    assert res["both"][0] < 1e-4 * res["one"][0]                       # centre cancels
+    assert abs(res["both"][1] / (res["one"][1] + res["two"][1]) - 1) < 0.03   # integrals add

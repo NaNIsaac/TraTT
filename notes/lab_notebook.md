@@ -1779,3 +1779,91 @@ do not fix the depth *order*) is a well-posed question for later.
 
 **Caveats.** One pulse shape (triangle), S_max = 3, Laue only; FWHM on a 0.25 eta
 grid (±0.25 resolution).
+
+---
+
+## 2026-10-01 — Entry 37: two acoustic domains — coherent cancellation at the centre, incoherent sum in the integral
+
+**Hypothesis (user's proposal).** Fill the crystal with two acoustic domains of
+amplitudes S1, S2 whose J_1 have opposite sign. Each alone diffracts strongly;
+when their accumulated couplings balance, r J_1(S1) + (1 - r) J_1(S2) = 0, the
+crystal is "dark" for n = 1. As the domain wall moves with the front, the
+satellite should switch bright -> dark -> bright. Maximise the individual
+strengths: S1 = 1.8412 (J_1 max, +0.5819), S2 = 5.3314 (J_1 min, -0.3461),
+balance at wall depth r* = 0.3730.
+
+**Setup.** `explore/nb/e37_domains.py`; figure `explore/make_domain_figure.py` ->
+`figures/domain_cancellation.png`. Transducer: S2 for one transit, then S1, so for
+t in [1, 2] the entrance-side layer zeta < t - 1 holds S1 and the rest S2.
+"Domain alone" runs replace the other domain with an unmodulated crystal.
+Laue and Bragg, alpha_ac = 40, alpha = 0.1 / 0.5 / 2, n_z from the extended rule.
+
+**Result — centre.**
+
+| geometry, alpha | S1 domain alone | S2 domain alone | both (wall at r*) | law max err n = 1, 2, 3 |
+|---|---|---|---|---|
+| Laue, 0.5 | 0.113 | 0.112 | 3.4e-6 | 0.008, 0.006, 0.003 |
+| Laue, 2 | **0.959** | **0.960** | **8.1e-4** | 0.031, 0.027, 0.014 |
+| Bragg, 0.5 | 0.109 | 0.106 | 1.8e-5 | 0.006, 0.005, 0.003 |
+| Bragg, 2 | 0.771 | 0.767 | 8.1e-4 | 0.025, 0.021, 0.011 |
+
+The minimum sits at t = 1.374 (predicted 1 + r* = 1.373). Dark width (I below 1 %
+of the maximum) ~0.1 t_tr at alpha = 0.5; ~0.01–0.03 t_tr in Bragg at alpha = 2
+(limited by the time grid). At alpha = 2 the Laue centre has further dark points
+that are ordinary Pendellösung zeros (|Theta| alpha = 1), e.g. near zeta_b ~ 0.9 —
+the cancellation is the one at r*.
+
+**Result — the whole satellite.** At the cancellation (Laue, alpha = 2) the
+centre is 8e-4 but the window integral is 17.6, *larger* than the S1 domain alone
+(16.6); the line is a doublet with side maxima at eta - q = ±4.5, ±10.7, ...
+Kinematic check (window integral minus the static tail):
+
+| alpha | both | S1 alone | S2 alone | Parseval 2 pi (pi alpha)^2 int J_1^2 dzeta (both / S1 / S2) |
+|---|---|---|---|---|
+| 0.1 | 0.1226 | 0.0771 | 0.0463 | 0.1249 / 0.0783 / 0.0466 |
+| 0.5 | 2.862 | 1.856 | 1.115 | 3.122 / 1.958 / 1.165 |
+
+"Both" equals the sum of the two domains (0.1226 vs 0.1234). The same holds for
+Entry 35's retuned-S* attenuation case: centre contrast 1.1e5 / 2.4e4 / 3.8e3
+(10 / 20 / 40 % loss) but **integrated contrast only 27 / 7.9 / 2.2**.
+
+**Order selection.** With (S1, S2) above, n = 1 cancels at r* = 0.373 while
+Theta_2 = +0.077 and Theta_3 = +0.226 there (n = 3 bright: 0.121 at alpha = 0.5,
+0.79 in Bragg alpha = 2). Other pairs: (1.0, 4.5) and (2.5, 4.2) cancel only n = 1;
+(3.0, 6.5) has cancellation points for n = 1, 2, 3 at r* = 0.312, 0.387, 0.103 —
+the wall position selects which order goes dark.
+
+**Reading.**
+- **Coherent cancellation is real and exact at the satellite centre**, in both
+  geometries: two domains that each reflect 96 % (Laue) or 77 % (Bragg) at
+  eta = q give < 1e-3 together. At exact resonance every layer rotates about the
+  same axis, so the angles (accumulated couplings) add with sign.
+- **It does not darken the satellite.** Away from eta = q the layer rotations do
+  not commute and the cancellation fails. Kinematically the amplitude is the
+  Fourier transform of the depth profile of the coupling,
+  A(delta) ~ int J_1(S(zeta)) e^{i delta (1 - zeta)} dzeta, so the centre is its
+  zeroth moment (Theta_1) while the eta-integral is, by Parseval,
+  2 pi (pi alpha)^2 int J_1(S(zeta))^2 dzeta — a sum of squares that no
+  arrangement can cancel. The two domains add *incoherently* in the integral.
+  **The integrated satellite vanishes only where J_1 = 0 locally.**
+- What the moving wall switches is the line shape: single peak -> centre-dark
+  doublet -> single peak, with the integral roughly conserved. A detector with
+  fine angular resolution at eta = q sees a sharp switch; an angle-integrating
+  detector sees almost nothing.
+- Order selection by wall position works in the same centre-only sense.
+
+**Corrections to earlier entries.**
+- Entry 35, section 6 ("the essence is the accumulated coupling, not the Bessel
+  zero") holds **for the satellite centre only**. For the eta-integrated satellite
+  the relevant quantity is int J_1^2 dzeta, so the transient-only satellite's
+  integrated darkness at the end requires J_1(S_f) ~ 0 locally — the Bessel zero
+  does matter there. Entry 35's integrated check (section 7) covered only the
+  ideal and non-retuned cases; the retuned case was added here (27 / 7.9 / 2.2).
+- The test docstring of `test_transient_only_contrast_set_by_accumulated_coupling`
+  now says "centre". New test
+  `test_two_domains_cancel_at_centre_but_add_in_the_integral` (42 pass).
+
+**Caveats.** Ideal step between domains (a real transducer has a finite switching
+time: the wall becomes a ramp, which leaves the centre cancellation intact but
+changes the profile). No acoustic reflection at the wall (same material). S2 =
+5.33 is a large drive (strain ~1e-4 for Si 440 at ~1 GHz, E).
