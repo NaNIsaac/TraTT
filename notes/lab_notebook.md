@@ -1471,3 +1471,31 @@ Time to reach 20 % of each channel's maximum: (1,0) 0.35; (0,1), (1,1), (1,-1)
   configuration; the user's "transient combination satellites" idea gives
   ordered, overlap-gated formation rather than an anomaly. Scope note: two-wave
   physics widens the study a lot; parked here.
+
+---
+
+## 2026-10-01 — Entry 33: claims table, additions from Entries 28–32, and the new story
+
+| # | Claim | Evidence | Status |
+|---|---|---|---|
+| 21 | Theta_n = int_0^1 J_n(S A(t - zeta)) sign_n dzeta is geometry-independent; Laue reads sin^2, Bragg reads tanh^2 (exact at resonance for any depth profile) | Entries 28, 30 (law error <= 0.03 / 0.008) | V |
+| 22 | Transient-only satellite: forbidden before and after (J_1(S_f) = 0), bright while a ramp is inside | Entry 28, test | V |
+| 23 | Steady-state-forbidden order is the brightest of all during the transient (weak coupling) | Entry 28 | V |
+| 24 | History dependence: same transducer amplitude, up vs down a pulse, up to 50x different (I_1 0.010 vs 0.494) | Entry 30a, `figures/poster_memory.png` b | V |
+| 25 | Satellite persists after the transducer is silent, while the packet is inside | Entry 30b | V |
+| 26 | Multiple bright/dark revivals at weak coupling from the drive's Bessel ladder | Entry 30c | V |
+| 27 | Phase-coded packet: pi flip cancels odd orders while both halves are inside, then they revive; even orders add | Entry 30d, test | V |
+| 28 | The brightest order switches 1 -> 2 -> 3 -> 4 -> 5 during a ramp, lagging the instantaneous ladder by t_tr / 2 | Entry 31 | V |
+| 29 | Two waves: combination satellites are overlap-gated; a second wave dims the first wave's satellite by J_0(S2) | Entry 32 | V |
+| — | Steady-state satellite extinction length ~ 1/J_1 (weak S) | Polikarpov & Skadorov 1987/1988 and refs (Entry 29) | prior art — cite |
+
+**Story, version 3.** A travelling acoustic front turns the crystal into a
+record of the last t_tr of the transducer signal. Each satellite reads that
+record through a Bessel kernel, Theta_n = int J_n(S A) dzeta, and the geometry
+only chooses how the reading is displayed — sin^2 (Laue) or tanh^2 (Bragg).
+Hence satellite formation remembers the path, not just the instantaneous
+strain: satellites can exist only in the transient, steady-forbidden orders
+can dominate it, equal strains give different patterns on the way up and down,
+and a pi-coded packet can erase and restore a satellite. The step-onset
+results (temporal Pendellösung, collapse, fringe flow) are the special case
+of a record that is a single step.

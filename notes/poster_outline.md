@@ -48,6 +48,19 @@ No fit parameter; all (alpha, S, n) collapse onto one curve.
 - Regime map: accuracy ~ 0.9 Lambda_ac / Lambda_P, independent of the clock.
   (Entry 26; `figures/regime_map.png`)
 
+## Panel 4b — Formation remembers the path (figure `figures/poster_memory.png`)
+The crystal is a record of the last t_tr of the drive; satellite n reads
+Theta_n = int_0^1 J_n(S A(t - zeta)) dzeta, sin^2 in Laue, tanh^2 in Bragg (exact).
+- Transient-only satellite: S_f at a J_1 zero — absent before and after, bright
+  in between; and it is the brightest order during the transient. (Entry 28)
+- Same strain, different pattern: I_1 = 0.010 on the way up vs 0.494 on the way
+  down a triangular pulse. (Entry 30a)
+- Pi-coded packet: n = 1 cancels while both halves are inside, n = 2 peaks,
+  then n = 1 revives. (Entry 30d)
+- Brightest order switches 1 -> 2 -> 3 -> 4 -> 5 during a ramp, t_tr / 2 late.
+  (Entry 31)
+All at alpha = 0.5 (no Pendellösung) and identical in Bragg.
+
 ## Panel 5 — What looked like features but are not
 Peak shifts, ±n asymmetry, acoustic-period ripple and the +12 % integral
 excess are one kinematic mechanism: interference with the main line's
@@ -65,6 +78,7 @@ Figure: `figures/poster_map.png` — I(eta, t) from full TT next to the
 closed three-mode model (Entry 22).
 
 ## Panel 7 — Answer to the abstract's question
+(Consider the story of notebook Entry 33 as the lead message.)
 The transit time ends the transient; it does not shape it. Inside the transit
 the clock is dynamical: t_tr / (alpha |J_n(S)|) — oscillation in Laue,
 saturation in Bragg. The static extinction length of each satellite, known
