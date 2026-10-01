@@ -1075,3 +1075,65 @@ At the two marked moments (centre value, window integral over ±40):
   tails and is the weakest; not investigated.
 - Poster candidate: this figure, or panel d of it, could replace panel c of
   `poster_mapping.png`.
+
+---
+
+## 2026-10-01 — Entry 25: at the Bessel zero the slow clock stops and only the acoustic ripple is left
+
+**Question (user's review).** As S -> j_{1,1} = 3.8317, J_1 -> 0 and
+tau_1 = Lambda_P / (v_s |J_1|) -> infinity. Where and how does the
+universal law break, and what is left at the zero?
+
+**Setup.** `explore/nb/e25_zero.py` plus an inline fine-time run. Laue, n = 1,
+centre intensity, 51 times (fine run: 801).
+
+**Result (a) — S scan, alpha = 3, alpha_ac = 60.**
+
+| S - Z | J_1 | max_t I sim (law) |
+|---|---|---|
+| -0.30 | +0.124 | 0.845 (0.850) |
+| -0.10 | +0.041 | 0.139 (0.141) |
+| -0.03 | +0.012 | 1.78e-2 (1.31e-2) |
+| -0.01 | +0.004 | 6.95e-3 (1.45e-3) |
+| 0 | 0 | 5.59e-3 (0) |
+| +0.01 | -0.004 | 6.67e-3 (1.45e-3) |
+| +0.03 | -0.012 | 2.01e-2 (1.29e-2) |
+| +0.10 | -0.040 | 0.147 (0.135) |
+
+**(b) — residual at the zero, max_t I:**
+
+| alpha | alpha_ac = 30 | 60 | 120 |
+|---|---|---|---|
+| 1 | 3.2e-3 | 6.3e-4 | 1.8e-4 |
+| 2 | 1.3e-2 | 2.5e-3 | 7.1e-4 |
+| 3 | 2.9e-2 | 5.6e-3 | 1.6e-3 |
+
+Scales as alpha^2 (1 : 4 : 8.9) and roughly as alpha_ac^-2 (x5.1, x3.5 per
+doubling).
+
+**(c)** The minimum of max_t I over S sits at the zero itself (S - Z = 0.0000
+for alpha_ac = 30 and 60, step 0.005): no shift of the zero.
+
+**Fine-time run at the zero** (alpha = 3, 801 times): the residual is a ripple
+at the acoustic frequency (FFT peak at 59.9 per unit t for alpha_ac = 60;
+60.9 for 60.5) with a **constant envelope** (7.1e-3) throughout the transit.
+A first reading that "the residual vanishes at t = 1" (I(1) = 4e-6) was a
+sampling accident: t = 1 is a whole number of acoustic periods for integer
+alpha_ac and lands on a node; with alpha_ac = 60.5, I(1) = 1.2e-3.
+
+**Reading.**
+- Away from the zero the law holds to the usual accuracy. It is overtaken by
+  the residual when (pi alpha J_1)^2 ~ residual, i.e. |J_1| ~ 0.008 here, or
+  **|J_n(S)| alpha_ac <~ 0.5** in general (equivalently J_n L / Lambda_ac <~ 0.5).
+- What is left at the zero is not a slow satellite at all: it is the
+  acoustic-period micromotion of the main-line tail (Entries 2, 14), with
+  amplitude ~ (alpha / alpha_ac)^2 and no growth. **The slow clock stops; the
+  fast clock (acoustic period) keeps ticking.** The two timescales separate
+  cleanly at the zero.
+- Physically interesting by-product: close to the zero, the same crystal
+  (alpha = 3, strongly dynamical for the main line) hosts a *kinematic*
+  satellite (alpha_1 << 1). S tunes the satellite from dynamical to kinematic
+  without changing the crystal — the S-scan rows above go from Pendellösung
+  (alpha_1 = 0.37 at S - Z = -0.3, not yet one oscillation) to pure t^2 growth.
+- Not to be called critical slowing-down: nothing collective, just
+  tau_1 ~ 1 / |S - Z| near a simple zero (J_1 linear in S - Z).
