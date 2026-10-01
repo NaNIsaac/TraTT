@@ -1275,3 +1275,44 @@ comparison stops discriminating.
   satellite is a short flash whose size ~ (pi alpha T <J_1>)^2.
 - Caveat: S = 3.83 is a large drive (Entry 20 scaling: u0 ~ 0.6 A for
   Si 440). Acoustic nonlinearity is outside the model.
+
+---
+
+## 2026-10-01 — Entry 29: Polikarpov & Skadorov read in full (supplied by the user)
+
+**[P87]** I. V. Polikarpov, V. V. Skadorov, "X-Ray Dynamical Diffraction in
+Crystals Being Subjected to the Action of Ultrasonic Waves", phys. stat. sol.
+(b) 143, 11 (1987). **[P88]** same authors, "X-Ray Bragg Dynamical Diffraction
+in Crystals Weakly Deformed by Ultrasonic Waves", phys. stat. sol. (b) 149,
+435 (1988).
+
+What they contain:
+- Quasi-static, multi-wave (Floquet) treatment: the non-stationary two-wave
+  problem becomes multi-wave diffraction of waves k + p kappa by a stationary
+  lattice + ultrasonic superlattice. The coupling coefficients are written with
+  Bessel functions explicitly, chi_{p,p'} = (-1)^{p-p'} e^{i(p'-p)phi}
+  J_{p'-p}(tau a) C chi_tau (P87 eq. 1) — our J_n(S), S = h.u0 = tau a.
+- They then expand in xi = (1/2) tau a << 1 (weak deformation) and keep only
+  p = 0, ±1 (six waves). The satellite extinction length is
+  Lambda_a = (k sqrt((Delta lambda)^2 + 4 xi^2 eta_a))^-1 (P87 eq. 13): ~ 1/xi,
+  the small-S limit of our Lambda_P / |J_1(S)|.
+- Main message of P87: the non-resonant waves must be kept; they make the
+  extinction lengths of different branches differ and give "an intricate
+  oscillating dependence of the X-ray intensity on the ultrasonic wave
+  amplitude" — steady state. P88: Bragg geometry, two- vs four-level
+  resonance depending on alpha, steady state.
+- Uniform, fully modulated crystal throughout. No travelling front, no
+  transient, no time-dependent amplitude, no rise. S is perturbative, so the
+  Bessel zeros are outside their scope.
+
+**Consequences for our claims.**
+- The steady-state satellite extinction length (weak-S form) is prior art:
+  P87, with earlier Soviet work it cites (Entin 1977/1979; Iolin & Entin 1983;
+  Dzyublik 1983; Assur & Entin 1982). Cite them for the ingredient.
+- Their emphasis on non-resonant waves is the steady-state counterpart of our
+  three-mode corrections (Entry 14); cite as such.
+- Still not found anywhere: the transient formation behind a travelling front
+  and everything built on it (collapse, fringe flow, Bessel-ordered stages,
+  accumulated-coupling law, transient-only and transiently dominant orders,
+  history dependence). Our use of the full J_n(S) at arbitrary S (zeros
+  included) also goes beyond their xi << 1 truncation.
