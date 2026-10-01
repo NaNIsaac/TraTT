@@ -1434,3 +1434,40 @@ max(alpha, alpha_ac, eta_max / 2 pi + S alpha_ac); `cube.*` and
 - Session 1's sweep (C-1.5) used the old default at S up to 3, windows to ±3 q.
   Its t_f values were already judged uninformative; if they are ever used,
   re-run with the new rule.
+
+---
+
+## 2026-10-01 — Entry 32: two co-propagating waves — combination satellites need overlap
+
+**Setup.** `explore/nb/e32_two_waves.py`. phi = S1 A1(s) sin(q1 s) +
+S2 A2(s) sin(q2 s), s = t - zeta, both step envelopes, the second launched
+tau = 0.4 later; alpha_ac1 = 40, alpha_ac2 = 57, S1 = S2 = 1.2, alpha = 0.5,
+Laue, n_z from the extended rule (4676). Channel (n, m) at eta = n q1 + m q2.
+Law: the product of the two Jacobi–Anger expansions gives coupling
+J_n(S1 A1) J_m(S2 A2), so Theta_nm = int_0^1 J_n(S1 A1(t - zeta)) J_m(S2 A2(t - zeta)) dzeta.
+
+**Result.** Law max error 0.003–0.006 on (1,0), (0,1), (1,1), (1,-1), (2,-1).
+Selected time series (centre intensity):
+
+| t | (1,0) | (0,1) | (1,1) | (1,-1) |
+|---|---|---|---|---|
+| 0.30 | 0.055 | 0.000 | 0.000 | 0.000 |
+| 0.60 | 0.169 | 0.012 | 0.006 | 0.007 |
+| 1.05 | **0.333** | 0.113 | 0.062 | 0.063 |
+| 1.50 | 0.251 | 0.251 | 0.145 | 0.145 |
+
+Time to reach 20 % of each channel's maximum: (1,0) 0.35; (0,1), (1,1), (1,-1)
+0.85; (2,-1) 0.80.
+
+**Reading.**
+- The history law extends to two waves without change of form.
+- Combination satellites exist only in the depth where both waves are present:
+  they start growing at t = tau and their clock is the overlap, not the transit.
+- Cross-talk: while the delayed wave fills the crystal, the first wave's own
+  satellite (1,0) *dims* (0.333 -> 0.251), because in the overlap its coupling is
+  J_1(S1) J_0(S2), J_0(1.2) = 0.67. A second acoustic wave switches the first
+  wave's satellite down with a delay set by tau.
+- No anomalously large transient combination satellite was found in this
+  configuration; the user's "transient combination satellites" idea gives
+  ordered, overlap-gated formation rather than an anomaly. Scope note: two-wave
+  physics widens the study a lot; parked here.
