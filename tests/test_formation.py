@@ -171,3 +171,22 @@ def test_bragg_satellite_saturates_as_filled_depth_slab():
     t = np.array([0.1037, 0.4037, 0.7037])
     I = rocking_cube(alpha, d, np.array([d.q]), t, geometry="bragg", n_z=1200)[:, 0]
     assert np.allclose(I, np.tanh(np.pi * alpha * abs(jv(1, S)) * t) ** 2, atol=0.02), I
+
+
+def test_dark_centre_keeps_integrated_satellite():
+    """At alpha_n t = 1 the centre is dark but the window integral is still
+    pi^2 alpha_n int_0^{2 pi} J_0 (about half its maximum): the intensity is
+    redistributed into side lobes, not lost."""
+    from scipy.integrate import quad
+    from scipy.special import jv
+
+    S, alpha = 1.5, 2.0
+    d = Drive(S=S, alpha_ac=40.0)
+    an = alpha * abs(jv(1, S))
+    eta = np.linspace(0.5 * d.q, 1.5 * d.q, 2001)
+    I = rocking_cube(alpha, d, eta, np.array([1.0 / an]), n_z=2400)[0]
+    centre = I[np.argmin(np.abs(eta - d.q))]
+    p = np.trapezoid(I, eta)
+    p_th = np.pi**2 * an * quad(lambda x: jv(0, x), 0, 2 * np.pi)[0]
+    assert centre < 0.01, centre
+    assert abs(p / p_th - 1) < 0.05, (p, p_th)

@@ -28,15 +28,25 @@ pi alpha |J_n(S)|. It replays its static thickness curve in time:
 No fit parameter; all (alpha, S, n) collapse onto one curve.
 
 ## Panel 4 — Consequences
-- Formation order follows the Bessel ladder, reorderable by S
-  (S = 3: n = 2, 1, 3). (Entry 1; figure c)
+- **Formation is not peak growth.** At the dark point (alpha_n t = 1) the
+  centre is at 0.1 % of its maximum while ~52 % of the integrated satellite
+  remains, in two side lobes. The line shape is a conveyor of Pendellösung
+  fringes flowing inward; each centre maximum is a fringe arrival. (Entry 23;
+  `figures/poster_map.png`)
+- **One front, several stages.** At S = 3 the n = 2 line is split around a dark
+  centre while n = 3 peaks and n = 1 decays — tau_n made visible.
+  (Entry 24; `figures/poster_ladder_map.png`, replaces the formation-order plot)
 - Main line: rotations add, sin^2(pi alpha [1 - (1 - J_0) t]) — CW analogue of
   the DeCamp et al. (2001) dividing layer. (Entry 1)
-- Width: Laue narrows to 0.71 of the finite-depth limit at alpha_n t ~ 0.86;
-  Bragg stops narrowing at the satellite Darwin width ~13.4 alpha_n. (Entries 4, 17)
-- Finite rise: sin^2(pi alpha |int J_n(S A) dzeta|) for all channels; a ramp
-  through the Bessel maximum gives a 1.5x overshoot even at weak coupling,
-  through the zero a dark window. (Entries 5, 15; figure d)
+- Width: Laue narrows to 0.71 of the finite-depth limit; Bragg stops at the
+  satellite Darwin width ~13.4 alpha_n. (Entries 4, 17)
+- Finite rise: sin^2(pi alpha |int J_n(S A) dzeta|); a ramp through the Bessel
+  maximum gives a 1.5x overshoot at weak coupling, through a zero a dark
+  window. (Entries 5, 15)
+- At a Bessel zero the slow clock stops; only the acoustic-period ripple is
+  left. (Entry 25)
+- Regime map: accuracy ~ 0.9 Lambda_ac / Lambda_P, independent of the clock.
+  (Entry 26; `figures/regime_map.png`)
 
 ## Panel 5 — What looked like features but are not
 Peak shifts, ±n asymmetry, acoustic-period ripple and the +12 % integral

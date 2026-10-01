@@ -1182,3 +1182,32 @@ alpha = alpha_1 / J_1, alpha_ac = alpha / x; 121 times; colour = max_t of
 - Caveat: stroboscopic model. Any genuine dependence on v_s beyond t_tr
   (e.g. the X-ray response time, quasi-static breakdown, handoff 7.5) is outside
   this map by construction.
+
+**Entry 21 addendum (user, 2026-10-01).** Time-resolved rocking curves of
+ultrasonically excited crystals have been measured for a long time (e.g. Liss
+et al., 1998: liss.freeshell.org/kdl/papers/Liss98-2.pdf), and the time
+dependence of SAW satellites is known. Those works look at the phase of an
+already established periodic (often standing) acoustic field. The question
+here — the line shape of a satellite being *created* behind a travelling
+front — is a different problem. Liss 1998 not yet read by me.
+
+---
+
+## 2026-10-01 — Entry 27: claims table, additions from Entries 20–26
+
+| # | Claim | Evidence | Status |
+|---|---|---|---|
+| 15 | At the dark point the satellite keeps ~52 % of its maximal integrated intensity, in two side lobes: formation is not peak growth | Entry 23, test `test_dark_centre_keeps_integrated_satellite` | V |
+| 16 | The line shape evolves by inward flow of Pendellösung fringes in eta; each centre maximum is a fringe arrival; lobe positions collapse as (eta - nq) t = G(alpha_n t) | Entry 23 | V (~5 % in (eta - nq) t) |
+| 17 | Integrated and centre intensities share the period but not the phase or damping (integral leads by ~1/8 period, damped as J_0) | Entry 23 | V |
+| 18 | Under one front, different orders are in different line-shape phases at the same time (n = 2 dark while n = 3 peaks, S = 3) | Entry 24, `figures/poster_ladder_map.png` | V |
+| 19 | At a Bessel zero the slow clock stops; only an acoustic-period ripple ~ (alpha/alpha_ac)^2 remains; the law fails for abs(J_n) alpha_ac <~ 0.5 | Entry 25 | V |
+| 20 | Mapping accuracy ~ 0.9 Lambda_ac / Lambda_P, independent of the number of turns; f tunes accuracy, L and S tune the clock | Entry 26, `figures/regime_map.png` | V |
+| 11 | Experimental accessibility | Entry 20 | V for X-ray constants (X0h); c44, transducer: E |
+
+**Sharper one-sentence story (replaces Entry 12's).** Behind a travelling
+acoustic front each satellite is a crystal whose thickness grows at v_s and
+whose extinction length is Lambda_P / abs(J_n(S)); its line shape is therefore a
+conveyor of Pendellösung fringes flowing toward the satellite centre, so the
+peak blinks while the integrated satellite persists, and different orders
+under the same front are caught at different stages of the same evolution.
