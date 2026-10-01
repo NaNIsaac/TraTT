@@ -956,3 +956,24 @@ onlinelibrary.wiley.com/doi/pdf/10.1002/pssb.2221430102 ;
 link.springer.com/article/10.1134/1.1376457 ;
 pubs.aip.org/aip/rsi/article-abstract/73/3/1643/1072347 ;
 researchgate.net/publication/26773530.
+
+---
+
+## 2026-10-01 — Entry 22: the time-resolved rocking curve as a picture
+
+`explore/make_map_figure.py` -> `figures/poster_map.png`. Laue, n = 1,
+S = 1.5, alpha = 3, alpha_ac = 60 (ratio 0.05), 321 eta x 99 t.
+(a) full TT, (b) three-mode closed model (Entry 14), (c) centre cut with
+sin^2(pi alpha_1 t). max |model - TT| / max TT = 0.065.
+
+What the map shows in one look: the satellite appears broad, narrows as
+1/t, blinks off at alpha_1 t = 1 (t = 0.6) with the line splitting into two
+side lobes, and returns narrower. The fringes fanning out to both sides are
+the finite-depth side lobes. This is the abstract's "time-resolved rocking
+curve I(eta, t)" with its analytic counterpart next to it.
+
+**Entry 12 table — status changes.**
+- Claim 11 (experimental accessibility): E -> **V for the X-ray constants**
+  (X0h, Entry 20); c44 and transducer feasibility remain estimates. The example
+  changes to Si 440 at 17–30 keV, ~1–2 GHz (Entry 20).
+- Claim 12 (three-mode model): add the map, 6.5 % max deviation at ratio 0.05.

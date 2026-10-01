@@ -45,10 +45,14 @@ off-Bragg tail, reproduced by a closed three-mode model and vanishing as
 alpha / alpha_ac -> 0. (Entries 2, 3, 8, 14)
 
 ## Panel 6 — Experiment
-Si 220, L = 50–200 um, shear wave ~2 GHz, strain ~1e-4: tau_1 ~ 5 ns,
-storage-ring timing suffices; Borrmann absorption keeps contrast (Entry 11b).
-S calibrated in situ from tau_2 / tau_1 = |J_1 / J_2| to ~1 %, gain-free
-(Entry 13). Material constants still to be verified (X0h/XOP).
+Constants from X0h (Entry 20). The resolved-channel rule is
+Lambda_ac <= 0.05–0.1 Lambda_P, so the drive frequency is set by the
+Pendellösung length, not the thickness. Si 220 at 8 keV needs 4–8 GHz; **Si 440
+at 17–30 keV needs ~0.6–2 GHz**, strain ~1.5–3e-5, tau_1 = 17–30 ns, absorption
+negligible — the recommended example. S calibrated in situ from
+tau_2 / tau_1 = |J_1 / J_2| to ~1 %, gain-free (Entry 13).
+Figure: `figures/poster_map.png` — I(eta, t) from full TT next to the
+closed three-mode model (Entry 22).
 
 ## Panel 7 — Answer to the abstract's question
 The transit time ends the transient; it does not shape it. Inside the transit
@@ -59,5 +63,6 @@ from the steady state, becomes a time.
 ## Before printing
 - Read DeCamp 2001 and the ultrasonic-superlattice literature in full; fix the
   novelty sentence (Entry 7).
-- Verify Lambda_P, kappa, v_T for the chosen reflection.
+- X-ray constants verified with X0h (Entry 20); c44 and GHz shear-wave launch through 0.2–0.3 mm Si still to check.
+- Read Polikarpov, phys. stat. sol. (b) 143 (1987) / 149 (1988) (paywalled; needs library access) — Entry 21.
 - Decide whether Bragg (deprioritised) gets a full panel or a sub-panel.
