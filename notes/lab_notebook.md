@@ -905,3 +905,54 @@ Transmission = exp(-mu0 L / cos theta_B) (the common factor the code gauges out)
   table (L changes, tau_1 tracks Lambda_P only).
 - Still unverified: c44 (textbook), whether a clean ~1 GHz shear wave can be
   launched through 0.2–0.3 mm of Si, acoustic attenuation at GHz.
+
+---
+
+## 2026-10-01 — Entry 21: prior art, second pass
+
+**Read in full (2 pages):** DeCamp, Reis, Bucksbaum et al., "Picosecond
+Switching of X-rays by Using the Borrmann Effect", APS Activity Report 2001
+(companion to Nature 413, 825 (2001)). Facts from the text:
+- Ge (001), 280 um, asymmetric 202 Laue, 10 keV; crystal thick against
+  absorption, so only the Borrmann mode transmits.
+- The disturbance is a **single short strain pulse**, "spatially short compared
+  to ... Pendellösung depth", launched by a 50 fs laser.
+- Mechanism stated: to switch efficiently "the short acoustic pulse must travel
+  into the crystal about one quarter of a Pendellösung depth, or ~400 ps";
+  observed switching was faster (supersonic, ambipolar plasma diffusion).
+- **No satellites, no periodic drive, no Bessel functions.**
+
+So the main-line "temporal Pendellösung" prior art is a pulse acting as a
+moving interface between two perfect crystals. Our n = 0 law (Entry 1) is the
+CW-grating version of that picture; the satellite results are outside it.
+
+**Found by search (abstracts only):**
+- Polikarpov, phys. stat. sol. (b) 143 (1987) and 149 (1988): dynamical
+  diffraction (Laue, Bragg) in crystals weakly deformed by ultrasonic waves —
+  the steady-state theory most likely to contain the J_n(S)-scaled satellite
+  extinction length. **Must be read before claiming anything about the
+  steady-state satellite Pendellösung.**
+- Iolin & Entin: suppression of anomalous transmission (Borrmann) by a
+  deformation superlattice — steady state, absorption-centred.
+- Zolotoyabko, Shilo et al., Rev. Sci. Instrum. 73, 1643 (2002) and related:
+  stroboscopic diffraction from 0.58 GHz standing SAWs in LiNbO3 at the APS;
+  satellites modulated at 2f — periodic steady state, phase-locked, not a
+  formation transient.
+- Yoshimura & Hirano, J. Synchrotron Rad. 16, 601 (2009): temporal oscillation
+  of Pendellösung fringes without acoustic drive — unrelated.
+
+**Novelty position after this pass.** Nothing found on (i) the transient
+formation of satellites behind a travelling front, (ii) the time-domain
+collapse onto the static thickness curves, (iii) Bessel-ordered formation,
+(iv) the accumulated-coupling law for a ramp, or (v) the period-ratio
+calibration of S. The search was not exhaustive (web search, no database
+access). The steady-state ingredient (satellite extinction length ~ Lambda/|J_n|)
+should be attributed to the ultrasonic-superlattice literature, pending
+Polikarpov.
+
+Sources: aps.anl.gov/.../apsar2001/DECAMP1.PDF ;
+onlinelibrary.wiley.com/doi/abs/10.1002/pssb.2221490203 ;
+onlinelibrary.wiley.com/doi/pdf/10.1002/pssb.2221430102 ;
+link.springer.com/article/10.1134/1.1376457 ;
+pubs.aip.org/aip/rsi/article-abstract/73/3/1643/1072347 ;
+researchgate.net/publication/26773530.
