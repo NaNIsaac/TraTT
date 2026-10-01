@@ -190,3 +190,30 @@ def test_dark_centre_keeps_integrated_satellite():
     p_th = np.pi**2 * an * quad(lambda x: jv(0, x), 0, 2 * np.pi)[0]
     assert centre < 0.01, centre
     assert abs(p / p_th - 1) < 0.05, (p, p_th)
+
+
+def test_history_law_transient_only_and_phase_coded_packet():
+    """The crystal stores the last t_tr of drive history; satellite n reads
+    Theta_n = int_0^1 J_n(S A(t - zeta)) sign_n dzeta. Two consequences:
+    a satellite that exists only while a ramp to a J_1 zero is inside, and a
+    pi-flipped packet that cancels odd orders while both halves are inside."""
+    import sys
+    from pathlib import Path
+
+    from scipy.special import jn_zeros
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "explore" / "nb"))
+    from memory_drive import HistoryDrive, box, ramp, theta
+
+    alpha = 0.5
+    d = HistoryDrive(S=jn_zeros(1, 1)[0], alpha_ac=40.0, env=ramp(2.0))
+    t = np.array([1.5037, 3.5037])
+    I = rocking_cube(alpha, d, np.array([d.q]), t, n_z=1600)[:, 0]
+    assert I[0] > 0.4 and I[1] < 1e-4, I
+    assert np.allclose(I, np.sin(np.pi * alpha * np.abs(theta(d, 1, t))) ** 2, atol=0.01)
+
+    d = HistoryDrive(S=1.5, alpha_ac=40.0, env=box(0.8), flip=lambda s: np.where(s >= 0.4, 1.0, 0.0))
+    t = np.array([0.4037, 0.9037, 1.4037])
+    I = rocking_cube(alpha, d, np.array([d.q, 2 * d.q]), t, n_z=1600)
+    assert I[1, 0] < 1e-3 and I[0, 0] > 0.1 and I[2, 0] > 0.1, I[:, 0]   # n = 1 cancels, revives
+    assert I[1, 1] > 0.07, I[:, 1]                                          # n = 2 adds meanwhile

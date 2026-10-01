@@ -1316,3 +1316,68 @@ What they contain:
   accumulated-coupling law, transient-only and transiently dominant orders,
   history dependence). Our use of the full J_n(S) at arbitrary S (zeros
   included) also goes beyond their xi << 1 truncation.
+
+---
+
+## 2026-10-01 — Entry 30: formation remembers the path
+
+**Setup.** `explore/nb/e30_history.py`; figure `explore/make_memory_figure.py`
+-> `figures/poster_memory.png`. Laue and Bragg, alpha = 0.5 (no Pendellösung),
+alpha_ac = 40, centre intensities. Law: Theta_n read by sin^2 / tanh^2
+(Entry 28). Law error <= 0.008 in every run below, both geometries.
+
+**(a) Same transducer amplitude, different pattern (triangular pulse,
+S_max = 3, rise = fall = T).** I_1 on the way up / down at equal S A(t):
+
+| geometry | T | A = 0.3 | A = 0.6 | A = 0.9 |
+|---|---|---|---|---|
+| Laue | 0.25 | 0.001 / 0.091 | 0.008 / 0.060 | 0.024 / 0.034 |
+| Laue | 1 | **0.010 / 0.494** | 0.117 / 0.518 | 0.322 / 0.429 |
+| Laue | 4 | 0.146 / 0.510 | 0.560 / 0.578 | 0.544 / 0.355 |
+| Bragg | 1 | 0.010 / 0.428 | 0.111 / 0.442 | 0.286 / 0.372 |
+
+n = 2 behaves the same way (Laue, T = 1, A = 0.3: 0.000 / 0.289).
+Reading: the satellite reads the drive averaged over the last t_tr, i.e. the
+transducer signal delayed by ~t_tr / 2 and smoothed; plotted against the
+instantaneous amplitude the response is a loop (figure panel b). Even a slow
+pulse (T = 4 t_tr) keeps a large loop: what matters is dA/dt x t_tr, not
+T >> t_tr alone. At A = 0.9 for T = 4 the order reverses (up > down) because the
+path crosses the J_1 maximum (S A = 1.84) inside the crystal. **Not**
+thermodynamic hysteresis — a finite, exactly known memory of length t_tr.
+
+**(b) Satellite after the drive has stopped.** Transducer amplitude 0
+(t = 2T + ...): Laue I_1 = 0.105 (T = 0.25), 0.063 (T = 1): the packet is still
+in the crystal. It vanishes once the packet has left (T = 4: 0.005, sampled late).
+
+**(c) Multiple revival, slow triangle to S = 10, T = 3, n = 1.** Bright maxima
+0.369, 0.105, 0.095, 0.107, 0.368 at t = 1.05, 2.1, 3.5, 4.85, 5.9; dark minima
+(I < 0.02, essentially 0) at t = 1.7, 2.63, 4.38, 5.31 — two J_1 zeros crossed
+on the way up and again on the way down. Four dark windows at alpha = 0.5, where
+the step-onset satellite would never pass through zero: this is the Bessel
+ladder of the drive, not Pendellösung. With a fast pulse (T = 0.5) the crystal
+averages over the whole ladder and I_1 stays below 0.05 throughout.
+
+**(d) Phase-coded packet: box of length 0.8 with a pi carrier flip at 0.4, S = 1.5.**
+
+| t | 0.2 | 0.4 | 0.6 | 0.8 | 0.9 | 1.0 | 1.2 | 1.4 | 1.6 | 1.9 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| n = 1 (Laue) | 0.031 | 0.117 | 0.030 | **0.000** | **0.000** | **0.000** | 0.031 | **0.118** | 0.030 | 0.000 |
+| n = 2 (Laue) | 0.005 | 0.022 | 0.048 | **0.083** | 0.083 | 0.084 | 0.048 | 0.020 | 0.005 | 0.000 |
+
+Bragg identical to within 0.006. While both halves are inside, the odd order
+cancels exactly (the flipped half contributes (-1)^n J_n) and the even order is
+at its maximum; when the leading half leaves, n = 1 **revives** to its earlier
+peak. A trailing edge erasing what the leading edge wrote, then the erasure
+being undone.
+
+**Test.** `tests/test_formation.py::test_history_law_transient_only_and_phase_coded_packet`
+(39 tests pass).
+
+**Story candidate (user's phrasing, now supported):** *formation dynamics
+remembers the path, not just the instantaneous strain* — with the memory
+length equal to the transit time and the memory kernel known in closed form.
+
+**Limits.** Phase jumps other than 0 / pi are not covered by the law (Entry 28
+framework). Real transducers: arbitrary A(s) with a pi phase flip is a
+standard RF burst technique, but its fidelity inside the crystal (dispersion,
+attenuation) is not modelled. S up to 10 is a very large drive.
