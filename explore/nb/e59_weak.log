@@ -1,0 +1,10 @@
+ R_D=0.05 S=0.02: W_TT / W_pred at eta/(2 pi alpha) = 3.0:0.971  5.2:1.010  10.2:0.989  19.8:0.979  39.9:0.980  60.0:0.957
+   where W > 2% of max: median 0.9851, range [0.971, 1.010];  kinematic-only law (|R0| |G| pi alpha S / kappa / T) off by up to 0.84
+ R_D=0.05 S=0.05: W_TT / W_pred at eta/(2 pi alpha) = 3.0:0.939  5.2:0.986  10.2:0.979  19.8:0.979  39.9:0.996  60.0:0.941
+   where W > 2% of max: median 0.9835, range [0.939, 1.056];  kinematic-only law (|R0| |G| pi alpha S / kappa / T) off by up to 0.90
+ R_D=0.2 S=0.02: W_TT / W_pred at eta/(2 pi alpha) = 0.4:0.960  0.7:0.970  1.0:0.984  1.5:0.980  2.0:0.990  3.0:0.989  5.0:1.035  10.0:1.007  17.0:0.973
+   where W > 2% of max: median 1.0213, range [0.969, 1.048];  kinematic-only law (|R0| |G| pi alpha S / kappa / T) off by up to 44.74
+ R_D=0.5 S=0.02: W_TT / W_pred at eta/(2 pi alpha) = 0.4:0.969  0.7:0.956  1.0:0.977  1.5:1.005  2.0:0.952  3.0:1.005  5.0:1.002  8.0:1.005
+   where W > 2% of max: median 0.9932, range [0.767, 1.065];  kinematic-only law (|R0| |G| pi alpha S / kappa / T) off by up to 47.96
+wrote D:\03_Develop\06_Paper\TraTT\figures\chalise_transfer.png
+ weak absorption (kappa/2pi alpha = 0.024), n_z = 14495: W_TT / W_pred median 0.9925, range [0.944, 1.044]

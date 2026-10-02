@@ -3359,3 +3359,112 @@ figures are approximate.
   against the absorbing Darwin–Prins curve);
 - or use a much thicker slab with an absorbing layer, which needs the same change.
 Without absorption, no finite slab avoids the fringes. Not done yet.
+
+---
+
+## 2026-10-02 — Entry 59: absorbing reference case for Chalise et al., and a closed-form transfer function from strain spectrum to Fourier weight
+
+**Why.** Entry 58 was invalid because a finite non-absorbing slab imprints back-face fringes.
+Normal absorption was added to the Bragg solver: `solve_bragg(..., kappa)` with
+eta -> eta + i kappa, tested against the Darwin–Prins root, 53 tests pass. Commit be2343d.
+
+**Setup.**
+- Scripts: `explore/nb/e58_chalise_ref.py abs darwin` (full TT) and
+  `explore/nb/e59_transfer.py [fig] [weak]` (closed form, figure, weak-absorption check).
+- Crystal: alpha = 8, so the Darwin half-width is 2 pi alpha = 50; kappa = 6, so
+  kappa / 2 pi alpha = 0.12 and the back face is suppressed by e^-6.
+- Packet as in Entry 58. Linear regime: S = 0.02 and 0.05 give the same normalised shapes.
+- Darwin ratio R_D = 2 pi alpha / q0 = 0.05, 0.2, 0.5.
+- The weight is now the Fourier component exactly at omega = |eta|. The nearest-FFT-bin pick of
+  Entry 58 added ~15 % leakage noise.
+
+**1. Kinematic tail (R_D = 0.05, eta > 3 Darwin half-widths).**
+- |r0| eta = 25.2 = pi alpha, i.e. the tail is r0 = pi alpha / eta.
+- Raw W follows |eps^| / omega^2: max normalised deviation 0.30, mostly at the low end;
+  1–3 % above 0.7 q0.
+- W / |r0| follows phi^ = eps^ / omega: max deviation 0.047.
+- So the Fourier weight is **not** the strain spectrum. It is the strain spectrum times
+  |r0(omega)| / omega ~ 1 / omega^2, because the oscillation is a heterodyne with the static
+  tail amplitude.
+- All spectra peak at the same frequency for this narrow packet (0.99 q0). A normalised peak
+  position therefore cannot reveal the weighting; the band shape can.
+
+**2. Closed form (first order in S).**
+Linearise the Riccati equation around the static semi-infinite root R0, where
+c R0^2 + i eta_c R0 + c = 0, c = i pi alpha and eta_c = eta + i kappa:
+
+    d delta/d zeta = i c phi (1 - R0^2) - Lambda delta,   Lambda = i eta_c + 2 c R0
+    int delta(0,t) e^{iWt} dt = i c S (1 - R0^2) G(W) / (Lambda + iW),   G = FT of the phase packet g
+    W_pred(eta) = | conj(R0) A(|eta|) + R0 conj(A(-|eta|)) | / T,   A(W) = i c S (1 - R0^2) G(W) / (Lambda + iW)
+
+Kinematic limit: |R0| ~ pi alpha / eta and Lambda - i eta ~ -kappa, which gives
+W_kin = |R0| |G| pi alpha S / (kappa T).
+
+| R_D | W_TT / W_pred, where W > 2 % of max | kinematic law off by up to |
+|---|---|---|
+| 0.05, S = 0.02 | median 0.985, range 0.971–1.010 | 0.84 |
+| 0.05, S = 0.05 | median 0.984, range 0.939–1.056 | 0.90 |
+| 0.2 | median 1.021, range 0.969–1.048 | 45x |
+| 0.5 | median 0.993, range 0.767–1.065 | 48x |
+
+- Time window: T = 0.6 -> 1.2 moves the median from 1.021 to 0.999, so the residual offset
+  is the finite window.
+- The remaining ±3.5 % scatter is not identified (candidates: the strain step at the packet
+  front, the finite slab).
+- **No fit parameter.** The agreement holds inside the Darwin plateau too, where W drops
+  100-fold below the kinematic law.
+
+**3. One curve.** W / W_kin, plotted against eta / (2 pi alpha) = phonon frequency / Darwin
+half-width, collapses onto a single curve for all three packet spectra
+(`figures/chalise_transfer.png` b).
+- At kappa / 2 pi alpha = 0.12 the curve reads 0.005 (0.3 Darwin half-widths),
+  0.11 (1), 0.40 (2), 0.76 (5), 0.92 (10).
+- The suppression goes as ~(omega / omega_D)^2 inside the plateau.
+- The factor depends on the crystal (omega / omega_D and kappa / 2 pi alpha), not on the strain
+  spectrum. It is therefore a transfer function a measurer can divide out.
+
+**4. Dependence on absorption** (closed form only, since TT was validated at 0.12; check below).
+
+| kappa/2 pi alpha | 0.3 | 1 | 2 | 5 | 10 Darwin half-widths |
+|---|---|---|---|---|---|
+| 0.005 | 0.000 | 0.001 | 0.019 | 0.049 | 0.099 |
+| 0.02 | 0.000 | 0.010 | 0.074 | 0.194 | 0.370 |
+| 0.05 | 0.001 | 0.035 | 0.182 | 0.442 | 0.704 |
+| 0.12 | 0.005 | 0.109 | 0.396 | 0.756 | 0.919 |
+| 0.3 | 0.021 | 0.280 | 0.679 | 0.929 | 0.981 |
+
+- Weak absorption extends the suppression far into the tail. There the probed depth is set by
+  the tail extinction depth ~ eta / (pi alpha)^2 rather than by absorption: in
+  Lambda - i eta = -kappa + 2 c R0, the term |2 c R0| ~ 2 (pi alpha)^2 / eta competes with kappa.
+- Order estimate (not computed for a real crystal): for Si reflections at ~10 keV,
+  kappa / 2 pi alpha is of order 1e-3–1e-2. That would make the correction large across the
+  band of their Fig. 2.
+- TT check at 0.024 (alpha = 40, kappa = 6, R_D = 0.2; `e59_transfer.py weak`): W_TT / W_pred
+  median 0.993, range 0.944–1.044. The closed form holds at weak absorption too.
+
+**5. Relation to Chalise et al. (Entry 57).**
+- Their Fig. 2 normalises both spectra to their peaks and reports exact overlap at the peak.
+- In our model a peak-normalised comparison of a narrow band also overlaps at the peak.
+  Off the peak the weight carries |r0| |phi^| times the transfer factor.
+- Their visible low-frequency deficit is consistent in sign with the near-Darwin suppression of
+  section 3.
+- Their weighting of the strain curve, energy and absorption are not given, so no quantitative
+  comparison was made. Their model is not claimed to be wrong.
+
+**Verdict.**
+- The Fourier weight of R(t) equals the strain spectrum only after dividing out a transfer
+  function H(omega) = W / |eps^|.
+- H(omega) is given in closed form at first order in S by the static root R0(omega). Its
+  ingredients are the X-ray reflection, the extinction and the absorption.
+- It is verified against full TT to 2–5 % for kappa / 2 pi alpha = 0.12 (R_D = 0.05–0.5) and
+  0.024 (R_D = 0.2).
+- This is a usable correction ("divide the measured weight by H") at reachable conditions,
+  which meets the continue criterion of the user's plan.
+- Novelty is not assessed. Linear-response treatments of time-resolved X-ray diffraction may
+  contain the same form; that literature was not searched.
+
+**Not done.**
+- Anomalous absorption (chi_h''), asymmetric geometry, instrument resolution.
+- Nonlinear S (harmonics, mixing).
+- A real-crystal parameter set.
+- A literature check of the linear-response form.

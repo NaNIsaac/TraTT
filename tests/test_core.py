@@ -149,3 +149,37 @@ def test_bragg_reflectivity_bounded_with_modulation():
     eta = np.linspace(-3.0 * drive.q, 3.0 * drive.q, 301)
     R = np.abs(solve_bragg(2.0, eta, phi=drive.phi(1.7), n_z=required_nz(2.0, 4.0))) ** 2
     assert np.all(R <= 1.0 + 1e-9)
+
+
+def test_bragg_fourier_weight_matches_first_order_transfer_function():
+    """Entry 59: a weak strain packet entering an absorbing Bragg crystal makes R(t) oscillate at
+    omega = |eta|; the Fourier weight equals the first-order closed form built on the static root R0
+    (W = |conj(R0) A(|eta|) + R0 conj(A(-|eta|))| / T, A = i c S (1 - R0^2) G / (Lambda + i omega))."""
+    alpha, kappa, S, q0 = 2.0, 5.0, 0.02, 2 * np.pi * 2.0 / 0.3
+    c = 1j * np.pi * alpha
+    tau_d = 3 * 2 * np.pi / q0
+
+    def g(tau):
+        return np.where(tau > 0, np.exp(-np.clip(tau, 0, None) / tau_d) * np.sin(q0 * tau), 0.0)
+
+    T, nt = 2.4, 2400            # the window must outlast the slowest response near omega = q0
+    t = np.linspace(0.0, T, nt, endpoint=False)
+    eta = np.array([0.6, 1.0, 1.5, 2.5]) * q0
+    R = np.abs(solve_bragg(alpha, eta, phi=lambda z: S * g(t[:, None] - z), n_z=1500, kappa=kappa)) ** 2
+    W = np.abs(np.mean((R - R.mean(axis=0)) * np.exp(1j * eta[None, :] * t[:, None]), axis=0))
+
+    tau = np.linspace(0, 40 * tau_d, 40001)
+
+    def G(w):
+        return np.trapezoid(g(tau) * np.exp(1j * w * tau), tau)
+
+    pred = []
+    for e in eta:
+        r = np.roots([c, 1j * (e + 1j * kappa), c])
+        R0 = r[np.argmin(np.abs(r))]
+        lam = 1j * (e + 1j * kappa) + 2 * c * R0
+
+        def A(w):
+            return 1j * c * S * (1 - R0 ** 2) * G(w) / (lam + 1j * w)
+        pred.append(abs(np.conj(R0) * A(e) + R0 * np.conj(A(-e))) / T)
+    assert np.allclose(W / np.array(pred), 1.0, atol=0.03)

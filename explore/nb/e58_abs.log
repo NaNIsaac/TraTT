@@ -1,0 +1,16 @@
+ abs: S=0.02, kappa=6.0, q0=1005: n_z = 11596; peak of W at eta = 998
+   max |W/maxW - eps/maxeps| = 0.404
+   max |W/maxW - phi/maxphi| = 0.311
+   max |W/maxW - eps_w2/maxeps_w2| = 0.300
+   max |W_r0/max - eps/max| = 0.066
+   max |W_r0/max - phi/max| = 0.047
+   max |W_r0/max - eps_w2/max| = 0.659
+ abs: S=0.05, kappa=6.0, q0=1005: n_z = 11711; peak of W at eta = 998
+   max |W/maxW - eps/maxeps| = 0.390
+   max |W/maxW - phi/maxphi| = 0.298
+   max |W/maxW - eps_w2/maxeps_w2| = 0.314
+   max |W_r0/max - eps/max| = 0.065
+   max |W_r0/max - phi/max| = 0.048
+   max |W_r0/max - eps_w2/max| = 0.660
+ R_D=0.2: q0=251, n_z=3283; D(eta/2pi alpha) = 0.4:0.01  0.7:0.04  1.0:0.19  1.5:0.34  2.0:0.46  3.0:0.63  5.0:0.87  8.0:0.99
+ R_D=0.5: q0=101, n_z=1543; D(eta/2pi alpha) = 0.4:0.01  0.7:0.04  1.0:0.17  1.5:0.42  2.0:0.51  3.0:0.74  5.0:0.97  8.0:1.13
