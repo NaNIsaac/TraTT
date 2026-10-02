@@ -1,7 +1,7 @@
 ---
 title: Transient Formation Dynamics of Acoustic Bragg Satellites in Dynamical X-ray Diffraction
 authors: **Isaac Yong**¹, Ouyoung Kwon¹, Hyunjung Kim¹*
-affiliation: ¹Department of Physics, Sogang University, Seoul, Korea  ·  *corresponding author
+affiliation: ¹Center for Ultrafast Phase Transformation, Department of Physics, Sogang University, Seoul, Korea  ·  *corresponding author
 footer: P2.17 · 2026 KPS Fall Meeting, Jeju, October 22, 2026 · This work was supported by the National Research Foundation of Korea grant RS-2021-NR059920.
 ---
 
