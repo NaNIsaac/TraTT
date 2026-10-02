@@ -100,7 +100,7 @@ def parse(text):
 
 # ───────────── typesetting ─────────────
 
-TOKEN = re.compile(r"\$[^$]+\$|\*\*[^*]+\*\*|[^\s$*]+")
+TOKEN = re.compile(r"\$[^$]+\$|\*\*[^*]+\*\*|[^\s$*]+|\*")   # a lone * (corresponding author) is a word
 
 
 class Page:
