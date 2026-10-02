@@ -3214,3 +3214,109 @@ calculation of such a use was made.
 
 **Reproduction.** `python explore/nb/e55_fault_check.py`. It uses no TT solver; the Entry 39
 numbers are typed in from the Entry 39 tables.
+
+---
+
+## 2026-10-02 — Entry 57: Chalise et al. (2026) — what "spectral weight" means, and whether our code can represent their case
+
+**Scope (user brief).** New direction: when can the time-frequency content of a measured
+diffracted intensity be read as the frequency content of the acoustic wave? Reference paper:
+Chalise et al., arXiv:2603.28071v1 (30 Mar 2026), "Dynamical diffraction formalism for imaging
+time-dependent diffuse scattering from coherent phonons with Dark-Field X-ray Microscopy".
+Only steps 1–2 of the agreed minimal procedure were done: the definitions, and the code
+capability. **No calculation was run.**
+
+**Evidence level.** arXiv HTML text, read through a fetch tool that returns quotes and
+summaries, plus the three figure images (downloaded and inspected). Numbers read off the
+figures are approximate.
+
+**1. What the paper computes.**
+- Geometry: symmetric Bragg, Si (400), laser-excited Au transducer, longitudinal packet
+  propagating into the sample normal to the surface (their Fig. 1a).
+- Takagi–Taupin equations: Klar–Rustichelli Riccati form for X = X_1 + i X_2, R = |X(0)|^2.
+  Strain enters only through the deviation parameter
+  y(A) = pi V_c sin(2 theta_B) / (lambda^2 r_e f'(psi)) [Delta theta + eps(A) tan theta_B] - f'(0)/f'(psi),
+  where eps(A) is the axial strain. Integration starts from the extinction depth or the back
+  surface.
+- Strain: from udkm1Dsim. Fig. 2a/c show bipolar decaying packets, peak |strain| ~ 1e-3
+  (read off the axis), with spectral peaks at ~87 and ~113 GHz.
+- Procedure: R(t) is recorded at each Delta theta and Fourier transformed at each Delta theta.
+  The frequency of maximum weight vs Delta theta is linear (Fig. 1b: ~350 GHz at 53 urad to
+  ~1000 GHz at 153 urad, i.e. ~6.5 GHz/urad from the plot).
+- **"Weight"**: the magnitude (not the square) of the Fourier transform of R(t). Fig. 2
+  compares it with the Fourier magnitude of the applied strain. **Both curves are normalised
+  to their own maximum** ("Normalized Amplitude").
+  - So Fig. 2 tests the *shape* of the spectrum, not its absolute scale or its linearity in
+    strain amplitude.
+  - The text says the weight "scales linearly with phonon population". The figure compares
+    strain amplitude spectra, not populations (|amplitude|^2). The wording is inconsistent.
+    Not resolved from the text.
+- Stated claim: "the weight of a certain frequency omega in a phonon spectrum is exactly
+  reproduced by the weight of the intensity oscillation at the same frequency".
+- **Visible in their own Fig. 2.** The curves agree at the peak, but not in the tails:
+  - below ~40 GHz the reflectivity spectrum lies well below the strain spectrum (~0.05 vs
+    ~0.2 at ~20 GHz, both panels);
+  - near 150–170 GHz there are small mismatches, including a feature in the reflectivity
+    curve where the strain spectrum has a dip.
+  - The paper does not discuss either. (Read off a figure; not quantified.)
+- Not found in the text: the X-ray energy, the time step and window of R(t), the angular
+  range used for Fig. 2, and how the angle-resolved FFTs are combined into one "frequency
+  spectrum of the reflectivity".
+- Also not given: a small-strain condition, an amplitude test, or any regime where the
+  correspondence fails. Their resolution analysis (Sec. IV: energy bandwidth, divergence,
+  objective acceptance give an oscillation damping time ~ 1/(pi FWHM)) concerns the
+  instrument, not the diffraction response.
+
+**2. Mapping to our variables (estimates, to be checked).**
+- Phase-modulation index S = G u_0. For one component, u_0 = eps_0 / K, so
+  S = eps_0 G / K = eps_0 G Lambda_ac / (2 pi).
+  - Example: Si (400), G = 2 pi / 1.358 Å, Lambda_ac = v / nu = 8433 m/s / 87 GHz = 97 nm,
+    eps_0 = 1e-3 gives **S ~ 0.7**.
+  - This is a single-component estimate. For a broadband packet, S is not defined per
+    component; the relevant quantity is the peak of phi = G u(z).
+  - At S ~ 0.7 the first-order Bessel response is no longer linear: J_1(S) / (S/2) = 0.94.
+    J_0, J_2 and the mixing between components are no longer negligible.
+- Low frequencies. The ratio R = Lambda_ac / Lambda_P (Entries 42–53) corresponds here to the
+  Darwin width in frequency units divided by nu.
+  - Using their Fig. 1b slope (~6.5 GHz/urad) and a Darwin width of a few urad gives an
+    estimate of ~10–40 GHz. **The energy is not stated, so this is an order estimate only.**
+  - This puts their observed low-frequency deficit at the scale where our map leaves the
+    independent-satellite regime (R >~ 0.3).
+  - This is a hypothesis, not a result.
+- Candidate biases for "intensity weight = strain spectrum":
+  - (i) dynamical response near the Bragg peak, below a few Darwin widths in frequency;
+  - (ii) strain-amplitude nonlinearity (Bessel saturation, harmonics, sum and difference
+    frequencies) at S ~ O(1);
+  - (iii) the normalisation hides any frequency-independent scale error by construction.
+
+**3. Can the existing code represent their case?**
+
+| requirement | status in this repo |
+|---|---|
+| symmetric Bragg, arbitrary depth profile | yes: `tratt.core.solve_bragg` (Riccati, backward from R(1) = 0), phase phi(zeta) arbitrary callable; strain enters as d phi / d zeta, phi = G u, equivalent to their y(A) eps term |
+| semi-infinite crystal | approximate with a thick slab (alpha >> 1); check convergence in alpha |
+| absorption | **missing** in Bragg (alpha and eta are real; the Laue gauge argument does not apply in Bragg). Needs complex eta (one dtype/validation change), or must be stated as non-absorbing |
+| moving strain packet | yes: phi(zeta, t) = G u(zeta - v t) as a callable per time (`PhaseDrive` with `theta_fn` / `amp`, or a plain function) |
+| udkm1Dsim strain | not available; use an analytic bipolar decaying packet with their Fig. 2 spectral peak. **Not the same profile** |
+| R(t) at fixed Delta theta, FFT | yes: loop over t with `rocking(..., geometry="bragg")`, then `numpy.fft` |
+| instrument resolution (Sec. IV) | not implemented; a convolution over eta in post-processing; not needed for the Fig. 2 comparison |
+| absolute X-ray parameters | not in the paper text found (energy); work dimensionlessly: R (Darwin / nu) and S are the only parameters that matter for the question |
+
+**Proposed reference case and single-variable test (not started).**
+- Dimensionless, symmetric Bragg, thick non-absorbing slab, bipolar packet.
+- Reference: nu_peak >> nu_Darwin and S << 1. Here intensity weight and strain spectrum
+  should agree in shape, which is the paper's claim. This is the reproduction check.
+- Then change one variable:
+  - (a) S at fixed spectrum, to test for amplitude bias, harmonics and mixing; or
+  - (b) the spectrum centre toward the Darwin scale, to test the low-frequency deficit.
+- Compare un-normalised and normalised spectra.
+- Stop criteria (user):
+  - Stop if a bias appears only at unrealistic S or R.
+  - Stop if it is fully explained by the kinematic Bessel expansion (known).
+  - Stop if it only restates the paper's own limits.
+  - Continue only if a usable correction or discrimination criterion (e.g. the harmonic
+    ratio as an S estimator) follows at reachable conditions.
+
+**Sources.**
+- https://arxiv.org/abs/2603.28071
+- https://arxiv.org/html/2603.28071v1 (figures `Untitled-1.png`, `fft.png`, `toy.png`)
