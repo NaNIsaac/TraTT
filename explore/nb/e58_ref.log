@@ -1,0 +1,21 @@
+ S=0.02 eta sign +1 (R_D = 2 pi alpha / q0 = 0.050): n_z = 2899; peak of W at eta = 242
+   max |W/maxW - eps/maxeps| = 0.666
+   max |W/maxW - phi/maxphi| = 0.666
+   max |W/maxW - eps_w2/maxeps_w2| = 0.666
+ S=0.02 eta sign -1 (R_D = 2 pi alpha / q0 = 0.050): n_z = 2899; peak of W at eta = -242
+   max |W/maxW - eps/maxeps| = 0.667
+   max |W/maxW - phi/maxphi| = 0.667
+   max |W/maxW - eps_w2/maxeps_w2| = 0.667
+ S=0.05 eta sign +1 (R_D = 2 pi alpha / q0 = 0.050): n_z = 2927; peak of W at eta = 242
+   max |W/maxW - eps/maxeps| = 0.666
+   max |W/maxW - phi/maxphi| = 0.666
+   max |W/maxW - eps_w2/maxeps_w2| = 0.666
+ S=0.05 eta sign -1 (R_D = 2 pi alpha / q0 = 0.050): n_z = 2927; peak of W at eta = -242
+   max |W/maxW - eps/maxeps| = 0.667
+   max |W/maxW - phi/maxphi| = 0.667
+   max |W/maxW - eps_w2/maxeps_w2| = 0.667
+ convergence (nt x2, n_z x2), S=0.02, +eta: n_z = 5798; peak of W at eta = 242
+   max |W/maxW - eps/maxeps| = 0.666
+   max |W/maxW - phi/maxphi| = 0.666
+   max |W/maxW - eps_w2/maxeps_w2| = 0.666
+   W change vs base: 3.45e-04

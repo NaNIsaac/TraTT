@@ -3320,3 +3320,42 @@ figures are approximate.
 **Sources.**
 - https://arxiv.org/abs/2603.28071
 - https://arxiv.org/html/2603.28071v1 (figures `Untitled-1.png`, `fft.png`, `toy.png`)
+
+---
+
+## 2026-10-02 — Entry 58: first reference case for Chalise et al. — invalid, because the finite non-absorbing slab imprints thickness fringes
+
+**Setup.** Script `explore/nb/e58_chalise_ref.py ref`; data in `e58_ref.json` and `e58_ref.log`.
+- Dimensionless symmetric Bragg (`solve_bragg`), alpha = 2, thickness 1, non-absorbing.
+- Packet phi = S exp(-tau / tau_d) sin(q0 tau), with tau = t - zeta, q0 = 2 pi 40, 3 cycles.
+  The Darwin ratio is 2 pi alpha / q0 = 0.05.
+- S = 0.02 and 0.05, both signs of eta. Time window T = 0.6 with 1200 steps.
+- W(eta) = |FFT R(t)| taken at omega = |eta|.
+
+**Result.**
+- W peaks at eta = 242 (q0 = 251). Doubling nt and n_z changes W by 3e-4.
+- The shape does not match any candidate. The maximum normalised deviation from |eps^|,
+  |phi^| and |eps^|/omega^2 is the same, 0.666, for all three. This happens because the
+  deviation is not set by the reference: W follows the static reflectivity R0(eta) of the slab.
+- R0 has back-face thickness fringes, period ~2 pi in eta. They swing R0 by 1–3 decades:
+  e.g. 3.4e-4 at eta = 220, 2.1e-3 at 256, 6.5e-5 at 327.
+- The heterodyne weight scales as |r0(eta)| times the sideband amplitude, so W inherits the
+  fringes. W / sqrt(R0) is smoother but still has gaps at the zeros of r0.
+
+**Verdict.**
+- This reference case is **invalid as a reproduction**.
+- A finite, non-absorbing slab is not the paper's crystal. Theirs is absorbing and
+  effectively semi-infinite, with integration starting from the extinction/penetration depth.
+  The observed structure is an artefact of my setup, not a bias of the paper's procedure.
+- One structural point does survive. The intensity oscillation at detuning eta is a
+  heterodyne with the static reflection amplitude r0(eta). So W/W_max can equal the strain
+  spectrum only if |r0(eta)| times the sideband transfer factor is flat over the band, or is
+  divided out. In a semi-infinite crystal the tail is ~1/eta, and the transfer factor of a
+  strain component (phi^ = eps^/omega) is another 1/omega. Which combination the paper's
+  normalisation uses is the open definition question of Entry 57.
+
+**Needed next (decision).** Remove the back face:
+- either add absorption to the Bragg solver (complex eta; a one-line dtype change plus a test
+  against the absorbing Darwin–Prins curve);
+- or use a much thicker slab with an absorbing layer, which needs the same change.
+Without absorption, no finite slab avoids the fringes. Not done yet.
