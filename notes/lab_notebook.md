@@ -3502,3 +3502,23 @@ half-width, collapses onto a single curve for all three packet spectra
 
 **Needed.** Read Shayduk 2013 (analysis section), the 2023 review, and the Springer chapter.
 Then decide whether Entry 59 is a correction worth a short paper.
+
+**Update (same day, full text of Shayduk et al. 2013, arXiv pp. 1–6 read).**
+- **Their estimator is not the Fourier weight.** They use the time-averaged intensity excess
+  <I_p(Q)>_t - I_up(Q) = alpha A(q)^2 (their eq. 2). This is second order in the strain, the 1D
+  analogue of thermal diffuse scattering (their eqs. 3–8).
+- They name the first-order oscillation explicitly ("interference of X-rays scattered from a
+  moving grating and the static component ... an X-ray analog of Brillouin oscillations") and
+  average it away. Chalise et al. use exactly that oscillation, and so does our Entry 59.
+- **Their validity conditions** (p. 4) include q >> 1/l, with l the X-ray extinction (or coherence)
+  length; time averaging over many periods; displacements << interatomic distance; q << G.
+  Their measured peaks (q ~ 0.045 and 0.09 rad/nm, STO 002 at 8 keV) sit well off the Darwin
+  width. They state that the X-ray extinction is negligible there and only absorption matters.
+- **Hypothesis of this entry revised: unlikely.** Their peak drift to higher q grows with time as
+  the packet goes deeper (Fig. 4b). A static transfer function cannot produce a time-dependent
+  drift, and their q are far from the Darwin width.
+- What remains: the *first-order* (oscillation) estimator near and around the Darwin width, and
+  in weakly absorbing crystals far into the tail (Entry 59 section 4). This is the regime that
+  Shayduk's condition q >> 1/l excludes and that Chalise's analysis uses.
+- Also relevant: Shayduk eq. (14) is the absorption decay time tau_abs = 2 mu c_s / sin theta.
+  That is the same physics as kappa in our closed form.
