@@ -3468,3 +3468,37 @@ half-width, collapses onto a single curve for all three packet spectra
 - Nonlinear S (harmonics, mixing).
 - A real-crystal parameter set.
 - A literature check of the linear-response form.
+
+---
+
+## 2026-10-02 — Entry 60: literature status of the Entry 59 transfer function (search only)
+
+**Evidence level.** Web search results and one abstract. No full text was read.
+
+**Found.**
+- Shayduk, Herzog, Bojahr, Schick, Gaal, Leitenberger, Navirian, Sander, Goldshteyn, Vrejoiu,
+  Bargheer, Phys. Rev. B 87, 184301 (2013), arXiv:1303.5643: "Direct time domain sampling of
+  sub-THz coherent acoustic phonon spectra in SrTiO3 using ultrafast X-ray diffraction".
+  - They determine a generated phonon spectrum from ultrafast XRD and find a k-dependent
+    phonon lifetime (Akhiezer 1/omega^2).
+  - Quote from the abstract: "the observed shift of the synthesized spectrum to the higher q is
+    discussed in the framework of non-linear effects".
+  - **Hypothesis to check, not a claim:** the dynamical suppression of the weight at low
+    frequency (Entry 59, section 3) also shifts an apparent spectrum to higher q. Whether their
+    analysis divides out a transfer function is not known from the abstract.
+- "Reconstructing longitudinal strain pulses using time-resolved x-ray diffraction"
+  (ResearchGate entry; fetch refused): strain reconstruction from UXRD is an established topic.
+- "Concepts and use cases for picosecond ultrasonics with x-rays", arXiv:2302.14116 (review,
+  Bargheer group). Likely to state the standard kinematic relation. Not read.
+- "Time-Dependent Dynamical Diffraction Theory for Phonon-Type Distortions", Springer chapter
+  (doi via link.springer.com/chapter/10.1007/978-1-4615-0387-3_10). Not read.
+
+**Status.**
+- The kinematic heterodyne weighting (W ~ |r0| |phi^|, i.e. ~|eps^|/omega^2) is probably known
+  in this community.
+- Whether the full first-order dynamical closed form (Entry 59 section 2, with 1 - R0^2 and
+  the 2 c R0 extinction term) and its one-curve suppression near the Darwin width are published
+  is **open**.
+
+**Needed.** Read Shayduk 2013 (analysis section), the 2023 review, and the Springer chapter.
+Then decide whether Entry 59 is a correction worth a short paper.

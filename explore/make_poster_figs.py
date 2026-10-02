@@ -150,7 +150,7 @@ def f4():
     import make_phase_figure as M
     style()
     P = M.merged()
-    fig, ax = plt.subplots(figsize=(FIG_W, 5.0), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(FIG_W, 4.5), constrained_layout=True)
     Ss = sorted(set(P[:, 2]))
     hues = plt.cm.viridis(np.linspace(0, 0.9, len(Ss)))
     for c, S in zip(hues, Ss):

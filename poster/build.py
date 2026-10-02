@@ -50,7 +50,7 @@ NOTEBOOK = ROOT / "notes" / "lab_notebook.md"
 # A0 portrait, same as the ICAMD 2025 poster (841 x 1189 mm). Check the KPS rule before printing.
 SPEC = dict(
     W=841, H=1189, margin=16, gap=14, cols=2, pad=12,
-    header_h=130, stripe_h=5, footer_h=62,
+    header_h=130, stripe_h=5, footer_h=56,
     title_pt=64, authors_pt=34, head_pt=44, body_pt=28, callout_pt=32, caption_pt=22, min_pt=20,
     leading=1.30, para_gap=7, panel_gap=14, fig_gap=4,
     navy="#0f2a3a", page="#efefef", card="#ffffff", head="#2f5597", ink="#1b1b1b", ink2="#55524c",
