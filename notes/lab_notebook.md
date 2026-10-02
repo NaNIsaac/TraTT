@@ -2736,3 +2736,124 @@ exact to O(R^4)); it sits in the line shapes / tails, which the window model doe
 not describe.
 
 Test: `tests/test_floquet.py::test_effective_2x2_hamiltonian_third_order` (51 pass).
+
+---
+
+## 2026-10-02 — Entry 53: is the acoustic phase average converged, and is the Bessel-zero residual visible in the exit intensity?
+
+**Scope (user brief).** Verify, without new solvers: (1) whether the 4-phase average of
+Entry 43 is converged; (2) whether the third-order residual coupling at a Bessel zero
+(Entries 45, 52) dominates the *physical* exit intensity under some condition. External
+numbers were treated as claims to check. No fifth-order theory, no new-phenomenon search.
+
+**Definitions in the existing code.**
+- Floquet: H[a_k,b_m] = pi alpha J_{k+m}(S) e^{-i(k+m) q t} (`src/tratt/floquet.py:63`);
+  incidence x(0) = a_0 (`:82`); physical exit amplitude Dh(1) = sum_m b_m(1) e^{-i m q}
+  (`:94`, zeta = 1); exit intensity |Dh(1)|^2.
+- TT steady phase: phi(zeta) = S sin(q zeta - q t) (`src/tratt/drive.py`, `steady_phi`).
+  Acoustic phase phi_ac = q t.
+- Target population (Entry 45): `explore/nb/e45_zero.py:55–65`, |b_{-n}(1)|^2 at t = 0,
+  maximised over eta in n q ± w. Channel eta = n q <-> b_{-n} (direct coupling J_{-n}).
+- Entry 43 average: `explore/nb/e43_phase.py:62–64`, intensity averaged over
+  t = k / (N alpha_ac), i.e. **phi_ac = 2 pi k / N, k = 0..N-1, N = 4**.
+- Entry 45 window: |eta - n q| < 0.45 q (`e45_zero.py`, section `phys`).
+
+**Derivation.** Let D = diag(e^{+i k phi_ac} on a_k, e^{-i m phi_ac} on b_m). Then
+(D H(phi_ac) D^dagger)[a_k,b_m] = pi alpha J_{k+m} e^{-i(k+m)phi_ac} e^{+i k phi_ac} e^{+i m phi_ac}
+= H(0)[a_k,b_m]; the diagonal is unchanged; D a_0 = a_0. Hence x(1; phi_ac) = D^dagger x(1; 0),
+b_m(1; phi_ac) = e^{+i m phi_ac} b_m(1; 0), and
+
+    A_h(phi_ac) = Dh(1) = sum_m c_m e^{i m phi_ac},   c_m = b_m(1; 0) e^{-i m q},  |c_m| = |b_m(1; 0)|.
+
+So the uniform phase average is exactly <|A_h|^2> = sum_m |b_m(1)|^2 (Parseval over integer
+m); **c_m equals the code's b_m up to the exit phase e^{-imq}, which drops out of |c_m|**.
+An N-point uniform average keeps all cross terms with m - m' = 0 (mod N). Validity:
+filled crystal, uniform travelling wave (steady state), non-absorbing, within the Floquet
+truncation; *not* for the transient with a front inside the crystal. Checked numerically:
+`FloquetLaue(t = phi/q)` reproduces e^{i m phi} b_m(0) to 1e-12, and the 16-phase TT
+average equals sum |b_m|^2 to < 1e-3 (`tests/test_floquet.py::test_exact_acoustic_phase_average_is_sum_of_floquet_populations`).
+
+**Reproduction** (`python explore/nb/e53_phaseavg.py check`; alpha = 1, S = j_11 = 3.8317,
+eta = q; K = auto + 4 and K = auto + 14 identical):
+
+| alpha_ac | target abs(b_-1)^2 | exact avg sum abs(b_m)^2 | N = 4 | N = 8 | N = 16, 32, 64 |
+|---|---|---|---|---|---|
+| 20 | 4.9226e-7 | 4.9226e-7 | 4.9234e-7 | 4.9225e-7 | 4.9226e-7 |
+| 20.25 | 4.5939e-7 | 5.3856e-4 | 4.5268e-4 (abs -8.6e-5, -16 %) | 5.3919e-4 | 5.3856e-4 |
+| 20.5 | 4.4632e-7 | 8.3845e-4 | 6.2890e-4 (abs -2.1e-4, -25 %) | 8.0193e-4 | 8.3845e-4 |
+
+The external values are reproduced to all quoted digits. Direct TT at phi_ac = 0, pi/2, 3pi/2
+equals the Floquet reconstruction to 4–5 digits (e.g. 8.5691e-4 / 8.5691e-4). Error vs N
+(figure `figures/phaseavg_convergence.png`, `explore/make_phaseavg_figure.py`) falls
+roughly exponentially (Bessel decay of c_m): ~1e-7 relative at N = 16, machine precision
+for N >~ 22. **The 4-phase average is not converged at non-integer alpha_ac.**
+At S = j_11 the corrected resonance coincides with the nominal one: B_1(j_11) = -4e-17
+(delta* = -pi alpha R B_1 = 0); B_1 / J_1 varies with S (3.75, 0.68, -0.17, -0.07 at
+S = 0.5, 1.5, 3, 5), so B_1 is not simply proportional to J_1 — why both vanish at j_11 is
+not established.
+
+**Impact on the Entry 43 map** (`e53b_map_check.py`, 16 representative points; then
+`e53c_boundary.py` for the 277 points with 4-phase E_pop within ±30 % of 0.05 / 0.2 / 0.5,
+and `e53d_affected.py` for all alpha_ac < 2 and all S >= 3: 769 points with 16 phases, cache
+`cache_e43_ph16/`; merged E_pop in `e53_merged_epop.json`). Entry 43 does use a phase average
+(4 phases); the reference is the independent-channel intensity sum, windows |eta - nq| < q/2.
+- Representative points: cache reproduced exactly; exact average vs 4 phases differs by
+  <= 0.009 (abs) at S = 1 but by 20–40 % (relative) at S = 5 (e.g. 0.031 -> 0.019,
+  0.110 -> 0.085, 0.409 -> 0.328), always lowering E_pop.
+- 769 points: **71 regime changes** (52 at alpha_ac < 2), 68 of them to a better regime;
+  E_pop(16) - E_pop(4) median -0.005, range [-0.19, +0.06]. Largest: small alpha, alpha_ac 0.5–1,
+  S >= 3: 4-phase 0.14–0.21 -> 16-phase 0.002–0.016.
+- Medians (all alpha_ac >= 2 / alpha_ac < 2), 4-phase -> merged:
+  R <= 0.05: 0.002 / 0.019 -> 0.000 / 0.000; 0.05–0.2: 0.009 / 0.036 -> 0.005 / 0.004;
+  0.2–0.5: 0.038 / 0.069 -> 0.033 / 0.039; 0.5–1: 0.208 / 0.185 -> 0.194 / 0.166;
+  1–3: 0.534 / 0.465 -> 0.504 / 0.461. Kinematic points (alpha <= 0.2): median 0.0048 -> 0.0005
+  (max 0.21 -> 0.07).
+- Boundaries (R where the binned median reaches 0.05 / 0.2 / 0.5; bins x1.3), 4-phase -> merged:
+  S 0.5: 0.34/0.73/4.40 -> 0.44/0.73/4.40; S 1: 0.34/0.57/2.04 unchanged; S 2: 0.44/0.95/1.58 ->
+  0.44/0.95/2.04; S 3 unchanged; **S 5: 0.20/0.95/2.04 -> 0.57/0.95/2.64; S 8: 0.20/1.22/2.64 ->
+  0.57/1.22/2.64**. Points with S < 3 and alpha_ac >= 2 far from thresholds were not recomputed
+  (representative checks there differ by <= 0.009).
+
+**Bessel-zero residual in the exit intensity** (`e53_phaseavg.py eps`, alpha = 1, S = j_11,
+alpha_ac = 20 + eps, -0.5 <= eps <= 0.5, refined to 1e-4 near 0; figure
+`figures/bessel_residual_eps.png`). At eta = q (= corrected point here):
+- target population ~4.5–5.5e-7, nearly independent of eps;
+- exact phase-averaged exit intensity rises from 4.92e-7 (eps = 0) to 1.9e-4 (eps = ±0.1) and
+  8–9e-4 (±0.5); the rest sum_{m != -1} |b_m|^2 grows ~eps^2 near 0;
+- **target >= 50 % of the exit intensity only for |eps| <= 0.004, >= 90 % only for
+  |eps| <= 0.0014** (contiguous intervals around the integer);
+- window integral |eta - q| < 0.45 q: target fraction 4.4e-5 even at eps = 0 (3.1e-6 vs 7.0e-2):
+  **never dominant in an angle-integrated signal.**
+Integer-alpha_ac suppression is not exact: at eps = 0 the rest is 2.5e-13 (alpha 1, alpha_ac 20),
+other/target = 3e-8 ... 1.3e-4 for alpha = 0.5–2, alpha_ac = 10, 20, scaling ~alpha^10 / alpha_ac^8
+(i.e. ~alpha^2 R^8), unchanged with K = 30. Mechanism: the first-order off-resonant amplitudes
+carry (e^{i(m+n)q} - 1), which vanishes for integer alpha_ac; higher orders remain. Shown for
+S = j_11 only; not generalised.
+
+**Verdicts on earlier claims.**
+
+| claim | verdict |
+|---|---|
+| Entry 43: phase averaging restores order additivity | **maintained, sharpened**: exact average = sum_m abs(b_m)^2 |
+| Entry 43: the 4-phase average is adequate | **revised**: not converged at non-integer alpha_ac or large S; use >= 16 phases or the exact formula |
+| Entry 43: residual kinematic-overlap error at alpha_ac < 2 after averaging (0.019) | **revised**: 4-phase aliasing; exact average gives 0.000 (median); the effect exists only for phase-locked measurements |
+| Entry 43: regime boundaries R ~ 0.3 / 0.75 / 2 | **condition added**: S-dependent; converged values S <= 3: 0.34–0.44 / 0.57–0.95 / 1.6–2.0, S >= 5: 0.57 / 0.95–1.22 / 2.0–2.6 (bin resolution x1.3); not a universal law |
+| Entry 45/52: third-order coupling and renormalised zero | **maintained** (target population reproduced exactly) |
+| Entry 45: physical intensity at eta = nq equals the channel population at integer alpha_ac | **condition added**: true to other/target ~5e-7 at eps = 0 (alpha 1); dominance >= 50 % only within abs(eps) <= 0.004 and >= 90 % within 0.0014 (alpha 1, S = j_11); approximate, residual ~alpha^2 R^8 |
+| Bessel-zero residual observable in angle-integrated intensity | **revised**: no (fraction 4.4e-5 in the Entry 45 window) |
+| B_1(j_11) = 0 (delta* = 0 at the zero) | **not yet established** beyond this numerical observation |
+
+**What the results support.** The phase average is exact as sum_m abs(b_m)^2 for the filled
+uniform wave; the old 4-phase map was qualitatively right for alpha_ac >= 2 and small S but
+overstated breakdown for small alpha_ac and large S. The third-order residual coupling is
+the dominant exit intensity at the exact satellite centre only in a narrow window around
+integer alpha_ac (relative tolerance of alpha_ac ~2e-4 for alpha = 1) and never in an
+angle-integrated measurement.
+
+**Remaining uncertainties / not done.** Angular resolution and thickness distribution of a real
+experiment (no values given; left for a sensitivity analysis); other S and alpha for the eps
+window; why B_1(j_11) = 0; the not-recomputed S < 3, alpha_ac >= 2 points far from thresholds.
+
+**Reproduction.** `python explore/nb/e53_phaseavg.py check eps`;
+`python explore/nb/e53b_map_check.py`; `python explore/nb/e53c_boundary.py`;
+`python explore/nb/e53d_affected.py`; `python explore/make_phaseavg_figure.py`.

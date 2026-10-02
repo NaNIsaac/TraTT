@@ -96,3 +96,26 @@ def test_effective_2x2_hamiltonian_third_order():
         assert abs(de - ds) < 0.01 * abs(ds)
         errs.append(abs(ge - abs(g3)) / (np.pi * alpha))
     assert 3.5 < np.log(errs[1] / errs[0]) / np.log(2) < 4.5         # relative error ~ R^4
+
+
+def test_exact_acoustic_phase_average_is_sum_of_floquet_populations():
+    """Notebook Entry 53: b_m(1; phi) = e^{i m phi} b_m(1; 0) (phi = q t), so the uniform average over the
+    acoustic phase of the exit intensity is sum_m |b_m(1)|^2; a 4-point average is not converged at
+    non-integer alpha_ac while 16 points are (checked against direct TT)."""
+    from scipy.special import jn_zeros
+
+    alpha, aac, S = 1.0, 20.25, jn_zeros(1, 1)[0]
+    q = 2 * np.pi * aac
+    eta = np.array([q])
+    K = auto_K(S) + 6
+    b0 = FloquetLaue(alpha, aac, S, K).propagate(eta)[0, 2 * K + 1:]
+    ms = np.arange(-K, K + 1)
+    phi = 0.7
+    b1 = FloquetLaue(alpha, aac, S, K, t=phi / q).propagate(eta)[0, 2 * K + 1:]
+    assert np.allclose(b1, np.exp(1j * ms * phi) * b0, atol=1e-12)
+    exact = np.sum(np.abs(b0) ** 2)
+    nz = 2 * required_nz(alpha, aac, S=S, eta_max=q)
+    tt = lambda N: np.mean([abs(solve_laue(alpha, eta, phi=Drive(S=S, alpha_ac=aac).steady_phi(k / (N * aac)),  # noqa: E731
+                                           n_z=nz)[1][0]) ** 2 for k in range(N)])
+    assert abs(tt(16) / exact - 1) < 1e-3
+    assert abs(tt(4) / exact - 1) > 0.1
