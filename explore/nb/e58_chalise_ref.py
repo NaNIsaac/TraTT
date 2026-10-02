@@ -13,7 +13,7 @@ Compared with |eps^(omega)|, |phi^(omega)| = |eps^|/omega and |eps^|/omega^2 (ea
 to identify which normalisation makes the shapes coincide.
 Reference: S << 1 and q0 >> Darwin half-width 2 pi alpha. Then one variable at a time:
   q0 sweep toward the Darwin scale (R_D = 2 pi alpha / q0) at fixed S.
-Usage: python e58_chalise_ref.py [ref] [darwin]
+Usage: python e58_chalise_ref.py [ref] [abs]
 """
 import os
 import sys
@@ -37,14 +37,14 @@ def packet(S, q0, ncyc=3.0):
     return g, tau_d
 
 
-def run(alpha, S, q0, eta, T=0.6, nt=1200, nz=None):
+def run(alpha, S, q0, eta, T=0.6, nt=1200, nz=None, kappa=0.0):
     g, tau_d = packet(S, q0)
     t = np.linspace(0.0, T, nt, endpoint=False)
     nz = nz or required_nz(alpha, q0 / (2 * np.pi), per_cycle=24, S=S, eta_max=np.abs(eta).max())
 
     def phi(zeta):
         return S * g(t[:, None] - zeta)
-    R = np.abs(solve_bragg(alpha, eta, phi=phi, n_z=nz)) ** 2          # (nt, n_eta)
+    R = np.abs(solve_bragg(alpha, eta, phi=phi, n_z=nz, kappa=kappa)) ** 2          # (nt, n_eta)
     F = np.fft.rfft(R - R.mean(axis=0), axis=0) / nt
     w = 2 * np.pi * np.fft.rfftfreq(nt, d=T / nt)
     W = np.array([np.abs(F[np.argmin(np.abs(w - abs(e))), i]) for i, e in enumerate(eta)])
@@ -65,6 +65,7 @@ def shape_err(a, b):
 
 def report(lab, r):
     print(f" {lab}: n_z = {r['nz']}; peak of W at eta = {r['eta'][np.argmax(r['W'])]:.0f}")
+    r["W_r0"] = r["W"] / np.sqrt(r["R0"])                    # heterodyne reference divided out
     for k in ("eps", "phi", "eps_w2"):
         print(f"   max |W/maxW - {k}/max{k}| = {shape_err(r['W'], r[k]):.3f}")
 
@@ -82,6 +83,23 @@ def section_ref():
     report("convergence (nt x2, n_z x2), S=0.02, +eta", r2)
     print(f"   W change vs base: {np.max(np.abs(r2['W'] - np.array(out['S0.02_1']['W']))) / max(r2['W']):.2e}")
     json.dump(out, open(HERE / "e58_ref.json", "w"))
+
+
+def section_abs():
+    """Entry 59: same comparison with absorption, so the back face is invisible (Entry 58 artefact).
+    alpha = 8 (Darwin half-width 2 pi alpha = 50), kappa = 6 (kappa / 2 pi alpha = 0.12, back face e^-6),
+    Darwin ratio 2 pi alpha / q0 = 0.05."""
+    alpha, kappa = 8.0, 6.0
+    q0 = 2 * np.pi * alpha / 0.05
+    eta = np.linspace(0.15 * q0, 3 * q0, 160)
+    out = {}
+    for S in (0.02, 0.05):
+        r = run(alpha, S, q0, eta, kappa=kappa)
+        report(f"abs: S={S}, kappa={kappa}, q0={q0:.0f}", r)
+        for k in ("eps", "phi", "eps_w2"):
+            print(f"   max |W_r0/max - {k}/max| = {shape_err(r['W_r0'], r[k]):.3f}")
+        out[f"S{S}"] = {k: np.asarray(v).tolist() for k, v in r.items()}
+    json.dump(out, open(HERE / "e58_abs.json", "w"))
 
 
 if __name__ == "__main__":

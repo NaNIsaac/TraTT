@@ -146,18 +146,31 @@ def solve_bragg(
     eta: ArrayLike = 0.0,
     phi: PhaseField | None = None,
     n_z: int = 512,
+    kappa: float = 0.0,
 ) -> NDArray[np.complex128]:
     """Integrate the Bragg Riccati equation backward from ``R(1)=0`` to ``zeta=0``.
 
     Returns the complex amplitude reflectivity ``R(0) = Dh(0)/D0(0)`` at the
     entrance surface; the measured reflectivity is ``|R|^2``.
+
+    ``kappa >= 0`` is normal absorption (chi_0''), which in Bragg does *not* gauge
+    out: the two beams travel in opposite directions, so it enters ``R`` as
+    ``eta -> eta + i kappa``. A layer at depth ``zeta`` then contributes with weight
+    ``exp(-kappa zeta)``, i.e. ``kappa`` is the round-trip amplitude attenuation per
+    unit depth (``mu L (1/gamma_0 + 1/gamma_h) / 2``). chi_h'' (anomalous absorption)
+    is not included. Thick slab, kappa > 0 -> the Darwin-Prins root of
+    ``c R^2 + i (eta + i kappa) R + c = 0`` (tests/test_core.py).
     """
     if alpha < 0:
         raise ValueError(f"alpha must be non-negative, got {alpha}")
     if n_z < 1:
         raise ValueError(f"n_z must be >= 1, got {n_z}")
 
+    if kappa < 0:
+        raise ValueError(f"kappa must be non-negative, got {kappa}")
+
     eta_a = np.asarray(eta, dtype=np.float64)
+    eta_c = eta_a + 1j * kappa
     phase = ZERO_PHASE if phi is None else phi
     R = np.zeros(_state_shape(eta_a, phase), dtype=np.complex128)
     c = 1j * np.pi * alpha
@@ -165,7 +178,7 @@ def solve_bragg(
 
     def f(zeta, r):
         e = _phase_factor(phase, zeta)
-        return -c * np.conj(e) - 1j * eta_a * r - c * e * r * r
+        return -c * np.conj(e) - 1j * eta_c * r - c * e * r * r
 
     for i in range(n_z):
         z = 1.0 + i * h

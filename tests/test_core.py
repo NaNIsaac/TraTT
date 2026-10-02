@@ -130,6 +130,19 @@ def test_bragg_total_reflection_plateau():
     assert np.all(R_in <= 1.0 + 1e-9)
 
 
+def test_bragg_absorption_gives_darwin_prins_root():
+    """Normal absorption kappa: an absorbing slab thick enough to hide its back face reflects like
+    the semi-infinite crystal, the root |R| < 1 of c R^2 + i (eta + i kappa) R + c = 0."""
+    alpha, kappa = 4.0, 12.0
+    eta = np.linspace(-60.0, 60.0, 25)
+    R = solve_bragg(alpha, eta, n_z=6000, kappa=kappa)
+    c = 1j * np.pi * alpha
+    roots = [np.roots([c, 1j * (e + 1j * kappa), c]) for e in eta]
+    R_dp = np.array([r[np.argmin(np.abs(r))] for r in roots])
+    assert np.max(np.abs(R - R_dp)) < 1e-5
+    assert np.all(np.abs(R) < 1.0)          # absorption: no total reflection
+
+
 def test_bragg_reflectivity_bounded_with_modulation():
     """Energy conservation: a lossless modulated Bragg crystal cannot reflect > 1."""
     drive = Drive(S=1.5, alpha_ac=4.0)
