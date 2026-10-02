@@ -3038,7 +3038,7 @@ derived); experimental resolution, flux and thickness distribution; detectabilit
 (b) a new measurement or control capability, because the boundary moves and is tunable.
 No calculations were run.
 
-**Evidence level.** Search results, abstracts and bibliographic records only. The full texts
+**Evidence level.** *(Superseded in part by Entry 56: Authier & Simon 1968 and Manukyan 2014 were later read in full and compared formula by formula.)* Search results, abstracts and bibliographic records only. The full texts
 of Authier & Simon (1968), Kato, Usami & Katagawa (1967), Authier & Patel (1975) and Manukyan
 (2014) were **not read**: they are paywalled or the fetch was refused (ITC Vol. B ch. 5.1:
 HTTP 403). Every "known" verdict below rests on the stated scope of these works. None rests on
@@ -3122,3 +3122,95 @@ dynamic version was not found in this search, which is not proof of absence.
 - Manukyan 2014: https://www.osti.gov/etdeweb/biblio/22283837
 - Polikarpov 1987: https://onlinelibrary.wiley.com/doi/abs/10.1002/pssb.2221430102
 - Zolotoyabko, standing acoustic waves: https://www.osti.gov/etdeweb/biblio/20552308
+
+---
+
+## 2026-10-02 — Entry 56: formula-level check of the Entry 39 phase wall against Authier & Simon (1968) and Manukyan (2014)
+
+**Sources (full text, supplied by the user; PDFs in the repo root, not committed).**
+- A. Authier & D. Simon, Acta Cryst. A 24, 517–526 (1968), "Application de la théorie
+  dynamique de S. Takagi au contraste d'un défaut plan en topographie par rayons X. I. Faute
+  d'empilement". Takagi equations; plane- and spherical-wave cases. Sec. 4: one planar fault
+  parallel to the surfaces, with the same h on both sides. chi_h^II = chi_h^I e^{i delta},
+  delta = 2 pi h.u. Plane-wave amplitude eq. (4-3); its Fourier form eq. (4-5); spherical-wave
+  fringes I_1, I_2, I_3; integrated intensity for a fault near a face. The case of a
+  different h (moiré) is deferred to part II, which was not read.
+- H. M. Manukyan, Izv. NAN Armenii Fizika 49, 360–365 (2014). Dynamical diffraction by a
+  heteroepitaxial superlattice with a stacking fault at depth N_1 z_0. Satellite m is treated
+  as a reflection with chi_hm = M_m chi_h. Eq. (11) gives the relative intensity change at the
+  satellite centre: R_r = sin^2(alpha/2) sin(2A_1m) sin(2A_2m) / sin^2(A_m). The fault phase
+  alpha = 2 pi h.u is **the same for every satellite m**.
+
+**Mapping.** Satellite n is treated as a two-beam crystal with a = pi alpha |J_n(S)| and
+thickness 1. The acoustic phase wall dphi at depth zeta_b acts as a fault with
+delta = n dphi. Authier–Simon variables map as B l -> a, B eta_AS -> eta/2,
+u l -> s = sqrt(a^2 + eta^2/4), l_I = zeta_b, l_II = 1 - zeta_b.
+
+**Eq. (4-5) as used** (normalised so that delta = 0 gives the perfect crystal):
+
+    A = a e^{i delta/2} { cos(delta/2) sin s / s - i sin(delta/2) sin(s (l_I - l_II)) / s
+                          + (eta/2)/s^2 sin(delta/2) [cos(s (l_I - l_II)) - cos s] }
+
+Derivation check. Re-derived by hand from the two-segment transfer matrix. Numerically equal
+to expm products to 7e-16 (`explore/nb/e55_fault_check.py`).
+
+Negative note. My first transcription put the last term inside the -i bracket, with a second
+sin(delta/2). It matched only at delta = pi and failed elsewhere (|dI| = 0.3). It was
+corrected before any comparison was recorded.
+
+**Comparison with Entry 39 (C: wall at 0.5, ratio integral(dphi) / integral(0); window
+±0.45 q, step 0.1 as in `e39_walls.py`).**
+
+| alpha, n | a | dphi = pi/4 | pi/2 | 3pi/4 | pi | 3pi/2 | abs. integral, dphi = 0 |
+|---|---|---|---|---|---|---|---|
+| 0.5, 1 | 0.876 | 1.019 / 1.019 | 1.070 / 1.063 | 1.119 / 1.108 | 1.132 / 1.127 | 1.065 / 1.063 | 3.70 / 3.697 |
+| 2, 1 | 3.506 | 1.069 / 1.051 | 1.198 / 1.175 | 1.287 / 1.299 | 1.327 / 1.350 | 1.168 / 1.175 | 10.1 / 10.12 |
+| 2, 2 | 1.458 | 1.214 / 1.221 | 1.456 / 1.441 | 1.247 / 1.221 | 1.002 / 1.000 | 1.453 / 1.441 | 6.49 / 6.375 |
+| 2, 3 | 0.383 | 1.035 / 1.011 | 1.035 / 1.007 | 1.000 / 1.002 | 1.094 / 1.013 | 1.153 / 1.007 | 0.85 / 0.873 |
+
+Each cell is Entry 39 TT / plane-wave fault formula.
+
+Cz (dphi = pi, n = 1), ratio pi wall / no wall:
+- alpha = 2: formula 2.59 at zeta_b = 0.3 and 0.7, 1.35 at 0.5. Entry 39: 2.58 and 1.33.
+- alpha = 0.5: formula maximum 1.16. Entry 39: 1.17.
+
+Centre: |A(eta = 0)| / a = |sin(a (1 - 2 zeta_b))| holds exactly. This is the Entry 39 "echo"
+law Theta = alpha_1 |1 - 2 zeta_b|, an identity of eq. (4-5) at delta = pi.
+
+Manukyan eq. (11) follows from the same amplitude at eta = 0, using
+sin^2 X - sin^2 Y = sin(X + Y) sin(X - Y):
+
+    |A|^2 / a^2 = sin^2 a - sin^2(delta/2) sin(2 a zeta_b) sin(2 a (1 - zeta_b))
+
+So the two papers agree with each other and with Entry 39 at the satellite centre.
+
+**Result.**
+- For n = 1 and 2, the full acoustic TT integrals of Entry 39 are reproduced by the 1968
+  plane-wave stacking-fault formula with delta = n dphi, within 1–3 %.
+  - This includes the absolute integrals, the odd/even selectivity, the depth dependence
+    (x2.58) and the mid-depth suppression.
+  - The residual 1–3 % fits what is neglected in the formula: neighbouring satellites,
+    micromotion (single acoustic phase, R = 0.05), and the static-tail subtraction. Not
+    separated further.
+- For n = 3 (a = 0.38, nearly kinematic) the formula predicts <= 1.3 % change, while TT shows
+  up to 15 %. In that small integral (0.85) this is not the fault effect. It is a different
+  contribution, probably tails of neighbouring orders or the single-phase micromotion; not
+  identified.
+- **Verdict on Entry 39 C:** known physics, quantitatively. The acoustic phase wall is a
+  stacking fault for each satellite, with fault phase n dphi. Any "new mechanism" claim for C
+  is withdrawn. The B (q-wall) comparison needs Authier–Simon part II (different h, moiré
+  fringes), which was not read.
+
+**What differs from the two papers (statement of fact, not a novelty claim).**
+1. In Manukyan, and in a crystallographic fault, delta = 2 pi h.u is the same for all
+   satellites. The acoustic wall gives delta = n dphi, which depends on the order. The
+   crystallographic counterpart is a phase slip of the modulation itself (a discommensuration
+   or phase soliton of a modulated structure). That literature was not checked.
+2. The fault phase and position are set by the drive: continuous in situ, and moving at the
+   sound speed. The physics does not change; the experimental control does.
+
+Whether item 1 or 2 enables a measurement that is not otherwise possible is not shown. No
+calculation of such a use was made.
+
+**Reproduction.** `python explore/nb/e55_fault_check.py`. It uses no TT solver; the Entry 39
+numbers are typed in from the Entry 39 tables.
