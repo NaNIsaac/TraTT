@@ -3007,6 +3007,9 @@ Period mismatch: centre at the numerical resonance for each alpha_ac; eps step 2
 - This holds only for |eps| <~ 1.3e-3 (90 %) or 4.3e-3 (50 %).
 - The integrated intensity inside that window is ~1e-7 in `e43_phase` units, about 2e-6 of
   the Entry 45 window integral.
+- I_t and I_a are integrals over the dimensionless eta. They are not photon efficiencies, and the
+  2e-6 ratio is not a photon-loss rate. Converting them needs the incident angular distribution
+  and the detector acceptance, which were not given.
 - Measurability depends on angular resolution, flux and thickness spread. None were given;
   none were assumed.
 
@@ -3025,3 +3028,97 @@ derived); experimental resolution, flux and thickness distribution; detectabilit
 **Reproduction.** `python explore/nb/e54_exactmap.py` (parallel, ~25 min);
 `python explore/nb/e54c_summary.py`; `python explore/nb/e54b_width.py base eps map res`;
 `python explore/make_phaseavg_figure.py`.
+
+---
+
+## 2026-10-02 — Entry 55: literature check of the Entry 39 acoustic walls against stacking-fault and deformed-crystal dynamical theory
+
+**Scope (user brief).** Before any new scan, decide whether the Entry 39 wall effects are
+(a) a known stacking-fault or bicrystal effect, reproduced with an acoustic wave, or
+(b) a new measurement or control capability, because the boundary moves and is tunable.
+No calculations were run.
+
+**Evidence level.** Search results, abstracts and bibliographic records only. The full texts
+of Authier & Simon (1968), Kato, Usami & Katagawa (1967), Authier & Patel (1975) and Manukyan
+(2014) were **not read**: they are paywalled or the fetch was refused (ITC Vol. B ch. 5.1:
+HTTP 403). Every "known" verdict below rests on the stated scope of these works. None rests on
+a formula-by-formula comparison.
+
+**Sources and the scope they state.**
+- A. Authier & D. Simon, Acta Cryst. A 24, 517–526 (1968).
+  - Applies Takagi's dynamical theory to a single stacking fault in a perfect crystal.
+  - Covers both plane-wave and spherical-wave incidence; fringe contrast via the stationary
+    phase method.
+  - The plane-wave theory for faults was later reformulated for the general Laue case.
+- N. Kato, K. Usami, T. Katagawa, Adv. X-Ray Anal. 10 (1967), "The X-ray diffraction image of
+  a stacking fault": spherical-wave Pendellösung theory extended to a crystal with one stacking
+  fault in an arbitrary position.
+- A. Authier & J. R. Patel, phys. stat. sol. (a) 27 (1975): X-ray topographic determination of
+  whether stacking faults are intrinsic or extrinsic. The method relies on the sign of the
+  fault phase.
+- H. M. Manukyan, Izv. NAN Armenii Fizika 49, 360–365 (2014). This is the closest analogue
+  found.
+  - Dynamical X-ray diffraction by a **superlattice with a stacking fault**.
+  - Gives the reflectance "within satellite limits" as a function of the wave's **phase jump**
+    at the fault and the **fault depth**.
+  - Whether the phase jump is resolved per satellite order is not stated in the abstract.
+- Background: Bonse, Lang, Kato, Patel and Taupin developed dynamical diffraction in deformed
+  crystals, and Takagi–Taupin theory is standard for faults and strain fields.
+- Background: Polikarpov (pss(b) 143, 1987) gives a dynamical theory with ultrasound, steady
+  state. Zolotoyabko controlled rocking curves with standing acoustic waves (quartz,
+  15–105 MHz). Neither reference, as found, treats a phase or q discontinuity of the drive.
+
+**Mapping.** Satellite n sees the coupling pi alpha J_n(S) e^{-i n phi_ac}. An acoustic phase
+jump dphi at depth zeta_b is therefore, for satellite n, a planar fault with fault phase
+alpha_f = n dphi at depth zeta_b. This is the same role as alpha_f = 2 pi h.R for a stacking
+fault with displacement R. A q-jump changes the satellite's resonance position on one side,
+which is the analogue of a lattice-parameter step (bicrystal or heterostructure).
+
+| Entry 39 result | standard counterpart | verdict |
+|---|---|---|
+| C: integrated satellite depends on dphi, but only dynamically (kinematic integral independent of dphi) | stacking-fault contrast vanishes kinematically for a single fault in an integrated measurement; dynamical fault contrast is classic (Authier & Simon; Kato et al.) | **known in kind** |
+| C: n = 2 blind to a pi wall, n = 1 most affected by pi; "acts through n dphi" | fault invisibility when h.R is an integer (alpha_f = 2 pi m); alpha_f depends on the reflection | **known in kind** (n plays the role of h) |
+| C: fault-depth dependence; pi wall at mid-depth suppresses the satellite ("echo", Theta = alpha_1 abs(1 - 2 zeta_b)); x2.58 at zeta_b = 0.3 / 0.7 | plane-wave fault theory at arbitrary depth and phase (Authier & Simon; general Laue reformulation). The mid-depth pi case is a special case: coupling sign flips, and the second half undoes the first | **known in kind**; the specific numbers follow from the standard formula (not checked against it) |
+| B: q-wall; shared resonance gives extinction, detuning > Darwin width decouples, integral returns to the incoherent sum | two crystals or layers with different lattice parameter in series; decoupling once the detuning exceeds the reflection width; extinction relief by dephasing (Entry 38 analogue: bent or graded crystals) | **known in kind** |
+| B: moving wall, integral non-monotonic through sub-crystal Pendellösung | fault-depth fringes (the fault position sets the sub-crystal thicknesses) | **known in kind** |
+| No new localised line at the wall | consistent with fault theory (fringes and doublets, no bound state for a single phase fault in two-beam theory) | consistent |
+| Superlattice satellites with a fault phase jump | Manukyan (2014), static superlattice | **direct precedent** in a static system |
+
+**What is not covered by the sources found (candidate differences; not established).**
+1. *Tunable fault phase.* An acoustic fault phase alpha_f = n dphi is set electronically and
+   can be varied continuously in situ. A crystallographic fault has a fixed R.
+2. *Moving fault.* An acoustic fault moves at the sound speed, so the fault depth is a time
+   variable. One sample then scans zeta_b stroboscopically. In topography, depth dependence
+   comes from wedge-shaped samples or the fault inclination, i.e. a spatial scan.
+3. *One dphi, all orders.* alpha_f = n dphi for every satellite at once, the analogue of
+   different h for one R. Its use as a control knob (e.g. the n = 2 blind / n = 1 maximal
+   pair) is not described in the sources found. In kind it is the h-dependence of fault
+   contrast.
+4. *A possible measurement use (idea only).* With alpha_f controlled, the fault contrast
+   depends on the relative sign and phase of the couplings on the two sides. This could in
+   principle read the sign of J_n(S) or of the third-order coupling (Entries 45, 52), which
+   rocking-curve intensities do not show. Not checked; it may already follow from standard
+   fault theory with complex structure factors.
+
+**Verdict.** The physics of Entry 39 is the established theory of dynamical diffraction by a
+planar fault or a lattice-parameter step, with the acoustic phase or q as the fault parameter.
+It is **not new physics**, and any "new mechanism" claim should be dropped. What remains open
+is narrower: whether an electronically tunable, moving fault in an acoustic superlattice
+(items 1–4) has been described or used. The closest static precedent is Manukyan (2014). The
+dynamic version was not found in this search, which is not proof of absence.
+
+**Needed before any claim (user / library).**
+- Full texts: Authier & Simon (1968), Authier's monograph (2001) chapter on planar defects,
+  Manukyan (2014), Polikarpov (1987/88).
+- Then compare the Entry 39 C table with the plane-wave fault formula at alpha_f = n dphi.
+  This is a single analytic check with no scan.
+- A targeted search for "phase-shifted" or "phase-switched" ultrasound drive in X-ray
+  diffraction (two transducers or a phase-keyed drive).
+
+**Sources (links as found).**
+- Authier & Simon 1968: https://journals.iucr.org/a/issues/1968/01/00/index.html
+- Kato, Usami & Katagawa 1967: https://www.cambridge.org/core/journals/advances-in-x-ray-analysis/article/abs/xray-diffraction-image-of-a-stacking-fault/03B647BC8A173C9D53A3F16B07A579E0
+- Authier & Patel 1975: https://onlinelibrary.wiley.com/doi/10.1002/pssa.2210270125
+- Manukyan 2014: https://www.osti.gov/etdeweb/biblio/22283837
+- Polikarpov 1987: https://onlinelibrary.wiley.com/doi/abs/10.1002/pssb.2221430102
+- Zolotoyabko, standing acoustic waves: https://www.osti.gov/etdeweb/biblio/20552308
