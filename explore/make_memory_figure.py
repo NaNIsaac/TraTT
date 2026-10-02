@@ -49,39 +49,43 @@ def pts(ax, t, y, c, m, lab=None):
     ax.plot(t, y, m, ms=3.5, color=c, mec="white", mew=0.5, ls="none", label=lab)
 
 
-def main(out="figures/poster_memory.png"):
-    fig, ax = plt.subplots(2, 2, figsize=(12, 8.6), constrained_layout=True)
-
-    # a: transient-only satellite
+def panel_a(ax, small=8, title=r"a  Transient-only satellite: $S_f=j_{1,1}$, $J_1(S_f)=0$"):
+    """Transient-only satellite (S_f at the J_1 zero, ramp T = 2)."""
     d = HistoryDrive(S=jn_zeros(1, 1)[0], alpha_ac=AAC, env=ramp(2.0))
     t = np.linspace(0, 3.4, 69) + OFF
     tf = np.linspace(0, 3.4, 400)
     I = centre(d, (1, 2, 3), t)
     for j, (n, c, m) in enumerate(zip((1, 2, 3), (BLUE, ORANGE, AQUA), ("o", "s", "^"))):
-        ax[0, 0].plot(tf, law(d, n, tf), color=c)
-        pts(ax[0, 0], t, I[:, j], c, m, rf"$n={n}$")
-    ax[0, 0].axvline(3.0, color=INK2, lw=0.8, ls="--")
-    ax[0, 0].text(2.3, 0.6, "ramp has left\nthe crystal", fontsize=8, color=INK2)
-    ax[0, 0].set(xlabel=r"$\tilde t$", ylabel=r"$I(nq,\tilde t)$", ylim=(-0.02, 0.72),
-                 title=r"a  Transient-only satellite: $S_f=j_{1,1}$, $J_1(S_f)=0$")
-    ax[0, 0].legend(fontsize=8, frameon=False, loc="upper right")
+        ax.plot(tf, law(d, n, tf), color=c)
+        pts(ax, t, I[:, j], c, m, rf"$n={n}$")
+    ax.axvline(3.0, color=INK2, lw=0.8, ls="--")
+    ax.text(2.3, 0.6, "ramp has left\nthe crystal", fontsize=small, color=INK2)
+    ax.set(xlabel=r"$\tilde t$", ylabel=r"$I(nq,\tilde t)$", ylim=(-0.02, 0.72), title=title)
+    ax.legend(fontsize=small, frameon=False, loc="upper right")
 
-    # b: hysteresis loop, triangular pulse
+
+def panel_b(ax, small=8, title="b  Same strain, different pattern: up vs down a triangular pulse"):
+    """Same transducer amplitude, different pattern: I_1 vs S A(t) for a triangular pulse."""
     for T, c, m in ((1.0, BLUE, "o"), (4.0, ORANGE, "s")):
         d = HistoryDrive(S=3.0, alpha_ac=AAC, env=triangle(T))
         t = np.linspace(0, 2 * T, 81) + OFF
         I = centre(d, (1,), t)[:, 0]
         A = 3.0 * d.envelope(t)
         tf = np.linspace(0, 2 * T, 400)
-        ax[0, 1].plot(3.0 * d.envelope(tf), law(d, 1, tf), color=c)
-        pts(ax[0, 1], A, I, c, m, rf"rise = fall = {T:g} $t_{{\rm tr}}$")
+        ax.plot(3.0 * d.envelope(tf), law(d, 1, tf), color=c)
+        pts(ax, A, I, c, m, rf"rise = fall = {T:g} $t_{{\rm tr}}$")
         k = len(tf) * 3 // 4
-        ax[0, 1].annotate("", xy=(3.0 * d.envelope(tf[k + 5]), law(d, 1, tf[k + 5:k + 6])[0]),
-                          xytext=(3.0 * d.envelope(tf[k]), law(d, 1, tf[k:k + 1])[0]),
-                          arrowprops=dict(arrowstyle="->", color=c, lw=1.2))
-    ax[0, 1].set(xlabel=r"transducer amplitude $S\,A(\tilde t)$", ylabel=r"$I(q,\tilde t)$",
-                 title="b  Same strain, different pattern: up vs down a triangular pulse")
-    ax[0, 1].legend(fontsize=8, frameon=False, loc="upper left")
+        ax.annotate("", xy=(3.0 * d.envelope(tf[k + 5]), law(d, 1, tf[k + 5:k + 6])[0]),
+                    xytext=(3.0 * d.envelope(tf[k]), law(d, 1, tf[k:k + 1])[0]),
+                    arrowprops=dict(arrowstyle="->", color=c, lw=1.2))
+    ax.set(xlabel=r"transducer amplitude $S\,A(\tilde t)$", ylabel=r"$I(q,\tilde t)$", title=title)
+    ax.legend(fontsize=small, frameon=False, loc="upper left")
+
+
+def main(out="figures/poster_memory.png"):
+    fig, ax = plt.subplots(2, 2, figsize=(12, 8.6), constrained_layout=True)
+    panel_a(ax[0, 0])
+    panel_b(ax[0, 1])
 
     # c: multiple revival
     d = HistoryDrive(S=10.0, alpha_ac=AAC, env=triangle(3.0))

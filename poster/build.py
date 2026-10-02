@@ -4,11 +4,21 @@ Same idea as a print pipeline: the manuscript is canonical and read-only, every 
 from SPEC (mm, page origin top-left), and the build ends with machine checks. Looking at the PNG
 is still required; the checks only catch what a machine can see.
 
+Look: the group's previous A0 poster (ICAMD 2025) — navy header with logo and a three-colour
+stripe, light page, white cards, "■ 01. Title" section heads, two columns, yellow callouts.
+
+Manuscript syntax
+  front matter: title, authors, affiliation, contact, footer
+  "## Title"      a panel (numbered automatically)        "@wide"   next panel spans both columns
+  "@column"       continue in the next column             "> text"  yellow callout
+  "- text"        bullet                                  "![caption](path)" figure (width = card)
+  {E12}           notebook entry tag (stripped from print, required on every item)
+
 Checks
-1. every paragraph, bullet and figure carries an {E..} tag, and each tagged Entry exists in
+1. every paragraph, bullet, callout and figure carries an {E..} tag, and each tagged Entry exists in
    notes/lab_notebook.md (nothing goes on the poster without its entry);
 2. every figure file exists;
-3. no column runs past the bottom margin (no silent reflow: move "@column" instead);
+3. no column runs into the footer (no silent reflow: move "@column" instead);
 4. no text below SPEC["min_pt"].
 """
 
@@ -23,23 +33,26 @@ import matplotlib
 matplotlib.use("Agg")
 # Word-by-word placement needs text widths that scale linearly with dpi; hinting breaks that and
 # makes long words overrun the next one in a preview rendered at another dpi.
-matplotlib.rcParams.update({"text.hinting": "none", "text.hinting_factor": 1})
+matplotlib.rcParams.update({"text.hinting": "none", "text.hinting_factor": 1, "mathtext.fontset": "dejavusans"})
 import matplotlib.image as mpimg  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
+from matplotlib.patches import FancyBboxPatch  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 MS = ROOT / "poster" / "poster.md"
 OUT = ROOT / "poster" / "out"
+ASSETS = ROOT / "poster" / "assets"
 NOTEBOOK = ROOT / "notes" / "lab_notebook.md"
 
-# ponytail: A0 portrait is a default, not a KPS rule. Check the conference poster size and edit here.
+# A0 portrait, same as the ICAMD 2025 poster (841 x 1189 mm). Check the KPS rule before printing.
 SPEC = dict(
-    W=841, H=1189, margin=24, gap=18, cols=3,
-    header_h=118,
-    title_pt=66, authors_pt=34, head_pt=38, body_pt=27, caption_pt=21, min_pt=20,
-    leading=1.32, para_gap=7, panel_gap=16, fig_gap=5,
-    ink="#1b1b1b", ink2="#55524c", accent="#2a5d9f", band="#eef2f8", rule="#c9d3e3",
-    font="DejaVu Sans",
+    W=841, H=1189, margin=16, gap=14, cols=2, pad=12,
+    header_h=130, stripe_h=5, footer_h=62,
+    title_pt=64, authors_pt=34, head_pt=44, body_pt=28, caption_pt=22, min_pt=20,
+    leading=1.30, para_gap=7, panel_gap=14, fig_gap=4,
+    navy="#0f2a3a", page="#efefef", card="#ffffff", head="#2f5597", ink="#1b1b1b", ink2="#55524c",
+    callout="#fff2cc", stripe=("#3a3a3a", "#e04b3a", "#f08a3c"), rule="#d5dbe5",
+    font="Arial",
 )
 PT_MM = 25.4 / 72
 
@@ -57,15 +70,17 @@ def parse(text):
             k, v = line.split(":", 1)
             meta[k.strip()] = v.strip()
     body = re.sub(r"<!--.*?-->", "", body, flags=re.S)
-    panels, cur = [], None
+    panels, cur, wide = [], None, False
     for block in re.split(r"\n\s*\n", body.strip()):
         block = block.strip()
-        if block == "@column":
-            panels.append("@column")
+        if block in ("@column", "@wide"):
+            if block == "@column":
+                panels.append("@column")
+            wide = block == "@wide"
             continue
         if block.startswith("## "):
-            num, title = [s.strip() for s in block[3:].split("|", 1)]
-            cur = dict(num=num, title=title, items=[])
+            cur = dict(title=block[3:].strip(), items=[], wide=wide)
+            wide = False
             panels.append(cur)
             continue
         m = re.match(r"!\[(.*?)\]\((.*?)\)(.*)", block, re.S)
@@ -77,8 +92,9 @@ def parse(text):
                 b = " ".join(b.split())
                 cur["items"].append(dict(kind="bullet", text=TAG.sub("", b).strip(), tags=TAG.findall(b)))
             continue
-        t = " ".join(block.split())
-        cur["items"].append(dict(kind="para", text=TAG.sub("", t).strip(), tags=TAG.findall(t)))
+        kind = "callout" if block.startswith(">") else "para"
+        t = " ".join(re.sub(r"^>\s?", "", block, flags=re.M).split())
+        cur["items"].append(dict(kind=kind, text=TAG.sub("", t).strip(), tags=TAG.findall(t)))
     return meta, panels
 
 
@@ -106,43 +122,52 @@ class Page:
             t.remove()
         return self._w[key]
 
-    def flow(self, text, x, y, w, pt, color=None, bold=False, indent=0.0):
+    def flow(self, text, x, y, w, pt, color=None, bold=False, indent=0.0, align="left", z=3):
         """Word-by-word placement with wrapping; $..$ and **..** stay atomic. Returns the new y (mm)."""
         color = color or SPEC["ink"]
         lh = pt * PT_MM * SPEC["leading"]
         sp = self.width("a a", pt) - 2 * self.width("a", pt)
-        line, lw, y = [], 0.0, y + pt * PT_MM          # baseline of the first line
-        prev = 0
-        toks = []
+        y = y + pt * PT_MM                                  # baseline of the first line
+        toks, prev = [], 0
         for m in TOKEN.finditer(text):
-            glue = m.start() == prev and toks
+            glue = m.start() == prev and bool(toks)
             prev = m.end()
             s, b = m[0], bold
             if s.startswith("**"):
                 s, b = s[2:-2], True
-            toks.append((s, b, bool(glue)))
-
-        def emit(line, y):
-            cx = x + indent
-            for s, b, g, tw in line:
-                if not g and cx > x + indent:
-                    cx += sp
-                self.ax.text(cx, y, s, fontsize=pt, color=color, family=SPEC["font"],
-                             fontweight="bold" if b else "normal", va="baseline")
-                cx += tw
+            toks.append((s, b, glue))
+        lines, line, lw = [], [], 0.0
         for s, b, g in toks:
             tw = self.width(s, pt, b)
             add = tw + (0 if g or not line else sp)
             if line and lw + add > w - indent:
-                emit(line, y)
-                y += lh
-                line, lw, add = [], 0.0, tw
-                g = False
+                lines.append((line, lw))
+                line, lw, add, g = [], 0.0, tw, False
             line.append((s, b, g, tw))
             lw += add
         if line:
-            emit(line, y)
-        return y + lh - pt * PT_MM
+            lines.append((line, lw))
+        for line, lw in lines:
+            cx = x + indent + ((w - indent - lw) / 2 if align == "center" else 0)
+            first = True
+            for s, b, g, tw in line:
+                if not g and not first:
+                    cx += sp
+                self.ax.text(cx, y, s, fontsize=pt, color=color, family=SPEC["font"], zorder=z,
+                             fontweight="bold" if b else "normal", va="baseline")
+                cx += tw
+                first = False
+            y += lh
+        return y - lh + pt * PT_MM * 0.35 if lines else y - pt * PT_MM
+
+    def image(self, path, x, y, w, h=None, z=2):
+        """Place an image at (x, y) mm, width w; height from the aspect ratio unless given."""
+        img = mpimg.imread(path)
+        h = h or w * img.shape[0] / img.shape[1]
+        a = self.fig.add_axes([x / SPEC["W"], 1 - (y + h) / SPEC["H"], w / SPEC["W"], h / SPEC["H"]], zorder=z)
+        a.imshow(img, interpolation="lanczos")
+        a.axis("off")
+        return h
 
 
 def build():
@@ -152,73 +177,118 @@ def build():
     problems, used = [], set()
     P = Page()
     ax = P.ax
+    W, H, M = s["W"], s["H"], s["margin"]
 
-    # header band
-    ax.add_patch(plt.Rectangle((0, 0), s["W"], s["header_h"], color=s["band"], lw=0))
-    ax.add_patch(plt.Rectangle((0, s["header_h"] - 2.5), s["W"], 2.5, color=s["accent"], lw=0))
-    y = P.flow(meta.get("title", ""), s["margin"], s["margin"] - 4, s["W"] - 2 * s["margin"], s["title_pt"], bold=True)
-    y = P.flow(meta.get("authors", ""), s["margin"], y + 5, s["W"] - 2 * s["margin"], s["authors_pt"], s["ink2"])
-    P.flow(" · ".join(v for k, v in meta.items() if k in ("affiliation", "contact")), s["margin"], y + 2,
-           s["W"] - 2 * s["margin"], s["authors_pt"] - 6, s["ink2"])
+    # page, header, stripe
+    ax.add_patch(plt.Rectangle((0, 0), W, H, color=s["page"], lw=0, zorder=0))
+    ax.add_patch(plt.Rectangle((0, 0), W, s["header_h"], color=s["navy"], lw=0, zorder=1))
+    seg = (0.0, 0.58, 0.60, 0.84, 0.86, 1.0)
+    for i, c in enumerate(s["stripe"]):
+        ax.add_patch(plt.Rectangle((seg[2 * i] * W, s["header_h"] + 2), (seg[2 * i + 1] - seg[2 * i]) * W,
+                                   s["stripe_h"], color=c, lw=0, zorder=1))
+    logo_w = 0
+    if (ASSETS / "logo_ihs.png").exists():
+        logo_w = 80
+        P.image(ASSETS / "logo_ihs.png", W - M - logo_w, 22, logo_w * 0.7, h=logo_w * 1.0)
+    tw = W - 2 * M - 2 * logo_w
+    y = P.flow(meta.get("title", ""), M + logo_w, 20, tw, s["title_pt"], "white", bold=True, align="center")
+    y = P.flow(meta.get("authors", ""), M + logo_w, y + 8, tw, s["authors_pt"], "white", align="center")
+    P.flow(meta.get("affiliation", ""), M + logo_w, y + 4, tw, s["authors_pt"] - 6, "#d8e2ea", align="center")
 
-    cw = (s["W"] - 2 * s["margin"] - (s["cols"] - 1) * s["gap"]) / s["cols"]
-    col, top = 0, s["header_h"] + s["panel_gap"]
-    y = top
-    bottom = s["H"] - s["margin"]
-    fill = []
+    # footer
+    fy = H - s["footer_h"]
+    ax.plot([M, W - M], [fy, fy], color=s["rule"], lw=2, zorder=1)
+    lw_ = 0
+    if (ASSETS / "logo_cupt.png").exists():
+        lw_ = 150
+        P.image(ASSETS / "logo_cupt.png", W - M - lw_, fy + 8, lw_)
+    P.flow(" · ".join(v for k, v in meta.items() if k in ("footer", "contact")), M, fy + 10,
+           W - 2 * M - lw_ - 10, s["caption_pt"], s["ink2"])
 
+    cw = (W - 2 * M - (s["cols"] - 1) * s["gap"]) / s["cols"]
+    top = s["header_h"] + s["stripe_h"] + 2 + s["panel_gap"]
+    bottom = fy - s["panel_gap"]
+    ys = [top] * s["cols"]
+    col = 0
+    num = 0
     for p in panels:
         if p == "@column":
-            fill.append(y)
-            col, y = col + 1, top
+            col += 1
             continue
-        x = s["margin"] + col * (cw + s["gap"])
-        ax.text(x, y + s["head_pt"] * PT_MM, p["num"], fontsize=s["head_pt"], color=s["accent"],
-                fontweight="bold", family=s["font"], va="baseline")
-        nx = x + P.width(p["num"], s["head_pt"], True) + 4
-        y = P.flow(p["title"], nx, y, cw - (nx - x), s["head_pt"], bold=True)
-        ax.plot([x, x + cw], [y + 2.5, y + 2.5], color=s["rule"], lw=2)
-        y += 2.5 + s["para_gap"]
+        num += 1
+        if p["wide"]:
+            x, w, y0 = M, W - 2 * M, max(ys)
+        else:
+            x, w, y0 = M + col * (cw + s["gap"]), cw, ys[col]
+        ix, iw = x + s["pad"], w - 2 * s["pad"]
+        y = y0 + s["pad"] * 0.6
+        # section head: ■ 01. Title
+        sq = s["head_pt"] * PT_MM * 0.62
+        ax.add_patch(plt.Rectangle((x, y + s["head_pt"] * PT_MM * 0.24), sq, sq, color=s["ink"], lw=0, zorder=3))
+        hx = x + sq + 5
+        y = P.flow(f"{num:02d}. {p['title']}", hx, y, w - (hx - x), s["head_pt"], s["head"], bold=True)
+        y += s["para_gap"] + 2
+        card_top = y
+        y += s["pad"]
+        # A wide panel with a figure is laid out side by side: text left, figure right (half width each).
+        side = p["wide"] and any(it["kind"] == "fig" for it in p["items"])
+        if side:
+            fx, ix, iw = ix + iw / 2 + s["gap"] / 2, ix, iw / 2 - s["gap"] / 2
+            fy = y
         for it in p["items"]:
             if not it["tags"]:
-                problems.append(f"panel {p['num']}: untagged {it['kind']}: {it.get('text', it.get('caption'))[:50]!r}")
+                problems.append(f"panel {num:02d}: untagged {it['kind']}: {it.get('text', it.get('caption'))[:50]!r}")
             for t in it["tags"]:
                 used.add(int(t))
                 if t not in known:
-                    problems.append(f"panel {p['num']}: tag E{t} is not an Entry in the notebook")
+                    problems.append(f"panel {num:02d}: tag E{t} is not an Entry in the notebook")
             if it["kind"] == "fig":
                 f = ROOT / it["path"]
                 if not f.exists():
-                    problems.append(f"panel {p['num']}: missing figure {it['path']}")
+                    problems.append(f"panel {num:02d}: missing figure {it['path']}")
                     continue
-                img = mpimg.imread(f)
-                h = cw * img.shape[0] / img.shape[1]
-                fa = P.fig.add_axes([x / s["W"], 1 - (y + h) / s["H"], cw / s["W"], h / s["H"]])
-                fa.imshow(img, interpolation="lanczos")
-                fa.axis("off")
-                y += h + s["fig_gap"]
-                y = P.flow(it["caption"], x, y, cw, s["caption_pt"], s["ink2"]) + s["para_gap"]
+                if side:
+                    fy += P.image(f, fx, fy, iw) + s["para_gap"]
+                    continue
+                y += P.image(f, ix, y, iw) + s["fig_gap"]
+                if it["caption"]:
+                    y = P.flow(it["caption"], ix, y, iw, s["caption_pt"], s["ink2"])
+                y += s["para_gap"]
             elif it["kind"] == "bullet":
-                ax.text(x, y + s["body_pt"] * PT_MM, "•", fontsize=s["body_pt"], color=s["accent"],
-                        family=s["font"], va="baseline")
-                y = P.flow(it["text"], x, y, cw, s["body_pt"], indent=7) + s["para_gap"]
+                ax.text(ix, y + s["body_pt"] * PT_MM, "•", fontsize=s["body_pt"], color=s["ink"],
+                        family=s["font"], va="baseline", zorder=3)
+                y = P.flow(it["text"], ix, y, iw, s["body_pt"], indent=8) + s["para_gap"]
+            elif it["kind"] == "callout":
+                y0c = y
+                y = P.flow(it["text"], ix + 8, y + 6, iw - 16, s["body_pt"]) + 6
+                ax.add_patch(FancyBboxPatch((ix, y0c), iw, y - y0c, boxstyle="round,pad=0,rounding_size=3",
+                                            fc=s["callout"], ec="none", zorder=2))
+                y += s["para_gap"]
             else:
-                y = P.flow(it["text"], x, y, cw, s["body_pt"]) + s["para_gap"]
+                y = P.flow(it["text"], ix, y, iw, s["body_pt"]) + s["para_gap"]
+        if side:
+            y = max(y, fy)
+        y += s["pad"] - s["para_gap"]
+        ax.add_patch(plt.Rectangle((x, card_top), w, y - card_top, fc=s["card"], ec="#dcdcdc", lw=1.2, zorder=1))
         y += s["panel_gap"]
+        if p["wide"]:
+            ys = [y] * s["cols"]
+        else:
+            ys[col] = y
         if y - s["panel_gap"] > bottom:
-            problems.append(f"column {col + 1} overflows the bottom margin by {y - s['panel_gap'] - bottom:.0f} mm "
-                            f"(at panel {p['num']})")
-    fill.append(y)
+            problems.append(f"panel {num:02d} ({p['title'][:30]}) runs {y - s['panel_gap'] - bottom:.0f} mm "
+                            f"into the footer")
     for k in ("body_pt", "caption_pt", "head_pt"):
         if s[k] < s["min_pt"]:
             problems.append(f"{k} = {s[k]} pt < min {s['min_pt']} pt")
+    if not ASSETS.exists():
+        print("note: poster/assets/ missing — logos skipped")
 
     OUT.mkdir(exist_ok=True)
     P.fig.savefig(OUT / "poster.pdf")
     P.fig.savefig(OUT / "poster.png", dpi=60)
-    avail = bottom - top
-    print("columns used: " + "  ".join(f"{i + 1}: {100 * (f - s['panel_gap'] - top) / avail:.0f}%"
-                                       for i, f in enumerate(fill)))
+    print("column bottoms (mm left above footer): " + "  ".join(f"{i + 1}: {bottom - (v - s['panel_gap']):.0f}"
+                                                              for i, v in enumerate(ys)))
     print("entries cited: " + ", ".join(f"E{e}" for e in sorted(used)))
     print(f"wrote {OUT / 'poster.pdf'} and poster.png")
     if problems:

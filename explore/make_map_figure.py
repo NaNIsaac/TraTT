@@ -33,7 +33,8 @@ mpl.rcParams.update({
 })
 
 
-def main(out="figures/poster_map.png"):
+def compute():
+    """I(eta, t) near n = 1 from full TT and the three-mode model; shared by the poster figures."""
     S, alpha, n, aac = 1.5, 3.0, 1, 60.0
     d = Drive(S=S, alpha_ac=aac)
     q = d.q
@@ -44,6 +45,12 @@ def main(out="figures/poster_map.png"):
     I = rocking_cube(alpha, d, eta, t, n_z=int(60 * aac))
     M = np.array([model(alpha, S, q, n, eta, x) for x in t])
     print(f"max |model - TT| / max TT = {np.max(np.abs(M - I)) / I.max():.3f}")
+    return dict(S=S, alpha=alpha, n=n, aac=aac, an=an, deta=deta, t=t, I=I, M=M)
+
+
+def main(out="figures/poster_map.png"):
+    r = compute()
+    S, alpha, aac, an, deta, t, I, M = (r[k] for k in ("S", "alpha", "aac", "an", "deta", "t", "I", "M"))
 
     fig, ax = plt.subplots(1, 3, figsize=(14, 4.4), constrained_layout=True,
                            gridspec_kw=dict(width_ratios=[1, 1, 0.8]))

@@ -44,17 +44,17 @@ def centre(alpha, S, n, t, geometry="laue", rise=0.0):
     return rocking_cube(alpha, d, np.array([n * d.q]), t, geometry=geometry, n_z=1200)[:, 0]
 
 
-def collapse(ax, geometry, law, lawlabel, title):
+def collapse(ax, geometry, law, lawlabel, title, small=7.5, ms=4):
     t = np.linspace(0.0, 1.0, 61) + OFF
     for (S, alpha, n), c, m in zip(CASES, HUES, MARK):
         an = alpha * abs(jv(n, S))
-        ax.plot(an * t, centre(alpha, S, n, t, geometry), m, ms=4, mfc=c, mec="white", mew=0.6,
+        ax.plot(an * t, centre(alpha, S, n, t, geometry), m, ms=ms, mfc=c, mec="white", mew=0.6,
                 color=c, ls="none", label=rf"$S$={S:g}, $\alpha$={alpha:g}, $n$={n}")
     s = np.linspace(0, 2.3, 500)
     ax.plot(s, law(s), color=INK, lw=1.4, label=lawlabel, zorder=0)
     ax.set(xlim=(0, 2.3), ylim=(-0.03, 1.08), xlabel=r"$\alpha_n\tilde t$,  $\alpha_n=\alpha|J_n(S)|$",
            ylabel=r"$I(\eta=nq,\,\tilde t)$", title=title)
-    ax.legend(fontsize=7.5, frameon=False, loc="lower right" if geometry == "bragg" else "upper right")
+    ax.legend(fontsize=small, frameon=False, loc="lower right" if geometry == "bragg" else "upper right")
 
 
 def order_panel(ax):
