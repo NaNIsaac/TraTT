@@ -35,7 +35,8 @@ import matplotlib
 matplotlib.use("Agg")
 # Word-by-word placement needs text widths that scale linearly with dpi; hinting breaks that and
 # makes long words overrun the next one in a preview rendered at another dpi.
-matplotlib.rcParams.update({"text.hinting": "none", "text.hinting_factor": 1, "mathtext.fontset": "dejavusans"})
+matplotlib.rcParams.update({"text.hinting": "none", "text.hinting_factor": 1, "mathtext.fontset": "dejavusans",
+                            "pdf.fonttype": 42})   # TrueType in the PDF: editable, accepted by print shops
 import matplotlib.image as mpimg  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.patches import FancyBboxPatch  # noqa: E402
