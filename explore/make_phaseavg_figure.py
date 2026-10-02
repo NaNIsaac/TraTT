@@ -5,6 +5,8 @@ phaseavg_convergence.png : |<I>_N - <I>_exact| (absolute) and relative, vs numbe
                            (exact average = sum_m |b_m(1)|^2, notebook Entry 53).
 bessel_residual_eps.png  : alpha_ac = 20 + eps: target population |b_-1|^2, exact phase-averaged exit
                            intensity, and the rest (sum over m != -1), at eta = q; target fraction.
+target_fraction_map.png  : fraction F = int |b_-1|^2 / int sum_m |b_m|^2 over |eta - eta*| < w vs eps and w/q
+                           (alpha = 1, S = j11, alpha_ac = 20 + eps; Entry 54, explore/nb/e54b_width.py map).
 """
 
 from __future__ import annotations
@@ -82,7 +84,27 @@ def eps_scan():
     fig.savefig(ROOT / "figures" / "bessel_residual_eps.png")
 
 
+def fraction_map():
+    d = json.load(open(NB / "e54b_map.json"))
+    wq = np.array(d["wq"])[1:]
+    e = np.array([r["eps"] for r in d["rows"]])
+    F = np.array([r["F"] for r in d["rows"]])[:, 1:].T
+    fig, ax = plt.subplots(figsize=(7.2, 4.8), constrained_layout=True)
+    pc = ax.pcolormesh(e, wq, F, cmap="Blues", norm=mpl.colors.LogNorm(1e-4, 1), shading="nearest", rasterized=True)
+    cs = ax.contour(e, wq, F, levels=[0.01, 0.1], colors=INK2, linewidths=0.7, linestyles=[":", "--"])
+    ax.clabel(cs, fmt={0.01: "1 %", 0.1: "10 %"}, fontsize=8)
+    ax.contour(e, wq, F, levels=[0.5, 0.9], colors=HUES[1], linewidths=1.6, linestyles=["-", "--"])
+    ax.legend(handles=[mpl.lines.Line2D([], [], color=HUES[1], lw=1.6, ls=ls, label=lab) for ls, lab in
+                       (("-", "F = 50 %"), ("--", "F = 90 %"))], loc="upper right", fontsize=8)
+    ax.set(yscale="log", ylim=(1e-7, 0.45), xlabel=r"period mismatch $\epsilon$ ($\alpha_{ac}=20+\epsilon$)",
+           ylabel=r"integration half-width $w/q$ around the resonance",
+           title=r"Target $|b_{-1}|^2$ share of the phase-averaged exit intensity ($\alpha$=1, $S=j_{1,1}$)")
+    fig.colorbar(pc, ax=ax, label=r"$\int_{-w}^{w}|b_{-1}|^2 d\eta\,/\int_{-w}^{w}\sum_m|b_m|^2 d\eta$")
+    fig.savefig(ROOT / "figures" / "target_fraction_map.png")
+
+
 if __name__ == "__main__":
     convergence()
     eps_scan()
+    fraction_map()
     print("wrote figures")

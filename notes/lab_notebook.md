@@ -2786,9 +2786,12 @@ The external values are reproduced to all quoted digits. Direct TT at phi_ac = 0
 equals the Floquet reconstruction to 4–5 digits (e.g. 8.5691e-4 / 8.5691e-4). Error vs N
 (figure `figures/phaseavg_convergence.png`, `explore/make_phaseavg_figure.py`) falls
 roughly exponentially (Bessel decay of c_m): ~1e-7 relative at N = 16, machine precision
-for N >~ 22. **The 4-phase average is not converged at non-integer alpha_ac.**
-At S = j_11 the corrected resonance coincides with the nominal one: B_1(j_11) = -4e-17
-(delta* = -pi alpha R B_1 = 0); B_1 / J_1 varies with S (3.75, 0.68, -0.17, -0.07 at
+for N >~ 22 (at this point, eta = q, S = j_11, alpha = 1 only). **The 4-phase average is not
+converged at non-integer alpha_ac.**
+*(Revised in Entry 54.)* At S = j_11, B_1(j_11) = -4e-17, so the **second-order resonance
+shift** delta*_2 = -pi alpha R B_1 vanishes. This is not an exact coincidence of the resonance
+with eta = q: the minimum two-branch gap lies at delta = -7.4e-6 (alpha_ac = 20), a resolved
+higher-order shift (Entry 54). B_1 / J_1 varies with S (3.75, 0.68, -0.17, -0.07 at
 S = 0.5, 1.5, 3, 5), so B_1 is not simply proportional to J_1 — why both vanish at j_11 is
 not established.
 
@@ -2803,11 +2806,12 @@ and `e53d_affected.py` for all alpha_ac < 2 and all S >= 3: 769 points with 16 p
 - 769 points: **71 regime changes** (52 at alpha_ac < 2), 68 of them to a better regime;
   E_pop(16) - E_pop(4) median -0.005, range [-0.19, +0.06]. Largest: small alpha, alpha_ac 0.5–1,
   S >= 3: 4-phase 0.14–0.21 -> 16-phase 0.002–0.016.
-- Medians (all alpha_ac >= 2 / alpha_ac < 2), 4-phase -> merged:
-  R <= 0.05: 0.002 / 0.019 -> 0.000 / 0.000; 0.05–0.2: 0.009 / 0.036 -> 0.005 / 0.004;
-  0.2–0.5: 0.038 / 0.069 -> 0.033 / 0.039; 0.5–1: 0.208 / 0.185 -> 0.194 / 0.166;
-  1–3: 0.534 / 0.465 -> 0.504 / 0.461. Kinematic points (alpha <= 0.2): median 0.0048 -> 0.0005
-  (max 0.21 -> 0.07).
+- Medians (all alpha_ac >= 2 / alpha_ac < 2), 4-phase -> merged *(revised in Entry 54:
+  scientific notation instead of values rounded to 0.000)*:
+  R <= 0.05: 1.8e-3 / 1.9e-2 -> 1.7e-4 / 4.8e-4; 0.05–0.2: 8.8e-3 / 3.6e-2 -> 4.7e-3 / 4.2e-3;
+  0.2–0.5: 3.8e-2 / 6.9e-2 -> 3.3e-2 / 3.9e-2; 0.5–1: 2.1e-1 / 1.9e-1 -> 1.9e-1 / 1.7e-1;
+  1–3: 5.3e-1 / 4.7e-1 -> 5.0e-1 / 4.6e-1. Kinematic points (alpha <= 0.2): median 4.8e-3 -> 4.7e-4
+  (max 2.1e-1 -> 7.4e-2).
 - Boundaries (R where the binned median reaches 0.05 / 0.2 / 0.5; bins x1.3), 4-phase -> merged:
   S 0.5: 0.34/0.73/4.40 -> 0.44/0.73/4.40; S 1: 0.34/0.57/2.04 unchanged; S 2: 0.44/0.95/1.58 ->
   0.44/0.95/2.04; S 3 unchanged; **S 5: 0.20/0.95/2.04 -> 0.57/0.95/2.64; S 8: 0.20/1.22/2.64 ->
@@ -2821,9 +2825,11 @@ alpha_ac = 20 + eps, -0.5 <= eps <= 0.5, refined to 1e-4 near 0; figure
 - exact phase-averaged exit intensity rises from 4.92e-7 (eps = 0) to 1.9e-4 (eps = ±0.1) and
   8–9e-4 (±0.5); the rest sum_{m != -1} |b_m|^2 grows ~eps^2 near 0;
 - **target >= 50 % of the exit intensity only for |eps| <= 0.004, >= 90 % only for
-  |eps| <= 0.0014** (contiguous intervals around the integer);
+  |eps| <= 0.0014** (contiguous intervals around the integer; on this eps grid — Entry 54's
+  finer grid puts the edges at 0.00425–0.0045 and 0.00125–0.0015);
 - window integral |eta - q| < 0.45 q: target fraction 4.4e-5 even at eps = 0 (3.1e-6 vs 7.0e-2):
-  **never dominant in an angle-integrated signal.**
+  **not dominant in the integral over the examined window |eta - q| < 0.45 q** *(revised in
+  Entry 54; narrower windows: Entry 54)*.
 Integer-alpha_ac suppression is not exact: at eps = 0 the rest is 2.5e-13 (alpha 1, alpha_ac 20),
 other/target = 3e-8 ... 1.3e-4 for alpha = 0.5–2, alpha_ac = 10, 20, scaling ~alpha^10 / alpha_ac^8
 (i.e. ~alpha^2 R^8), unchanged with K = 30. Mechanism: the first-order off-resonant amplitudes
@@ -2835,20 +2841,21 @@ S = j_11 only; not generalised.
 | claim | verdict |
 |---|---|
 | Entry 43: phase averaging restores order additivity | **maintained, sharpened**: exact average = sum_m abs(b_m)^2 |
-| Entry 43: the 4-phase average is adequate | **revised**: not converged at non-integer alpha_ac or large S; use >= 16 phases or the exact formula |
-| Entry 43: residual kinematic-overlap error at alpha_ac < 2 after averaging (0.019) | **revised**: 4-phase aliasing; exact average gives 0.000 (median); the effect exists only for phase-locked measurements |
-| Entry 43: regime boundaries R ~ 0.3 / 0.75 / 2 | **condition added**: S-dependent; converged values S <= 3: 0.34–0.44 / 0.57–0.95 / 1.6–2.0, S >= 5: 0.57 / 0.95–1.22 / 2.0–2.6 (bin resolution x1.3); not a universal law |
+| Entry 43: the 4-phase average is adequate | **revised**: not converged at non-integer alpha_ac or large S; use the exact formula sum_m abs(b_m)^2 (*revised in Entry 54*: 16 phases differ from it by up to 1.3e-2 in E_pop on the 437 checked points; no general N is claimed) |
+| Entry 43: residual kinematic-overlap error at alpha_ac < 2 after averaging (0.019) | **revised**: 4-phase aliasing; merged average gives median 4.8e-4 (R <= 0.05; exact, Entry 54: 4.5e-4); the effect exists only for phase-locked measurements |
+| Entry 43: regime boundaries R ~ 0.3 / 0.75 / 2 | **condition added**: S-dependent; converged values S = 0.5: 0.44 / 0.73 / 4.40; S = 1–3: 0.34–0.44 / 0.57–0.95 / 1.58–2.04; S = 5, 8: 0.57 / 0.95–1.22 / 2.64 (bin resolution x1.3; *corrected in Entry 54*: S = 0.5's 4.40 was omitted); not a universal law |
 | Entry 45/52: third-order coupling and renormalised zero | **maintained** (target population reproduced exactly) |
 | Entry 45: physical intensity at eta = nq equals the channel population at integer alpha_ac | **condition added**: true to other/target ~5e-7 at eps = 0 (alpha 1); dominance >= 50 % only within abs(eps) <= 0.004 and >= 90 % within 0.0014 (alpha 1, S = j_11); approximate, residual ~alpha^2 R^8 |
-| Bessel-zero residual observable in angle-integrated intensity | **revised**: no (fraction 4.4e-5 in the Entry 45 window) |
-| B_1(j_11) = 0 (delta* = 0 at the zero) | **not yet established** beyond this numerical observation |
+| Bessel-zero residual observable in angle-integrated intensity | **revised**: not dominant in the integral over abs(eta - q) < 0.45 q (fraction 4.4e-5); narrower windows: Entry 54 |
+| B_1(j_11) = 0 | numerical observation (-4e-17), not proven; it removes the **second-order** shift only — the resonance itself is displaced by a resolved -7.4e-6 (Entry 54) |
 
 **What the results support.** The phase average is exact as sum_m abs(b_m)^2 for the filled
 uniform wave; the old 4-phase map was qualitatively right for alpha_ac >= 2 and small S but
 overstated breakdown for small alpha_ac and large S. The third-order residual coupling is
 the dominant exit intensity at the exact satellite centre only in a narrow window around
-integer alpha_ac (relative tolerance of alpha_ac ~2e-4 for alpha = 1) and never in an
-angle-integrated measurement.
+integer alpha_ac (relative tolerance of alpha_ac ~2e-4 for alpha = 1), and it is not dominant
+in the integral over the examined window |eta - q| < 0.45 q *(revised in Entry 54; the
+half-width dependence is in Entry 54)*.
 
 **Remaining uncertainties / not done.** Angular resolution and thickness distribution of a real
 experiment (no values given; left for a sensitivity analysis); other S and alpha for the eps
@@ -2857,3 +2864,164 @@ window; why B_1(j_11) = 0; the not-recomputed S < 3, alpha_ac >= 2 points far fr
 **Reproduction.** `python explore/nb/e53_phaseavg.py check eps`;
 `python explore/nb/e53b_map_check.py`; `python explore/nb/e53c_boundary.py`;
 `python explore/nb/e53d_affected.py`; `python explore/make_phaseavg_figure.py`.
+
+---
+
+## 2026-10-02 — Entry 54: exact phase-averaged map, resonance position at the Bessel zero, target share vs integration half-width
+
+**Scope (user brief).** Follow-up to Entry 53. It reuses the existing solvers and caches.
+1. Restrict Entry 53's conclusions to the computed range (edited in place, marked "revised in
+   Entry 54").
+2. Check the phase-averaged map against the exact average sum_m |b_m|^2.
+3. Locate the actual resonance at S = j_11.
+4. Compute the target share of the exit intensity vs the angular integration half-width w and
+   the period mismatch eps.
+
+This is a signal-share analysis for one condition (alpha = 1, S = j_11, n = 1). It does not
+establish experimental detectability or novelty. No experimental angular resolution or
+thickness was assumed.
+
+**1. Corrections to Entry 53 (in place).**
+- "never dominant in an angle-integrated signal" -> "not dominant in the integral over the
+  examined window |eta - q| < 0.45 q".
+- B_1(j_11) ~ 0 is now stated as: the **second-order** resonance shift vanishes. This is
+  separate from the resonance position itself (section 3).
+- Regime-boundary verdict: added S = 0.5 (0.44 / 0.73 / 4.40). The value was in the bullet
+  list but missing from the summary row.
+- Medians are now in scientific notation (e.g. R <= 0.05: 1.7e-4 / 4.8e-4, not 0.000).
+- Entry 53's point-dominance edges (|eps| <= 0.004 / 0.0014) were limited by the eps grid. The
+  finer grid of section 4 puts them at 0.00425–0.0045 (50 %) and 0.00125–0.0015 (90 %).
+
+**2. Exact phase-averaged map.**
+- Code: `explore/nb/e54_exactmap.py`, cache `cache_e43_exact/`, output `e54_exactmap.json`;
+  summary `explore/nb/e54c_summary.py`.
+- Method: same eta grid, windows and independent-channel reference as `e43_phase.metrics`.
+  The intensity is sum_m |b_m(eta)|^2 from `FloquetLaue.propagate`.
+- Points: all S = 5 and 8 (240) and all points whose merged E_pop is within ±30 % of
+  0.05 / 0.2 / 0.5. Total 437. All 437 also have a 16-phase value.
+
+Results:
+- Truncation: K and K + 4 differ by at most 1.0e-8 in E_pop.
+- Exact minus 16-phase: median -3.0e-5; 99th percentile of the absolute value 2.9e-3;
+  maximum absolute value 1.3e-2.
+- The largest differences are at small alpha_ac and large S, (alpha, alpha_ac, S):
+  (0.05, 0.5, 8): 1.5e-2 -> 1.8e-3; (0.1, 0.5, 8): 1.6e-2 -> 7.0e-3;
+  (0.2, 0.5, 8): 3.2e-2 -> 2.8e-2.
+  At these points the 16-phase average still has order-1 relative error in a small E_pop
+  (aliasing of the m - m' = 16 terms). Elsewhere differences are <~ 3e-3.
+- Regime changes, 16-phase -> exact: 2 of 437. Both straddle 0.05 by < 2e-4:
+  (1, 2, 4): 5.01e-2 -> 4.996e-2; (5, 12, 5): 5.01e-2 -> 4.994e-2.
+- Boundaries (bins x1.3) and medians do not change at the quoted precision.
+
+| S | R at E_pop = 0.05 / 0.2 / 0.5: 4-phase | 16-phase merged | exact where available |
+|---|---|---|---|
+| 0.5 | 0.34 / 0.73 / 4.40 | 0.44 / 0.73 / 4.40 | 0.44 / 0.73 / 4.40 |
+| 1 | 0.34 / 0.57 / 2.04 | 0.34 / 0.57 / 2.04 | 0.34 / 0.57 / 2.04 |
+| 2 | 0.44 / 0.95 / 1.58 | 0.44 / 0.95 / 2.04 | 0.44 / 0.95 / 2.04 |
+| 3 | 0.34 / 0.95 / 1.58 | 0.34 / 0.95 / 1.58 | 0.34 / 0.95 / 1.58 |
+| 5 | 0.20 / 0.95 / 2.04 | 0.57 / 0.95 / 2.64 | 0.57 / 0.95 / 2.64 |
+| 8 | 0.20 / 1.22 / 2.64 | 0.57 / 1.22 / 2.64 | 0.57 / 1.22 / 2.64 |
+
+- Medians (alpha_ac >= 2 / alpha_ac < 2), exact where available: R <= 0.05: 1.4e-4 / 4.5e-4;
+  0.05–0.2: 4.7e-3 / 4.1e-3; 0.2–0.5: 3.3e-2 / 3.9e-2; 0.5–1: 1.9e-1 / 1.6e-1;
+  1–3: 5.0e-1 / 4.6e-1. Kinematic points (alpha <= 0.2): median 4.4e-4, maximum 7.4e-2.
+- Not recomputed exactly: points far from thresholds with S < 5. They keep their 16-phase or
+  4-phase values. Whether 16 phases suffice depends on the point. No general N is claimed.
+
+**3. Resonance position at S = j_11, n = 1, alpha = 1.**
+- Code: `e54b_width.py res`.
+- Method: same as `e52_heff.exact`. Minimise the half-splitting of the two eigenvalues of
+  `fl.H` nearest zero over eta = q + delta, with a bounded search in ±0.05.
+
+| alpha_ac | delta* (min gap) | delta*/q | half-gap g(delta*) | g(0) - g(delta*) |
+|---|---|---|---|---|
+| 20 | -7.38e-6 | -5.9e-8 | 7.01928175e-4 | 9.70e-9 |
+| 20.25 | -7.11e-6 | -5.6e-8 | 6.84708663e-4 | 9.23e-9 |
+| 10 | -5.917e-5 | -9.4e-7 | 2.80517483e-3 | 1.55e-7 |
+
+- Search and truncation error: K = auto + 4 / + 8 / + 12 and xatol 1e-9 / 1e-12 change
+  delta* by <= 1.2e-8 (alpha_ac = 20) and g by <= 2e-13.
+- Consistency: for two levels, g(0) - g(delta*) = delta*^2 / (8 g) = 9.7e-9 at alpha_ac = 20.
+  This matches the direct difference. The excess of 9.7e-9 is far above the 2e-13 noise.
+- **The difference is resolved. The resonance is not at eta = q.**
+- The second-order shift -pi alpha R B_1 vanishes (B_1 = -4e-17), but a higher-order shift
+  remains. At fixed alpha, the shift grows x8 from alpha_ac = 20 to 10. This is consistent
+  with ~R^3 (fourth order). It is not derived here; no fourth- or fifth-order theory was
+  attempted.
+- Size: |delta*| = 7.4e-6, i.e. 1e-2 of the half-gap g and 6e-8 of q.
+
+**4. Target share vs integration half-width.**
+- Code: `e54b_width.py base eps map`.
+- Figure: `figures/target_fraction_map.png` (`explore/make_phaseavg_figure.py`).
+
+Definitions:
+- Centre c: nominal (eta = q) or numerical resonance (q + delta*).
+- Target I_t(w): integral of |b_{-1}|^2 over |eta - c| < w.
+- Total I_a(w): integral of sum_m |b_m|^2 over the same window. This is the exact
+  phase-averaged physical exit intensity (Entry 53).
+- Share F(w) = I_t / I_a.
+- Grid: offsets u = 0 plus geomspace(1e-8 q, 0.45 q, npts) on both sides of c; trapezoid rule.
+- w_50, w_90: largest w for which F >= 0.5 (0.9) holds contiguously from the centre.
+
+alpha_ac = 20 (eps = 0), q = 125.66:
+
+| w/q | 1e-6 | 1e-5 | 1e-4 | 1e-3 | 3e-3 | 1e-2 | 3e-2 | 1e-1 | 0.45 |
+|---|---|---|---|---|---|---|---|---|---|
+| F | 1.0000 | 0.9997 | 0.974 | 0.270 | 3.9e-2 | 3.8e-3 | 6e-4 | 2e-4 | 4.4e-5 |
+
+- **F >= 90 % for w/q <= 2.0e-4** (w = 0.025). There I_t = 2.5e-8 and I_a = 2.8e-8.
+- **F >= 50 % for w/q <= 6.0e-4** (w = 0.076). There I_t = 7.4e-8 and I_a = 1.5e-7.
+- For comparison, I_a(0.45 q) = 7.0e-2. The window where the target dominates holds about
+  2e-6 of the exit intensity integrated over the Entry 45 window.
+- Convergence: npts 1500 -> 3000 changes w_50 and w_90 by <= 0.3 %. The log-grid step
+  (~1.2 %) limits resolution. K + 4 gives identical values.
+- Nominal vs numerical centre: identical to 4 digits, because |delta*| = 6e-8 q is far below
+  every w examined.
+
+Period mismatch: centre at the numerical resonance for each alpha_ac; eps step 2.5e-4 in
+|eps| <= 0.008, plus a log grid out to 0.05.
+
+| abs(eps) | F(w -> 0) | w_90 / q | I_a(w_90) | w_50 / q | I_a(w_50) |
+|---|---|---|---|---|---|
+| 0 | 1.000 | 2.0e-4 | 2.8e-8 | 6.0e-4 | 1.5e-7 |
+| 0.0005 | 0.987 | 1.9e-4 | 2.6e-8 | 6.0e-4 | 1.5e-7 |
+| 0.001 | 0.952 | 1.5e-4 | 2.0e-8 | 5.9e-4 | 1.4e-7 |
+| 0.00125 | 0.927 | 1.1e-4 | 1.5e-8 | 5.8e-4 | 1.4e-7 |
+| 0.0015 | 0.898 | none | – | 5.7e-4 | 1.4e-7 |
+| 0.002 | 0.833 | none | – | 5.4e-4 | 1.3e-7 |
+| 0.003 | 0.689 | none | – | 4.5e-4 | 1.1e-7 |
+| 0.004 | 0.554 | none | – | 2.7e-4 | 6.6e-8 |
+| 0.00425 | 0.524 | none | – | 1.8e-4 | 4.5e-8 |
+| 0.0045 | 0.496 | none | – | none | – |
+
+- For |eps| >= 0.0015 no w gives F >= 90 %. For |eps| >= 0.0045 no w gives F >= 50 %. In
+  both cases even the w -> 0 share is below the threshold.
+- +eps and -eps agree to the printed digits (largest difference: F(w -> 0) 0.526 vs 0.524 at
+  0.00425).
+- F(0.45 q) = 4.4e-5 for all |eps| <= 0.05.
+- delta* stays within -7.33e-6 ... -7.44e-6 for |eps| <= 0.05.
+
+**Interpretation (this condition only).**
+- The third-order residual dominates the integrated exit intensity only in a window
+  w/q <~ 2e-4 (90 %) or 6e-4 (50 %) around the resonance.
+- This holds only for |eps| <~ 1.3e-3 (90 %) or 4.3e-3 (50 %).
+- The integrated intensity inside that window is ~1e-7 in `e43_phase` units, about 2e-6 of
+  the Entry 45 window integral.
+- Measurability depends on angular resolution, flux and thickness spread. None were given;
+  none were assumed.
+
+**Verdicts.**
+
+| claim | verdict |
+|---|---|
+| Entry 53: 16-phase map adequate | **condition added**: within 1.3e-2 of exact on the 437 checked points; 2 regime changes at the 0.05 edge; boundaries and medians unchanged; not a general N criterion |
+| Entry 53: corrected resonance = nominal at S = j_11 | **revised**: only the second-order shift vanishes; resonance at delta* = -7.4e-6 (resolved, higher order) |
+| Entry 53: residual never dominant in an angle-integrated signal | **revised**: not dominant for w = 0.45 q; >= 90 % for w/q <= 2.0e-4 and >= 50 % for w/q <= 6.0e-4 at eps = 0 |
+| Entry 53: point-dominance window abs(eps) <= 0.004 / 0.0014 | **refined**: edges at 0.00425–0.0045 / 0.00125–0.0015 |
+
+**Remaining / not done.** Other S, alpha and n; the origin of the R^3-like shift (not
+derived); experimental resolution, flux and thickness distribution; detectability; novelty.
+
+**Reproduction.** `python explore/nb/e54_exactmap.py` (parallel, ~25 min);
+`python explore/nb/e54c_summary.py`; `python explore/nb/e54b_width.py base eps map res`;
+`python explore/make_phaseavg_figure.py`.
