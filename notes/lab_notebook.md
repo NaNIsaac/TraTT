@@ -2660,3 +2660,79 @@ picking (the simple S q + pi alpha law failed; the main-line Darwin width domina
 `anomaly_summary.png` (7), `reduced_model_convergence.png` (8). Code:
 `src/tratt/floquet.py`; `explore/nb/e43_phase.py` ... `e50_anomaly.py`; caches
 `cache_e43/`, `cache_e43_ph4/`. Tests: `tests/test_floquet.py` (7), 50 total pass.
+
+---
+
+## 2026-10-02 — Entry 52: effective 2x2 Hamiltonian of a satellite channel, derived independently and verified
+
+**Starting point (exact).** Gauge t = 0. H[a_k,a_k] = -k q, H[b_m,b_m] = eta + m q,
+H[a_k,b_m] = V J_{k+m}(S), V = pi alpha, H Hermitian. alpha = L / Lambda_P,
+alpha_ac = L / Lambda_ac, q = 2 pi alpha_ac, R = alpha / alpha_ac = Lambda_ac / Lambda_P,
+**V / q = R / 2** (the expansion parameter). Resonant subspace for channel n:
+P = {a_0, b_-n} with E(a_0) = 0, E(b_-n) = delta = eta - n q; Q energies:
+a_k = -k q (k != 0), b_m = (m + n) q + delta (m != -n). Independent-satellite limit:
+H_IND = [[0, V J_{-n}], [V J_{-n}, delta]].
+
+**Derivation** (quasi-degenerate perturbation theory, Schrieffer–Wolff / Winkler
+form; denominators evaluated at E_P = 0, i.e. delta dropped inside them):
+- Order 1: P-block of H.
+- Order 2, diagonal: Delta_a = sum_{m != -n} |V J_m|^2 / (0 - (m + n) q) = -V (R/2) B_n;
+  Delta_b = sum_{k != 0} |V J_{k-n}|^2 / (0 + k q) = +V (R/2) B_n, with
+  **B_n = sum_{k != 0} J_{k-n}^2 / k** (substituting m' = m + n shows both sums are the
+  same B_n). B_0 = 0 because J_{-k}^2 = J_k^2.
+- Order 2, off-diagonal: **identically zero** — H is bipartite (a <-> b only), so no
+  Q state couples to both a_0 (couples only to b's) and b_-n (couples only to a's).
+- Order 3, off-diagonal, two kinds:
+  (i) Q–Q paths a_0 -> b_m -> a_k -> b_-n: (1/2) sum V J_m . V J_{k+m} . V J_{k-n} x
+  [1/((0 - E_bm)(0 - E_ak)) + same] = -V (R/2)^2 C_n,
+  **C_n = sum_{k != 0, m != -n} J_{k-n} J_{k+m} J_m / (k (m + n))** (excluded states k = 0,
+  m = -n);
+  (ii) paths with one P-intermediate (wave-function renormalisation):
+  -(1/2) V J_{-n} (R/2)^2 W_n, **W_n = sum_{m != -n} J_m^2 / (m + n)^2 + sum_{k != 0} J_{k-n}^2 / k^2**.
+- Order 3, diagonal: identically zero (an odd path cannot return to the same
+  sublattice).
+
+    H_eff^(n) = [[ -V (R/2) B_n ,  g ], [ g , delta + V (R/2) B_n ]],
+    g = pi alpha [ J_{-n}(S) (1 - (R/2)^2 W_n / 2) - (R/2)^2 C_n(S) ] + O(R^4),
+
+so there are two distinct shifts: a **resonance-position shift in eta**,
+delta* = Delta_a - Delta_b = **-pi alpha R B_n** (O(R^2) at fixed alpha_ac via alpha = R alpha_ac),
+and a **coupling-zero shift in S**, g(S*) = 0 with
+**S* - j = (R/2)^2 C_n(j) / J'_{-n}(j)** + O(R^4) (term (ii) does not enter at this order
+because it is proportional to J_{-n}). At the bare zero g(j) = -pi alpha (R/2)^2 C_n(j),
+so P_n ~ (pi alpha)^2 (R/2)^4 C_n^2 ~ alpha^6 / alpha_ac^4. The quoted Entry 45 result
+is confirmed for the zero and the zero shift; for generic S it was missing term (ii).
+
+**Numerical verification** (`explore/nb/e52_heff.py`; exact reference = half the
+minimum splitting of the two Floquet branches nearest 0, found by bounded
+minimisation over eta, and its eta position; alpha_ac = 10).
+
+| n, S | R | rel. error g1 | rel. error 3rd (C only) | rel. error 3rd (full) | delta* exact / predicted |
+|---|---|---|---|---|---|
+| 0, 1.0 | 0.1 | 1.7e-3 | 7.6e-4 | 9.1e-6 | 0 / 0 |
+| 1, 1.5 | 0.1 | 1.0e-4 | 5.6e-4 | **5.8e-8** | -0.11953 / -0.11962 |
+| 1, 3.0 | 0.1 | 1.2e-3 | 3.3e-4 | 9.8e-7 | +0.01856 / +0.01847 |
+| 2, 2.5 | 0.1 | 2.2e-5 | 3.8e-4 | 5.1e-9 | -0.10716 / -0.10712 |
+| 2, 4.5 | 0.1 | 8.4e-4 | 1.7e-4 | 5.8e-8 | +0.01841 / +0.01839 |
+
+Log-log slopes of the relative error over R = 0.01–0.1: first order and C-only
+**2.00** in every case; full third order **3.98–4.09** (i.e. O(R^4), as derived).
+delta* residuals scale with slopes 2.8–3.3 (next order), delta* itself ~R^2 at fixed
+alpha_ac; n = 0 shows no shift, as B_0 = 0 requires.
+
+At the Bessel zeros (n = 0, 1, 2; R = 0.02–0.2): |g| exact / predicted = 0.9999–1.0000
+(R 0.02) down to 0.993–0.996 (R 0.2); **Delta S exact / predicted = 0.9994–1.0027**; at S*
+the exact minimum splitting is 1e-11 – 7e-8, i.e. the gap closes completely — the
+renormalised zero is a genuine level crossing, not a near-miss.
+
+**Correction to Entry 49.** "The third-order model is worse than IND" came from two
+errors: term (ii) was missing, and the G3 windows contained only each channel's own
+line while IND sums all orders' lines (including their tails) before windowing.
+Redone consistently (all orders summed, full third-order couplings, phase-averaged
+cache, alpha_ac >= 2): median E_pop IND / full-third-order = 0.0026 / 0.0025 (R <= 0.1),
+0.0162 / 0.0164 (0.1–0.3), 0.065 / 0.052 (0.3–0.6; improved in 78 % of cases). The
+remaining population error at R <= 0.3 is not a coupling error (the coupling is now
+exact to O(R^4)); it sits in the line shapes / tails, which the window model does
+not describe.
+
+Test: `tests/test_floquet.py::test_effective_2x2_hamiltonian_third_order` (51 pass).

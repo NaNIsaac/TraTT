@@ -74,3 +74,25 @@ def test_two_band_gap_equals_independent_coupling_when_resolved():
     lam, gap, mix, det = bands(alpha, aac, S, eta)
     assert np.allclose(det, 1.0, atol=1e-5)
     assert np.allclose(gap, [2 * np.pi * alpha * abs(jv(n, S)) for n in range(3)], rtol=0.03)
+
+
+def test_effective_2x2_hamiltonian_third_order():
+    """Schrieffer-Wolff reduction of the exact Floquet H onto {a_0, b_-n} (notebook Entry 52):
+    off-diagonal g = pi alpha [J_{-n}(1 - W_n (R/2)^2 / 2) - (R/2)^2 C_n] with error O(R^4), and the
+    resonance shift delta* = -pi alpha R B_n. Measured as half the minimum splitting of the exact
+    Floquet branches and its eta position."""
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "explore" / "nb"))
+    from e52_heff import exact, predictions
+
+    errs = []
+    for R in (0.05, 0.1):
+        alpha, aac, S, n = R * 10.0, 10.0, 1.5, 1
+        ge, de = exact(alpha, aac, S, n)
+        g1, g3C, g3, ds = predictions(alpha, aac, S, n)
+        assert abs(ge - abs(g3)) < 1e-3 * abs(ge - abs(g1))      # full third order >> first order
+        assert abs(de - ds) < 0.01 * abs(ds)
+        errs.append(abs(ge - abs(g3)) / (np.pi * alpha))
+    assert 3.5 < np.log(errs[1] / errs[0]) / np.log(2) < 4.5         # relative error ~ R^4
