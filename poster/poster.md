@@ -30,6 +30,7 @@ A travelling acoustic wave enters a perfect crystal. The steady-state satellites
 
 - Laue: $I(nq,t) = \sin^2(\pi\alpha_n t)$, a temporal Pendellösung with period $\Lambda_P/(v_s|J_n(S)|)$, independent of $L$. {E1}
 - Bragg: $I(nq,t) = \tanh^2(\pi\alpha_n t)$; the naive $t_f \sim t_{tr}/\alpha$ holds with $\alpha \to \alpha|J_n(S)|$. {E9}
+- Formation order follows the Bessel ladder: channel $n$ first peaks at $t^*/t_{tr} = 1/(2\alpha|J_n(S)|)$, so $S$ reorders the channels (at $S=3$: $n=2$, then 1, then 3). {E1}{E24}
 
 ![Points: full Takagi–Taupin for four $(S, \alpha, n)$; lines: closed forms, no fit parameter.](figures/poster/f1_collapse.png){E1}{E9}
 
@@ -43,7 +44,7 @@ A travelling acoustic wave enters a perfect crystal. The steady-state satellites
 
 ## Formation remembers the path
 
-Satellite $n$ reads the last $t_{tr}$ of the drive, $\Theta_n = \int_0^1 J_n(S\,A(t-\zeta))\,d\zeta$ ($\sin^2$ Laue, $\tanh^2$ Bragg). An order forbidden at the final amplitude, $J_1(S_f)=0$, is the brightest line during formation. {E28}{E30}{E34}
+Satellite $n$ reads the last $t_{tr}$ of the drive through $\Theta_n = \int J_n(S\,A(t-\zeta))\,d\zeta$ over the depth ($\sin^2\Theta_n$ in Laue, $\tanh^2\Theta_n$ in Bragg). An order forbidden at the final amplitude, $J_1(S_f)=0$, is the brightest line during formation. {E28}{E30}{E34}
 
 ![Laue, $\alpha=0.5$: points full TT, lines the $\Theta_n$ law.](figures/poster/f3_memory.png){E28}{E30}
 

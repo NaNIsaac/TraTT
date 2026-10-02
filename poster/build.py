@@ -14,6 +14,8 @@ Manuscript syntax
   "- text"        bullet                                  "![caption](path)" figure (width = card)
   {E12}           notebook entry tag (stripped from print, required on every item)
 
+Usage: python poster/build.py [preview_dpi]   (default 60; use ~150 to inspect details)
+
 Checks
 1. every paragraph, bullet, callout and figure carries an {E..} tag, and each tagged Entry exists in
    notes/lab_notebook.md (nothing goes on the poster without its entry);
@@ -48,7 +50,7 @@ NOTEBOOK = ROOT / "notes" / "lab_notebook.md"
 SPEC = dict(
     W=841, H=1189, margin=16, gap=14, cols=2, pad=12,
     header_h=130, stripe_h=5, footer_h=62,
-    title_pt=64, authors_pt=34, head_pt=44, body_pt=28, caption_pt=22, min_pt=20,
+    title_pt=64, authors_pt=34, head_pt=44, body_pt=28, callout_pt=32, caption_pt=22, min_pt=20,
     leading=1.30, para_gap=7, panel_gap=14, fig_gap=4,
     navy="#0f2a3a", page="#efefef", card="#ffffff", head="#2f5597", ink="#1b1b1b", ink2="#55524c",
     callout="#fff2cc", stripe=("#3a3a3a", "#e04b3a", "#f08a3c"), rule="#d5dbe5",
@@ -170,7 +172,7 @@ class Page:
         return h
 
 
-def build():
+def build(preview_dpi=60):
     s = SPEC
     meta, panels = parse(MS.read_text(encoding="utf8"))
     known = set(re.findall(r"^## .*?Entry (\d+)\b", NOTEBOOK.read_text(encoding="utf8"), flags=re.M))
@@ -260,7 +262,7 @@ def build():
                 y = P.flow(it["text"], ix, y, iw, s["body_pt"], indent=8) + s["para_gap"]
             elif it["kind"] == "callout":
                 y0c = y
-                y = P.flow(it["text"], ix + 8, y + 6, iw - 16, s["body_pt"]) + 6
+                y = P.flow(it["text"], ix + 8, y + 7, iw - 16, s["callout_pt"]) + 7
                 ax.add_patch(FancyBboxPatch((ix, y0c), iw, y - y0c, boxstyle="round,pad=0,rounding_size=3",
                                             fc=s["callout"], ec="none", zorder=2))
                 y += s["para_gap"]
@@ -286,7 +288,7 @@ def build():
 
     OUT.mkdir(exist_ok=True)
     P.fig.savefig(OUT / "poster.pdf")
-    P.fig.savefig(OUT / "poster.png", dpi=60)
+    P.fig.savefig(OUT / "poster.png", dpi=preview_dpi)
     print("column bottoms (mm left above footer): " + "  ".join(f"{i + 1}: {bottom - (v - s['panel_gap']):.0f}"
                                                               for i, v in enumerate(ys)))
     print("entries cited: " + ", ".join(f"E{e}" for e in sorted(used)))
@@ -301,4 +303,4 @@ def build():
 
 
 if __name__ == "__main__":
-    sys.exit(build())
+    sys.exit(build(int(sys.argv[1]) if len(sys.argv) > 1 else 60))   # optional preview dpi

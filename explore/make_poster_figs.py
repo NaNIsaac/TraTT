@@ -138,7 +138,11 @@ def f3():
             line.set_markersize(8)
     ax[0].texts[0].set(position=(2.93, 0.66), ha="right", va="top")
     ax[0].legend(frameon=False, loc="upper left", fontsize=SMALL)
-    ax[1].legend(frameon=False, loc="lower right", fontsize=SMALL - 2)
+    ax[1].set_ylim(-0.02, 0.76)
+    ax[1].legend(frameon=False, loc="upper center", ncol=2, fontsize=SMALL - 2, columnspacing=1.0, handletextpad=0.3)
+    # which branch is which: every loop starts at the origin, so the lower branch is the rise
+    ax[1].text(2.05, 0.09, "up", color=BLUE, fontsize=SMALL, fontweight="bold")
+    ax[1].text(0.02, 0.475, "down", color=BLUE, fontsize=SMALL, fontweight="bold")
     finish(fig, ax, "f3_memory")
 
 
@@ -157,7 +161,13 @@ def f4():
         ax.text(1.3e-3, e * 1.12, lab, fontsize=SMALL, color=INK2)
     ax.set(xscale="log", yscale="log", ylim=(5e-5, 1.5), xlim=(1e-3, 6),
            xlabel=r"$R=\Lambda_{ac}/\Lambda_P$", ylabel="population error $E_{pop}$")
-    ax.legend(frameon=False, ncol=3, loc="lower right", fontsize=SMALL - 2, markerscale=1.2)
+    # nine S values: a discrete colour bar reads better than a nine-entry legend
+    cmap = mpl.colors.ListedColormap(hues)
+    norm = mpl.colors.BoundaryNorm(np.arange(len(Ss) + 1) - 0.5, len(Ss))
+    cb = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, pad=0.01, aspect=25)
+    cb.set_ticks(range(len(Ss)), labels=[f"{S:g}" for S in Ss])
+    cb.set_label("modulation index $S$")
+    cb.outline.set_visible(False)
     finish(fig, ax, "f4_regime")
 
 
