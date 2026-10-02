@@ -3522,3 +3522,21 @@ Then decide whether Entry 59 is a correction worth a short paper.
   Shayduk's condition q >> 1/l excludes and that Chalise's analysis uses.
 - Also relevant: Shayduk eq. (14) is the absorption decay time tau_abs = 2 mu c_s / sin theta.
   That is the same physics as kappa in our closed form.
+
+**Update 2 — likely closest prior art for the closed form (abstract level).**
+- P. Sondhauss & J. S. Wark, "Extension of the time-dependent dynamical diffraction theory to
+  'optical phonon'-type distortions: application to diffraction from coherent acoustic and
+  optical phonons", Acta Cryst. A 59 (2003). IUCr page refused (403); index:
+  https://journals.iucr.org/a/issues/2003/02/00/index.html
+- Book chapter: "Time-Dependent Dynamical Diffraction Theory for Phonon-Type Distortions", in
+  *Nonlinear Optics, Quantum Optics, and Ultrafast Phenomena with X-Rays* (Springer, 2003).
+- Abstract: a generalised, time-dependent Takagi–Taupin equation; "numerical and perturbative
+  analytical solutions ... in the presence of such phonons", comparing acoustic and optical
+  phonons.
+- **Consequence.** A first-order perturbative solution for acoustic phonons in Bragg geometry
+  may already exist there. The Entry 59 closed form must not be called new until this paper is
+  read. What may still be new is the *use*: the weight-to-spectrum transfer function H(omega),
+  its one-curve collapse in omega/omega_D, the strong dependence on kappa/2 pi alpha, and the
+  comparison with the peak-normalised spectra of Chalise et al. That too is open until the
+  paper is read.
+- **Needed (library):** Sondhauss & Wark 2003, both versions.
