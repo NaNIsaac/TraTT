@@ -22,6 +22,9 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "explore"))
 OUT = ROOT / "figures" / "poster"
+for _f in sorted((ROOT / "poster" / "fonts").glob("*.ttf")):     # same typeface as the poster text
+    mpl.font_manager.fontManager.addfont(str(_f))
+FONT = "IBM Plex Sans"
 
 FIG_W = 14.4          # inches = poster card inner width (~366 mm)
 BIG, SMALL = 24, 20   # printed pt
@@ -38,8 +41,8 @@ def style():
         "axes.edgecolor": INK2, "axes.labelcolor": INK, "text.color": INK, "xtick.color": INK2,
         "ytick.color": INK2, "axes.spines.top": False, "axes.spines.right": False,
         "figure.facecolor": "white", "savefig.facecolor": "white", "savefig.dpi": 200,
-        "font.family": "Arial", "mathtext.fontset": "custom", "mathtext.rm": "Arial",
-        "mathtext.it": "Arial:italic", "mathtext.bf": "Arial:bold", "mathtext.sf": "Arial",
+        "font.family": FONT, "mathtext.fontset": "custom", "mathtext.rm": FONT,
+        "mathtext.it": f"{FONT}:italic", "mathtext.bf": f"{FONT}:bold", "mathtext.sf": FONT,
     })
 
 
@@ -55,7 +58,7 @@ def finish(fig, ax, name):
 def f0():
     """Schematic for half a wide card (text sits on the other half), so FIG_W / 2 wide."""
     style()
-    fig, ax = plt.subplots(figsize=(FIG_W / 2, 3.6), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(FIG_W / 2, 3.2), constrained_layout=True)
     ax.set(xlim=(0, 14), ylim=(0, 9.2))
     ax.axis("off")
     x0, x1, y0, y1 = 3.2, 7.2, 1.6, 7.6                       # crystal slab (Laue: beams cross it)
@@ -92,7 +95,7 @@ def f0():
 def f1():
     import make_poster_figure as M
     style()
-    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.4), constrained_layout=True, sharey=True)
+    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.9), constrained_layout=True, sharey=True)
     M.collapse(ax[0], "laue", lambda s: np.sin(np.pi * s) ** 2, r"$\sin^2(\pi\alpha_n\tilde t)$",
                r"Laue: $\sin^2(\pi\alpha_n\tilde t)$", small=SMALL - 4, ms=9)
     M.collapse(ax[1], "bragg", lambda s: np.tanh(np.pi * s) ** 2, r"$\tanh^2(\pi\alpha_n\tilde t)$",
@@ -112,7 +115,7 @@ def f2():
     style()
     r = M.compute()
     deta, t, I, an = r["deta"], r["t"], r["I"], r["an"]
-    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.4), constrained_layout=True,
+    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.9), constrained_layout=True,
                            gridspec_kw=dict(width_ratios=[1.25, 1]))
     im = ax[0].imshow(I, origin="lower", aspect="auto", cmap="Blues", vmin=0, vmax=I.max(),
                       extent=[deta[0], deta[-1], t[0], t[-1]])
@@ -132,7 +135,7 @@ def f2():
 def f3():
     import make_memory_figure as M
     style()
-    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.4), constrained_layout=True)
+    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.9), constrained_layout=True)
     M.panel_a(ax[0], small=SMALL - 2, title=r"transient-only: $J_1(S_f)=0$")
     M.panel_b(ax[1], small=SMALL - 4, title="same strain, up vs down")
     for line in ax[0].lines + ax[1].lines:
@@ -152,7 +155,7 @@ def f4():
     import make_phase_figure as M
     style()
     P = M.merged()
-    fig, ax = plt.subplots(figsize=(FIG_W, 4.5), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(FIG_W, 5.0), constrained_layout=True)
     Ss = sorted(set(P[:, 2]))
     hues = plt.cm.viridis(np.linspace(0, 0.9, len(Ss)))
     for c, S in zip(hues, Ss):

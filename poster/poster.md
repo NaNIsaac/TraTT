@@ -1,5 +1,5 @@
 ---
-title: Transient Formation Dynamics of Acoustic Bragg Satellites in Dynamical X-ray Diffraction
+title: Transient Formation Dynamics of Acoustic Bragg Satellites // in Dynamical X-ray Diffraction
 authors: **Isaac Yong**¹, Ouyoung Kwon¹, Hyunjung Kim¹*
 affiliation: ¹Center for Ultrafast Phase Transformation, Department of Physics, Sogang University, Seoul, Korea  ·  *corresponding author
 footer: P2.17 · 2026 KPS Fall Meeting, Jeju, October 22, 2026 · This work was supported by the National Research Foundation of Korea grant RS-2021-NR059920.
@@ -57,7 +57,10 @@ Satellite $n$ reads the last $t_{tr}$ of the drive, $\Theta_n = \int J_n(S\,A(t-
 
 ## Conclusion and outlook
 
-- Satellite formation is governed by a dynamical clock set by each order's extinction length, with closed-form laws in Laue and Bragg. {E1}{E9}{E33}
-- Acoustic phase steps act as tunable, moving stacking faults (Authier–Simon theory to 1–3 %). {E56}
-- Si 440, 17–30 keV, 0.6–2 GHz: $\tau_1$ = 17–30 ns, with in-situ $S$ from $\tau_2/\tau_1$ to ~1 %. {E13}{E20}
+%% 0 | fit parameters: one law for every order, Laue and Bragg {E1}{E9}
+%% 1–3 % | phase walls vs stacking-fault theory {E56}
+%% ~1 % | in-situ calibration of S from two periods {E13}
+
+- Satellite formation runs on a dynamical clock set by each order's extinction length. {E1}{E9}{E33}
+- Si 440 at 17–30 keV with a 0.6–2 GHz drive: $\tau_1$ = 17–30 ns. {E20}
 - Outlook: a closed-form transfer function turns Bragg oscillations into phonon spectra. {E59}
