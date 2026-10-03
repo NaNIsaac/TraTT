@@ -38,7 +38,8 @@ def style():
         "axes.edgecolor": INK2, "axes.labelcolor": INK, "text.color": INK, "xtick.color": INK2,
         "ytick.color": INK2, "axes.spines.top": False, "axes.spines.right": False,
         "figure.facecolor": "white", "savefig.facecolor": "white", "savefig.dpi": 200,
-        "font.family": "Arial", "mathtext.fontset": "dejavusans",
+        "font.family": "Arial", "mathtext.fontset": "custom", "mathtext.rm": "Arial",
+        "mathtext.it": "Arial:italic", "mathtext.bf": "Arial:bold", "mathtext.sf": "Arial",
     })
 
 
@@ -91,7 +92,7 @@ def f0():
 def f1():
     import make_poster_figure as M
     style()
-    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.4), constrained_layout=True)
+    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.4), constrained_layout=True, sharey=True)
     M.collapse(ax[0], "laue", lambda s: np.sin(np.pi * s) ** 2, r"$\sin^2(\pi\alpha_n\tilde t)$",
                r"Laue: $\sin^2(\pi\alpha_n\tilde t)$", small=SMALL - 4, ms=9)
     M.collapse(ax[1], "bragg", lambda s: np.tanh(np.pi * s) ** 2, r"$\tanh^2(\pi\alpha_n\tilde t)$",
@@ -102,6 +103,7 @@ def f1():
     for a in ax:
         a.set_xlabel(r"$\alpha_n\tilde t$,   $\alpha_n=\alpha|J_n(S)|$")
     ax[1].set_ylabel("")
+    ax[1].tick_params(labelleft=False)          # shared y axis: one set of tick labels
     finish(fig, ax, "f1_collapse")
 
 
