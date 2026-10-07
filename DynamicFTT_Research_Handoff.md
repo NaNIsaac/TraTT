@@ -848,6 +848,36 @@ Bragg의 χ0 처리, Bessel 비의 적용 조건, 소광길이 정의를 재확�
   - 포스터 문체는 자신 있게 쓴다. 방어적 표현은 노트에만 둔다.
 - 테스트 54개 통과.
 
+### C-1.18 2026-10-07 전달함수의 선행연구 경계 (노트 Entry 61)
+
+Entry 60이 남긴 유일한 미결 항목을 2차 자료로 좁혔다. 1차 자료(Sondhauss & Wark 2003)는 여전히 미독이다.
+
+**논문 자체.** OpenAlex 기준 인용 43회, 공개 전문 없음. Semantic Scholar가 보고한 인용 1회는 색인 누락이므로 사용하지 않는다. 복원한 초록이 Entry 60의 가정을 확인한다 — "Numerical and perturbative analytical solutions of generalized Takagi-Taupin equation are presented in presence of such phonons." 즉 **1차 섭동해 자체는 그 논문에 있을 가능성이 높다.** IUCr 403, PubMed 쿠키벽, Springer·Elsevier 유료벽으로 접근 실패.
+
+**분야의 표준 처리 (arXiv:2302.14116, Bargheer 그룹 2023 리뷰, 29쪽 전문 검색).**
+
+| 용어 | 출현 |
+|---|---|
+| Takagi | 0 |
+| Darwin | 0 |
+| extinction | 0 |
+| transfer function | 0 |
+| Sondhauss | 2 (둘 다 무관한 공저 참고문헌) |
+
+**이 리뷰는 Sondhauss & Wark 2003을 인용하지 않는다.** 변형 추출은 운동학적으로 하거나 `udkm1Dsim` 수치 시뮬레이션으로 한다. 해석적 주파수 의존 보정은 쓰이지 않는다.
+
+**직접 비교 대상 (Chalise et al. 2026, arXiv:2603.28071 전문 검색).** Takagi 12회, dynamical diffraction 9회로 수치 TT를 쓴다. 그러나 Darwin 0회, transfer function 0회, Sondhauss/Wark 인용 0회. 전방 모델에는 Entry 59 §3의 억제가 들어 있으나, 1차 닫힌 형태도 Darwin 폭 논의도 없고 분광 가중치를 보고할 때 아무것도 나누지 않는다.
+
+**경계가 그어진 결론.**
+
+- 1차 섭동 **해법 단계**는 새 것으로 주장하지 않는다.
+- 그것을 **전달함수 H(ω)로 쓰는 것** — ω/ω_D에서의 한 곡선 붕괴, κ/2πα 의존성, "측정 가중치를 H로 나누라"는 처방 — 은 보이는 선행연구가 없다. 분야 리뷰가 해당 논문을 인용조차 않고, 그 보정이 필요한 2026년 논문에도 없다.
+- 이것은 질문을 **좁힌 것이지 닫은 것이 아니다.** 보정을 결과로 제출하기 전 Sondhauss & Wark를 읽어야 한다.
+
+**포스터 조치: 변경 없음.** 전달함수는 Outlook 한 줄에만 있고 우선권 주장이 아니라 방향 제시다.
+
+**도서관 요청 대상.** Sondhauss & Wark, Acta Cryst. A59, 100–107 (2003), DOI 10.1107/S010876730201704X. 차선: Sheppard et al., Solid State Commun. 136, 181 (2005), DOI 10.1016/j.ssc.2005.05.056 (같은 섭동 접근을 사용).
+
 ## 부록 안내
 
 아래 구현 전사본은 추가 첨부 없이 대화를 이어갈 수 있도록 제공한다. 원래 모듈의 긴 docstring에는 이 문서에서 수정 대상으로 설명한 주장이 들어 있었으므로 그대로 재수록하지 않았다. 후속 AI는 짧아진 주석을 원저자의 확정된 물리 설명으로 오인하지 말아야 한다.

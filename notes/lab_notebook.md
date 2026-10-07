@@ -3540,3 +3540,90 @@ Then decide whether Entry 59 is a correction worth a short paper.
   comparison with the peak-normalised spectra of Chalise et al. That too is open until the
   paper is read.
 - **Needed (library):** Sondhauss & Wark 2003, both versions.
+
+## 2026-10-07 — Entry 61: how far the Entry 59 transfer function is prior art (secondary sources only)
+
+**Why.** Entry 60 flagged Sondhauss & Wark, Acta Cryst. A59 (2003) as the likely closest prior
+art for the Entry 59 closed form and said the paper must be read before any novelty claim. The
+paper is still closed access. This entry does not read it; it establishes what the surrounding
+literature does, which bounds the claim from the other side.
+
+**Evidence level.** One reconstructed abstract, two full-text PDFs read by keyword, two
+bibliographic APIs. The primary source is still unread.
+
+**1. The paper itself.**
+- OpenAlex (`api.openalex.org/works/doi:10.1107/S010876730201704X`): 43 citations, no open-access
+  location, abstract reconstructed. Semantic Scholar reports 1 citation for the same DOI and no
+  abstract, so its count is an indexing gap, not a measure of impact. Use OpenAlex here.
+- Abstract confirms what Entry 60 assumed: "Numerical and perturbative analytical solutions of
+  generalized Takagi-Taupin equation are presented in presence of such phonons." So a first-order
+  perturbative solution for phonon distortions very likely exists in that paper.
+- Access attempts that failed: IUCr (403), PubMed (cookie wall), Springer chapter (paywall),
+  Semantic Scholar (abstract elided by publisher), Elsevier for the companion paper
+  Sheppard, Sondhauss, Merlin, Bucksbaum, Lee & Wark, Solid State Commun. 136, 181 (2005),
+  "Simulations of the phonon Bragg switch in GaAs", which uses the same perturbative approach.
+  The Lund repository record for that one carries no full text either.
+
+**2. What the picosecond-ultrasonics community does (arXiv:2302.14116, Bargheer group review,
+29 pp, full text read by keyword).**
+
+| term | occurrences |
+|---|---|
+| Takagi | 0 |
+| Darwin | 0 |
+| extinction | 0 |
+| transfer function | 0 |
+| Sondhauss | 2 |
+
+- Both "Sondhauss" hits are unrelated co-authorships in the reference list (InSb acoustic phonons,
+  Appl. Phys. A 75, 467 (2002); a streak camera, Opt. Lett. 35, 3219 (2010)). **The review does not
+  cite Sondhauss & Wark 2003.**
+- "dynamical" appears three times, twice for the numerical `udkm1Dsim` libraries and once for
+  peak broadening in inhomogeneously strained layers ("require explicitly modelling the Bragg peak
+  evolution via kinematical or dynamical x-ray diffraction").
+- So the standard route is kinematic, or numerical dynamical simulation of the whole peak. No
+  analytic frequency-dependent correction is in use.
+
+**3. What the direct comparison case does (Chalise et al. 2026, arXiv:2603.28071, full text read
+by keyword).**
+
+| term | occurrences |
+|---|---|
+| Takagi | 12 |
+| dynamical diffraction | 9 |
+| kinematic | 9 |
+| extinction | 2 (both as the depth at which the iteration starts) |
+| Darwin | 0 |
+| transfer function | 0 |
+| Sondhauss / Wark | 0 |
+
+- They solve the Takagi-Taupin system numerically through the depth and take `R = |X(0)|^2`.
+  That is the same physics as our solver, so the suppression of Entry 59 section 3 is present in
+  their forward model.
+- They do not write a first-order closed form, do not mention the Darwin width, and do not divide
+  anything out when they report spectral weight.
+
+**4. Citing works of Sondhauss & Wark 2003** (OpenAlex, 50 fetched). Open-access ones are
+"Coherent phonon control" (2007), "Tuning and Tracking of Coherent Shear Waves in Molecular Films"
+(2018), an InSb heat-conduction paper (2008) and a grazing-incidence TDS paper (2003). None
+reproduces or applies a first-order Bragg transfer function. Several entries are mis-attributed
+(uranium solution chemistry), so the list is noisy.
+
+**Conclusion (bounded).**
+- The first-order perturbative *solution* of the time-dependent Takagi-Taupin equation for phonon
+  distortions is probably in Sondhauss & Wark 2003. Do not claim that step as new.
+- The *use* of it as a transfer function H(omega) between the strain spectrum and the measured
+  Fourier weight -- its collapse in omega/omega_D, its dependence on kappa / 2 pi alpha, and the
+  instruction to divide it out -- has no visible precedent: the field's own 2023 review does not
+  cite the paper and uses no such correction, and the 2026 paper that needs it does not have it.
+- This bounds, but does not close, the question. Reading Sondhauss & Wark remains required before
+  submitting the correction as a result.
+
+**Poster.** No change. The transfer function appears only in the Outlook line, where it is stated
+as a direction, not as a priority claim.
+
+**Needed (library).** Sondhauss & Wark, Acta Cryst. A59, 100-107 (2003), DOI
+10.1107/S010876730201704X -- via the Sogang subscription or an IUCr reprint request. Second
+choice: Sheppard et al., Solid State Commun. 136, 181 (2005), DOI 10.1016/j.ssc.2005.05.056.
+
+---
