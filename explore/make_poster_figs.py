@@ -88,7 +88,7 @@ def f0():
     ax.text(12.6, 3.0, r"$D_h$", va="center", fontsize=BIG, color=ORANGE)
     ax.text(13.9, 0.75, r"satellites $n=\pm1,\pm2$", ha="right", fontsize=SMALL, color=ORANGE)
     OUT.mkdir(parents=True, exist_ok=True)
-    fig.savefig(OUT / "f0_scheme.png")
+    fig.savefig(OUT / "f0_scheme.png", dpi=400)  # half the card width, so twice the dpi to print like the rest
     print("wrote", OUT / "f0_scheme.png")
 
 

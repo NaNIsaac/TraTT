@@ -3627,3 +3627,43 @@ as a direction, not as a priority claim.
 choice: Sheppard et al., Solid State Commun. 136, 181 (2005), DOI 10.1016/j.ssc.2005.05.056.
 
 ---
+
+## 2026-10-07 — Entry 62: the quasi-static number for the poster's experimental window
+
+**Why.** The poster called the model "time-dependent two-beam Takagi-Taupin". The solver is not
+that: `core.py` integrates one frozen phase profile per instant, and the header of this notebook
+says "stroboscopic". The label also collides with Sondhauss & Wark 2003, whose title is literally
+"time-dependent dynamical diffraction theory" (Entry 60, 61) -- a reader from that community would
+take the two to be the same object. The fix is to name the approximation and give its number.
+
+**Parameter.** The lattice is static during one X-ray traversal when the acoustic phase advanced in
+that time is small:
+
+    beta = Omega L / c = 2 pi f L / c
+
+with L the slab thickness (the longest path in the problem) and c the vacuum speed of light. The
+stricter-looking version with the Pendellosung length, 2 pi f Lambda_P / c, is smaller, so beta is
+the conservative choice.
+
+**Numbers**, for the recommended window of Entry 20 (Si 440, symmetric Laue, L = 3 Lambda_P):
+
+| E keV | Lambda_P um | L um | f GHz | beta = 2 pi f L / c | 2 pi f Lambda_P / c |
+|---|---|---|---|---|---|
+| 17.48 | 54.34 | 163 | 1.1 | 3.8e-3 | 1.3e-3 |
+| 17.48 | 54.34 | 163 | 2.0 | 6.8e-3 | 2.3e-3 |
+| 30 | 98.76 | 296 | 0.6 | 3.7e-3 | 1.2e-3 |
+| 30 | 98.76 | 296 | 2.0 | 1.2e-2 | 4.1e-3 |
+
+- Worst case in the window: **beta = 1.2e-2**.
+- Stated as a time rather than a phase: at the thickest, fastest corner the X-ray crosses the
+  crystal in L/c = 0.99 ps, which is **0.2 % of the 500 ps acoustic period**.
+
+**Reading.** The frozen-profile treatment is not a convenience; in this window the lattice moves by
+0.2 % of a period while the field is inside. The poster should say so and drop "time-dependent".
+
+**Not covered by this number.** The X-ray response time of the crystal itself (the field needs
+~Lambda_P / c to settle into the dynamical state, the regime of Shvyd'ko & Lindberg) is a separate
+question from the acoustic motion, and the stroboscopic model does not address it. Entry 21's
+caveat stands: any genuine dependence on v_s beyond t_tr is outside these maps by construction.
+
+---
