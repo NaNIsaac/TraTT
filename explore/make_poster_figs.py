@@ -153,7 +153,7 @@ def f0():
 def f1():
     import make_poster_figure as M
     style()
-    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.9), constrained_layout=True, sharey=True)
+    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 6.9), constrained_layout=True, sharey=True)
     M.collapse(ax[0], "laue", lambda s: np.sin(np.pi * s) ** 2, r"$\sin^2(\pi\alpha_n\tilde t)$",
                r"Laue: $\sin^2(\pi\alpha_n\tilde t)$", small=SMALL - 4, ms=9)
     M.collapse(ax[1], "bragg", lambda s: np.tanh(np.pi * s) ** 2, r"$\tanh^2(\pi\alpha_n\tilde t)$",
@@ -193,7 +193,7 @@ def f2():
 def f3():
     import make_memory_figure as M
     style()
-    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.9), constrained_layout=True)
+    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.55), constrained_layout=True)
     M.panel_a(ax[0], small=SMALL - 2, title=r"transient-only: $J_1(S_f)=0$")
     M.panel_b(ax[1], small=SMALL - 4, title="same strain, up vs down")
     for line in ax[0].lines + ax[1].lines:
@@ -213,7 +213,7 @@ def f4():
     import make_phase_figure as M
     style()
     P = M.merged()
-    fig, ax = plt.subplots(figsize=(FIG_W, 5.0), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(FIG_W, 4.2), constrained_layout=True)
     Ss = sorted(set(P[:, 2]))
     hues = plt.cm.viridis(np.linspace(0, 0.9, len(Ss)))
     for c, S in zip(hues, Ss):
@@ -222,7 +222,11 @@ def f4():
     for e, lab in ((0.05, "5 %"), (0.2, "20 %"), (0.5, "50 %")):
         ax.axhline(e, color=INK2, lw=1.4, ls=":")
         ax.text(1.3e-3, e * 1.12, lab, fontsize=SMALL, color=INK2)
-    ax.set(xscale="log", yscale="log", ylim=(5e-5, 1.5), xlim=(1e-3, 6),
+    # the boundary the panel is about, so the result is readable without decoding the scatter
+    ax.axvline(0.3, color=INK, lw=2.0, ls=(0, (5, 3)), zorder=4)
+    ax.text(0.26, 3.5e-5, "resolved satellites", fontsize=SMALL, color=INK, ha="right", va="bottom")
+    ax.text(0.35, 3.5e-5, "channels overlap", fontsize=SMALL, color=INK, ha="left", va="bottom")
+    ax.set(xscale="log", yscale="log", ylim=(2.2e-5, 1.5), xlim=(1e-3, 6),
            xlabel=r"$R=\Lambda_{ac}/\Lambda_P$", ylabel="population error $E_{pop}$")
     # nine S values: a discrete colour bar reads better than a nine-entry legend
     cmap = mpl.colors.ListedColormap(hues)

@@ -1,4 +1,4 @@
-"""poster/poster.md -> poster/out/poster.pdf (+ PNG preview). Run: python poster/build.py [preview_dpi]
+r"""poster/poster.md -> poster/out/poster.pdf (+ PNG preview). Run: python poster/build.py [preview_dpi]
 
 Same idea as a print pipeline: the manuscript is canonical and read-only, every coordinate comes
 from SPEC (mm, page origin top-left), and the build ends with machine checks. Looking at the PNG
@@ -239,7 +239,8 @@ def bullet(P, it, x, y, w, draw=True):
         d = s["body_pt"] * PT_MM * 0.24                     # marker side
         mid = y + s["body_pt"] * PT_MM * (1 - XH / 2)       # middle of the x-height of the first line
         P.box(x + 0.5, mid - d / 2, d, d, s["accent"], r=0.5, z=3)
-    return P.flow(it["text"], x, y, w, s["body_pt"], indent=7, draw=draw) + s["para_gap"]
+    return P.flow(it["text"], x, y, w, s["body_pt"], indent=7, draw=draw,
+                  strong=s["accent"]) + s["para_gap"]
 
 
 def callout(P, it, x, y, w, draw=True):
@@ -281,7 +282,8 @@ def text_height(P, items, ix, iw):
         elif it["kind"] == "stats":
             y = stats(P, it, ix, y, iw, draw=False)
         elif it["kind"] == "para":
-            y = P.flow(it["text"], ix, y, iw, s["body_pt"], draw=False) + s["para_gap"]
+            y = P.flow(it["text"], ix, y, iw, s["body_pt"], draw=False,
+                      strong=s["accent"]) + s["para_gap"]
     return y
 
 
@@ -384,7 +386,8 @@ def build(preview_dpi=60, extra=None, save=True):
                     continue
                 y += P.image(f, ix, y, iw) + s["fig_gap"]
                 if it["caption"]:
-                    y = P.flow(it["caption"], ix, y, iw, s["caption_pt"], s["ink2"])
+                    y = P.flow(it["caption"], ix, y, iw, s["caption_pt"], s["ink2"],
+                                strong=s["accent"])
                 y += s["para_gap"]
             elif it["kind"] == "bullet":
                 y = bullet(P, it, ix, y, iw)
@@ -393,7 +396,8 @@ def build(preview_dpi=60, extra=None, save=True):
             elif it["kind"] == "stats":
                 y = stats(P, it, ix, y, iw)
             else:
-                y = P.flow(it["text"], ix, y, iw, s["body_pt"]) + s["para_gap"]
+                y = P.flow(it["text"], ix, y, iw, s["body_pt"],
+                           strong=s["accent"]) + s["para_gap"]
         if side:
             y = max(y, fyy)
         y += s["pad"] - s["para_gap"]

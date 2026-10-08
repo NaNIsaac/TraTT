@@ -9,6 +9,11 @@ footer: P2.17 · 2026 KPS Fall Meeting, Jeju, October 22, 2026 · This work was 
 Poster manuscript. This file is the only source of printed text; poster/build.py reads it and
 never edits it. Every item carries {E..} tags pointing at notes/lab_notebook.md (checked).
 Syntax: see the docstring of poster/build.py. Poster figures: python explore/make_poster_figs.py
+
+Three claims, in this order, and everything else is evidence for them:
+  1 each satellite has its own dynamical clock;
+  2 the transient remembers the drive history;
+  3 the independent-satellite picture holds up to R ~ 0.3.
 -->
 
 @wide
@@ -21,25 +26,23 @@ Temporal Pendellösung of the main reflection: DeCamp et al., Nature 413, 825 (2
 
 ![Snapshot at $\tilde t$ = 0.62: the profile inside the slab is the drive, the curve on the right the solved $I(\eta)$ of that same instant ($\alpha$ = 0.6, $S$ = 1.5, $\alpha_{ac}$ = 5).](figures/poster/f0_scheme.png){E0}
 
-> **Key result.** Behind the front, satellite $n$ is a crystal of the filled depth $v_s t$ with coupling $\pi\alpha\left|J_n(S)\right|$. Formation runs on a dynamical clock, $t_{tr}/(\alpha\left|J_n(S)\right|)$: the transit time only ends the transient. {E1}{E9}{E33}
+> **Key result.** Each satellite diffracts from the filled depth $v_s t$, on its own clock $\tau_n = \Lambda_P/(v_s\left|J_n(S)\right|)$. **Transit time sets the window; extinction length sets the clock.** {E1}{E9}{E33}
 
 ## Model
 
-- Two-beam Takagi–Taupin with a travelling deformation, Laue and Bragg: $\phi = S\,A(t-\zeta)\sin(q\zeta-qt)$; $\alpha = L/\Lambda_P$, $S = h\cdot u_0$, $R = \Lambda_{ac}/\Lambda_P$. {E0}
-- The X-ray crosses the crystal in 0.2 % of an acoustic period: the lattice is static while the field is inside, $\beta \leq 1.2\times10^{-2}$. {E62}
-- Verified to $10^{-9}$ against analytic limits and to $3\times10^{-7}$ against an independent exact Floquet solver. {E0}{E42}
+- Two-beam Takagi–Taupin, travelling acoustic deformation, Laue and Bragg. {E0}
+- $\alpha = L/\Lambda_P$, $S = h\cdot u_0$, $R = \Lambda_{ac}/\Lambda_P$; the lattice is static while the field is inside, $\beta \leq 1.2\times10^{-2}$. {E0}{E62}
+- Verified to $10^{-9}$ against analytic limits and $3\times10^{-7}$ against an independent exact Floquet solver. {E0}{E42}
 
 ## Filled-depth mapping: one law, no fit
 
-- Laue: $I(nq,t) = \sin^2(\pi\alpha_n t)$, a temporal Pendellösung with period $\Lambda_P/(v_s\left|J_n(S)\right|)$, independent of $L$. {E1}
-- Bragg: $I(nq,t) = \tanh^2(\pi\alpha_n t)$, formation time $0.95\,t_{tr}/\alpha_n$, capped at $t_{tr}$. {E9}
-- Formation order follows the Bessel ladder: channel $n$ first peaks at $t^*/t_{tr} = 1/(2\alpha\left|J_n(S)\right|)$, so $S$ reorders the channels (at $S=3$: $n=2$, then 1, then 3). {E1}{E24}
+- Behind the front, satellite $n$ is a crystal of filled depth $v_s t$ with coupling $\alpha_n = \alpha\left|J_n(S)\right|$: Laue reads $I_n(t) = \sin^2(\pi\alpha_n t)$, Bragg reads $\tanh^2(\pi\alpha_n t)$. {E1}{E9}
 
-![Points: full Takagi–Taupin for four $(S, \alpha, n)$; lines: closed forms, no fit parameter.](figures/poster/f1_collapse.png){E1}{E9}
+![Points: full Takagi–Taupin for four $(S, \alpha, n)$; lines: the closed forms, **no fit parameter**. The Laue period $\Lambda_P/(v_s\left|J_n(S)\right|)$ does not depend on $L$. Formation order follows the Bessel ladder, so $S$ reorders it — at $S=3$: $n=2$, then 1, then 3.](figures/poster/f1_collapse.png){E1}{E9}{E24}
 
 ## Formation is not peak growth
 
-- At the dark point ($\alpha_n t = 1$) the centre falls to 0.1–0.2 % of maximum, yet ~52 % of the integrated satellite sits in two side lobes: fringes flow inward. {E23}
+- At the dark point ($\alpha_n t = 1$) the centre falls to **0.1–0.2 %** of maximum, yet **≈52 %** of the integrated satellite sits in two side lobes: fringes flow inward. {E23}
 
 ![Satellite $n=1$, $S=1.5$, $\alpha=3$: the line narrows and blinks as the front fills the crystal.](figures/poster/f2_fringes.png){E22}{E23}
 
@@ -47,23 +50,25 @@ Temporal Pendellösung of the main reflection: DeCamp et al., Nature 413, 825 (2
 
 ## Formation remembers the path
 
-Satellite $n$ reads the last $t_{tr}$ of the drive, $\Theta_n = \int J_n(S\,A(t-\zeta))\,d\zeta$. An order forbidden at the final amplitude ($J_1(S_f)=0$) is the brightest during formation. {E28}{E30}{E34}
+> **Same final amplitude $\neq$ same diffraction state.** {E30}
+
+- Satellite $n$ reads the last $t_{tr}$ of the drive, $\Theta_n = \int J_n(S\,A(t-\zeta))\,d\zeta$: an order forbidden at the final amplitude ($J_1(S_f)=0$) is the **brightest** line during formation. {E28}{E30}{E34}
 
 ![Laue, $\alpha=0.5$: points full TT, lines the $\Theta_n$ law.](figures/poster/f3_memory.png){E28}{E30}
 
-## Validity map of the satellite picture
+## When does the independent-satellite picture fail?
 
-- With the exact phase average, satellites stay independent channels (error below 5%) up to $R$ = 0.34–0.57, depending on $S$. {E53}{E54}
-- Near resonance ($R \sim 1$) Bessel-dark orders reappear via a third-order coupling $\pi\alpha (R/2)^2 C_n(S)$. {E45}{E50}{E52}
+- Accurate to 5 % up to $R \lesssim 0.3$; measured boundary **0.34–0.57**, depending on $S$. {E53}{E54}
+- Past it the channels talk through sidebands of the forward beam — the same third-order path, $\pi\alpha (R/2)^2 C_n(S)$, that brings a Bessel-dark order back. {E44}{E45}{E50}{E52}
 
-![](figures/poster/f4_regime.png){E54}
+![Population error of the independent-channel picture. Each point is one $(\alpha, \alpha_{ac}, S)$, exact acoustic-phase average.](figures/poster/f4_regime.png){E54}
 
-## Conclusion and outlook
+## Take home
 
-%% 0 | fit parameters: one law for every order, Laue and Bragg {E1}{E9}
-%% 1–3 % | phase walls vs stacking-fault theory {E56}
-%% ~1 % | in-situ calibration of S, $\alpha\left|J_2\right|\geq 0.5$ {E13}
+%% CLOCK | $\tau_n=\Lambda_P/(v_s\left|J_n(S)\right|)$, set by each order's own extinction length {E1}{E9}
+%% MEMORY | the last $t_{tr}$ of the drive, not the final amplitude {E30}
+%% VALIDITY | independent satellites to 5 % for $R \lesssim 0.3$ {E54}
 
-- Every order, Laue and Bragg, runs on one dynamical clock, set by its own extinction length. {E1}{E9}{E33}
-- Si 440 at 17–30 keV with a 1–2 GHz drive: $\tau_1$ = 17–30 ns. {E20}
-- Outlook: a closed-form transfer function maps Bragg oscillations to phonon spectra. {E59}
+A travelling acoustic front makes every Bragg satellite a dynamical probe: its own clock, its own memory of the drive, valid while the channels stay resolved. {E33}
+
+- Si 440 at 17–30 keV, 1–2 GHz: $\tau_1$ = 17–30 ns. Outlook: a closed-form transfer function maps Bragg oscillations to phonon spectra. {E20}{E59}
