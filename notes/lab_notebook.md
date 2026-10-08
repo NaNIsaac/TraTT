@@ -3667,3 +3667,117 @@ question from the acoustic motion, and the stroboscopic model does not address i
 caveat stands: any genuine dependence on v_s beyond t_tr is outside these maps by construction.
 
 ---
+
+## 2026-10-08 — Entry 63: what a surface acoustic wave has to do with this
+
+**Why.** SAW X-ray diffraction is the largest experimental community in acoustically driven
+diffraction, and the poster says nothing about it. Entry 21 only recorded that Zolotoyabko's
+standing-SAW work is a periodic steady state. The geometric relation was never worked out, so
+"why not just do it with a SAW?" has had no answer. Script: `explore/nb/e63_saw.py`.
+
+**1. The geometries are different, and the solver cannot bridge them.**
+
+| | this work | SAW (Rayleigh) |
+|---|---|---|
+| acoustic wavevector | along the depth | in the surface |
+| amplitude behind the front | uniform | decays into the depth |
+| what grows with time | the modulated **depth** | the modulated **lateral extent** |
+| satellite displacement | in the rocking variable | needs the in-plane component (hence "sagittal") |
+
+The solver is one-dimensional in depth. An in-plane acoustic wavevector changes the in-plane
+momentum transfer and cannot be represented in it at all. **No result of this work transfers to
+SAW geometry as it stands.** That is a statement about the model, not about the physics.
+
+**2. What does carry over: the law is about the depth profile, not about the front.**
+
+The accumulated-coupling law (Entries 5, 28, 30) reads the depth profile through a Bessel kernel,
+`Theta_n = int_0^1 J_n(S A(zeta)) d zeta`, and Laue displays it as `sin^2(pi alpha |Theta_n|)`.
+Nothing in that derivation requires `A` to be a travelling step. Tested here with a **static
+exponential skin**, `A(zeta) = exp(-zeta / zeta_d)`, carrier still travelling, averaged over 8
+acoustic phases (alpha = 3, alpha_ac = 20, n = 1, n_z = 4096):
+
+| zeta_d | S = 0.5 | S = 1.5 | S = 3.0 |
+|---|---|---|---|
+| 0.02 | 8.6e-3 | 5.0e-3 | 2.9e-3 |
+| 0.05 | 8.3e-3 | 3.9e-3 | 2.6e-3 |
+| 0.10 | 6.7e-3 | 4.2e-3 | 1.1e-2 |
+| 0.30 | -3.4e-2 | -7.2e-2 | 4.0e-2 |
+| 1.00 | -1.6e-1 | 2.8e-2 | -2.9e-3 |
+
+(absolute difference, full TT minus law). **For skins thinner than 0.1 L — which is the whole SAW
+regime, see section 3 — the law holds to <= 1.1e-2 absolute.** It degrades for a thick skin, where
+the drive is strong over the whole depth and the known `(alpha/alpha_ac)^2` residual plus the
+phase average take over. This is a genuine extension of the law's domain: step onset, finite ramp,
+and now a static depth profile.
+
+**3. How much of the extinction depth a SAW can modulate — a bound, not an estimate.**
+
+A Rayleigh wave is two partial waves decaying as `exp(-kappa_{L,T} z)` with
+`kappa_{L,T} = q sqrt(1 - c_R^2 / c_{L,T}^2)`, `q = 2 pi / Lambda_ac`. The slower one sets the
+skin. For Si (`c_L = 8435`, `c_T = 5846` m/s from c11, c44):
+
+| c_R | kappa_T / q | skin |
+|---|---|---|
+| 4920 m/s | 0.540 | 0.295 Lambda_ac |
+| 5378 m/s (0.92 c_T) | 0.392 | 0.406 Lambda_ac |
+
+So the fraction of the extinction depth that a SAW modulates is
+
+    skin / Lambda_P = (0.30 to 0.41) * R,        R = Lambda_ac / Lambda_P
+
+— **frequency- and material-independent in R**. The resolved-channel condition of Entry 54 is
+`R <= 0.34-0.57`, so
+
+    modulated fraction <= 0.10 to 0.17.
+
+A SAW cannot fill the extinction depth and keep its satellites resolved. The two requirements pull
+in opposite directions: resolving channels wants a short acoustic wavelength, filling the depth
+wants a long one. Si numbers (`c_R = 4920`, Lambda_P from Entry 20):
+
+| f GHz | Lambda_ac um | skin um | Si 440 17 keV: R / frac | Si 440 30 keV: R / frac |
+|---|---|---|---|---|
+| 0.2 | 24.6 | 7.25 | 0.453 / 0.133 | 0.249 / 0.073 |
+| 0.5 | 9.84 | 2.90 | 0.181 / 0.053 | 0.100 / 0.029 |
+| 1.0 | 4.92 | 1.45 | 0.091 / 0.027 | 0.050 / 0.015 |
+| 2.0 | 2.46 | 0.73 | 0.045 / 0.013 | 0.025 / 0.007 |
+| 5.0 | 0.98 | 0.29 | 0.018 / 0.005 | 0.010 / 0.003 |
+
+**4. What a skin reads as a filled depth.** With `t_eff = Theta_n(skin) / J_n(S)`, a skin of depth
+`zeta_d` reads like a filled depth of
+
+| S | t_eff / zeta_d (n = 1) |
+|---|---|
+| 0.5 | 1.02 |
+| 1.5 | 1.23 |
+| 3.0 | 3.09 |
+
+The ratio exceeds 1 at large S because the decaying tail of the skin sweeps down through the
+maximum of `J_1` (at S ~ 1.84): depth where the amplitude has fallen contributes *more* coupling
+than the surface. A deep crystal can therefore still show the oscillation — but only by changing
+frequency or thickness, which is a steady-state measurement.
+
+**5. The decisive point: a SAW has no depth-filling transient.**
+
+The skin depth is set by the acoustic frequency and does not grow. Once the surface wavefront has
+passed a point, the depth profile under it is established and static. The transient in this work
+exists because the acoustic front travels **into** the depth that the X-ray samples; for a SAW the
+front travels **across** the surface, and the depth profile is slaved to it.
+
+A SAW does have a transient, but it is a different one: the lateral filling of the X-ray
+footprint, `footprint / v_R` — about 20 ns for a 100 um footprint, coincidentally the same order
+as our `t_tr`. That produces an inhomogeneously illuminated surface, not a depth-graded crystal,
+and it is not what the filled-depth law describes.
+
+**Consequence for the poster.** The experiment this work predicts is a **bulk** wave launched into
+the depth from a transducer, and shear-polarised so that `h . u != 0` in symmetric Laue (Entry 6,
+Entry 20, handoff 7.4). That is already the poster's geometry; it should be said out loud, because
+a visitor from the SAW community will otherwise assume a surface wave.
+
+**Not done.**
+- No calculation with an in-plane acoustic wavevector; the solver cannot do one.
+- The exponential skin is a model. The real Rayleigh profile is a sum of two partial waves whose
+  normal displacement changes sign with depth, and the `h . u` projection varies with depth too.
+- The 2017 sagittal-SAW Bragg paper (handoff ref [3]) has still not been read.
+- Nothing here says a SAW experiment is uninteresting; it says it measures a different quantity.
+
+---

@@ -56,6 +56,40 @@ and the path memory." {E21}
 Standing SAW at 0.58 GHz in LiNbO₃, satellites modulated at 2f — a phase-locked **periodic steady
 state**, not a formation transient. Different object. {E21}
 
+### Q. "Why not do this with a surface acoustic wave? That is how everyone does it."
+
+Expect this one. Say the geometry first, then the number. {E63}
+
+**Geometry.** "A SAW's wavevector lies *in* the surface and its amplitude decays into the depth.
+Ours is a bulk wave travelling *into* the depth, uniform behind the front. So what grows with time
+is different: for us the modulated depth, for a SAW the modulated lateral extent. Our solver is
+one-dimensional in depth and cannot represent an in-plane wavevector at all — which is why that
+literature talks about sagittal diffraction."
+
+**The number that settles it.** "A Rayleigh wave's skin is 0.30–0.41 Λ_ac, so the fraction of the
+extinction depth it modulates is 0.30–0.41 R — independent of frequency and material. Resolving
+the channels needs R ≤ 0.34–0.57, so the modulated fraction is capped at 10–17 %. A SAW cannot
+fill the extinction depth and keep its satellites resolved: resolving wants a short acoustic
+wavelength, filling wants a long one."
+
+**The physical point, if they push.** "The skin depth is set by the frequency and does not grow.
+Once the surface wavefront has passed a point, the profile under it is static. **A SAW has no
+depth-filling transient** — that is the whole mechanism here. A SAW does have a transient, the
+lateral filling of the X-ray footprint, ~20 ns for a 100 µm footprint. Same order as our t_tr,
+but it is an inhomogeneously illuminated surface, not a depth-graded crystal."
+
+**What does carry over.** "The accumulated-coupling law is a statement about the depth *profile*,
+not about the front. I checked it on a static exponential skin: it holds to ≤ 1.1×10⁻² absolute
+for skins thinner than 0.1 L, which is the whole SAW regime. And a skin of depth d reads like a
+filled depth of 1.0–3.1 d depending on S — above S ≈ 1.8 the decaying tail sweeps through the
+maximum of J₁, so depth where the amplitude has *fallen* couples more strongly than the surface."
+
+**Close by naming your own geometry.** "So the experiment this predicts is a bulk wave from a
+transducer, launched along the depth, and shear-polarised — in symmetric Laue a longitudinal wave
+along the normal gives h·u = 0." {E6}{E20}
+
+Never say a SAW experiment is uninteresting. It measures a different quantity.
+
 ### Q. "What about Sondhauss & Wark's time-dependent dynamical diffraction theory?"
 
 **This one only touches the Outlook line, so route it there.** "Acta Cryst. A59 (2003) — closed
