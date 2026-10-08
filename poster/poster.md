@@ -19,7 +19,7 @@ A travelling acoustic wave enters a perfect crystal. The steady-state satellites
 
 Temporal Pendellösung of the main reflection: DeCamp et al., Nature 413, 825 (2001). Steady-state acoustic satellites: Entin; Zolotoyabko et al. {E7}
 
-![](figures/poster/f0_scheme.png){E0}
+![Snapshot at $\tilde t$ = 0.62: the profile inside the slab is the drive, the curve on the right the solved $I(\eta)$ of that same instant ($\alpha$ = 0.6, $S$ = 1.5, $\alpha_{ac}$ = 5).](figures/poster/f0_scheme.png){E0}
 
 > **Key result.** Behind the front, satellite $n$ is a crystal of the filled depth $v_s t$ with coupling $\pi\alpha\left|J_n(S)\right|$. Formation runs on a dynamical clock, $t_{tr}/(\alpha\left|J_n(S)\right|)$: the transit time only ends the transient. {E1}{E9}{E33}
 

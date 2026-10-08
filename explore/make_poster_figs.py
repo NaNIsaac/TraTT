@@ -21,6 +21,10 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "explore"))
+sys.path.insert(0, str(ROOT / "src"))
+
+from tratt.core import required_nz, rocking  # noqa: E402
+from tratt.drive import Drive  # noqa: E402
 OUT = ROOT / "figures" / "poster"
 for _f in sorted((ROOT / "poster" / "fonts").glob("*.ttf")):     # same typeface as the poster text
     mpl.font_manager.fontManager.addfont(str(_f))
@@ -58,37 +62,89 @@ def finish(fig, ax, name):
 
 
 def f0():
-    """Schematic for half a wide card (text sits on the other half), so FIG_W / 2 wide."""
+    """Schematic for half a wide card (text sits on the other half), so FIG_W / 2 wide.
+
+    Everything here is computed, like the other four figures: the profile inside the slab is
+    `Drive.phi(t)` sampled in depth, and the curve on the right is a real `rocking()` of that
+    same snapshot, turned on its side so each satellite peak faces the beam it belongs to.
+    The earlier version drew sine curves wiggling along the transverse direction, i.e. the
+    modulation varying across the beam rather than with depth -- the opposite of the drive.
+    """
     style()
-    fig, ax = plt.subplots(figsize=(FIG_W / 2, 3.2), constrained_layout=True)
-    ax.set(xlim=(0, 14), ylim=(0, 9.2))
+    alpha, S, alpha_ac, t = 0.6, 1.5, 5.0, 0.62
+    d = Drive(S=S, alpha_ac=alpha_ac)
+
+    fig, (ax, axr) = plt.subplots(
+        1, 2, figsize=(FIG_W / 2, 3.2), constrained_layout=True,
+        gridspec_kw=dict(width_ratios=[2.5, 1.0], wspace=0.0))
+
+    # ---- left: the crystal in cross-section, with the real phase profile inside it
+    ax.set(xlim=(-3.3, 9.6), ylim=(-0.3, 9.6))
     ax.axis("off")
-    x0, x1, y0, y1 = 3.2, 7.2, 1.6, 7.6                       # crystal slab (Laue: beams cross it)
-    ax.add_patch(plt.Rectangle((x0, y0), x1 - x0, y1 - y0, fc="#eef2f8", ec=INK2, lw=1.6))
-    xf = x0 + 0.62 * (x1 - x0)                                  # acoustic front inside the crystal
-    yy = np.linspace(y0, y1, 400)
-    for k in range(6):
-        xs = x0 + 0.05 + k * (xf - x0 - 0.1) / 5
-        ax.plot(xs + 0.12 * np.sin(2 * np.pi * (yy - y0) / 1.5), yy, color=BLUE, lw=1.6, alpha=0.8)
-    ax.plot([xf, xf], [y0, y1], color=BLUE, lw=3, ls="--")
-    ax.annotate("", xy=(xf + 1.6, 8.3), xytext=(xf - 0.2, 8.3),
-                arrowprops=dict(arrowstyle="-|>", color=BLUE, lw=2.5, mutation_scale=26))
-    ax.text(xf + 1.8, 8.3, r"front, $v_s$", color=BLUE, va="center", fontsize=BIG)
-    ax.add_patch(plt.Rectangle((x0 - 0.35, y0), 0.35, y1 - y0, fc=INK2, ec="none"))
-    ax.text(x0 - 0.2, 0.75, "transducer", ha="center", fontsize=SMALL, color=INK2)
-    ax.annotate("", xy=(x0 + 0.1, 4.6), xytext=(0.2, 6.8),
-                arrowprops=dict(arrowstyle="-|>", color=INK, lw=3, mutation_scale=28))
-    ax.text(0.1, 7.3, "X-ray", fontsize=BIG)
-    ax.annotate("", xy=(12.4, 7.4), xytext=(x1, 4.6),       # forward beam
-                arrowprops=dict(arrowstyle="-|>", color=INK2, lw=2.6, mutation_scale=24))
-    ax.text(12.6, 7.4, r"$D_0$", va="center", fontsize=BIG, color=INK2)
-    for n in (-2, -1, 0, 1, 2):                              # diffracted beam D_h and its satellites
-        y = 3.0 - 0.75 * n
-        ax.annotate("", xy=(12.4, y), xytext=(x1, 4.6),
-                    arrowprops=dict(arrowstyle="-|>", color=ORANGE, lw=3.2 if n == 0 else 1.8,
-                                    mutation_scale=24 if n == 0 else 16, alpha=1 if n == 0 else 0.75))
-    ax.text(12.6, 3.0, r"$D_h$", va="center", fontsize=BIG, color=ORANGE)
-    ax.text(13.9, 0.75, r"satellites $n=\pm1,\pm2$", ha="right", fontsize=SMALL, color=ORANGE)
+    x0, x1, y0, y1 = 0.0, 6.0, 2.1, 8.1            # slab; depth zeta runs left to right
+    xf = x0 + t * (x1 - x0)                         # acoustic front
+    ymid = 0.5 * (y0 + y1)
+
+    ax.add_patch(plt.Rectangle((x0, y0), x1 - x0, y1 - y0, fc="#f4f7fb", ec=INK2, lw=1.6, zorder=1))
+    ax.add_patch(plt.Rectangle((x0, y0), xf - x0, y1 - y0, fc="#e7effa", ec="none", zorder=1))
+
+    zz = np.linspace(0.0, 1.0, 1200)
+    phi = d.phi(t)(zz)
+    amp = 0.33 * (y1 - y0) / max(abs(phi).max(), 1e-9)
+    ax.plot(x0 + zz * (x1 - x0), ymid + amp * phi, color=BLUE, lw=2.6, zorder=3,
+            solid_capstyle="round")
+    ax.plot([xf, x1], [ymid, ymid], color=BLUE, lw=2.6, zorder=3, solid_capstyle="round")
+    ax.plot([xf, xf], [y0, y1], color=BLUE, lw=2.4, ls=(0, (4, 3)), zorder=4)
+
+    # transducer on the lower part of the entrance face, so the beam enters clear of it
+    ty = y0 + 0.58 * (y1 - y0)
+    ax.add_patch(plt.Rectangle((x0 - 0.44, y0), 0.44, ty - y0, fc=INK2, ec="none", zorder=2))
+    ax.text(x0 - 0.62, 0.5 * (y0 + ty), "transducer", ha="right", va="center",
+            fontsize=SMALL, color=INK2)
+
+    # front marker
+    ax.annotate("", xy=(xf + 1.25, y1 + 0.70), xytext=(xf, y1 + 0.70),
+                arrowprops=dict(arrowstyle="-|>", color=BLUE, lw=2.2, mutation_scale=22))
+    ax.text(xf + 1.45, y1 + 0.70, r"$v_s$", color=BLUE, va="center", fontsize=BIG)
+
+    # one dimension row: the slab thickness, with the filled part picked out on the same line
+    yd = y0 - 0.72
+    ax.annotate("", xy=(x1, yd), xytext=(x0, yd),
+                arrowprops=dict(arrowstyle="<|-|>", color=INK2, lw=1.2, mutation_scale=13))
+    for x in (x0, xf, x1):
+        ax.plot([x, x], [yd - 0.22, yd + 0.22], color=INK2, lw=1.1)
+    ax.plot([x0, xf], [yd, yd], color=INK, lw=3.2, solid_capstyle="butt")
+    ax.text(x1 + 0.22, yd, r"$L$", ha="left", va="center", fontsize=SMALL, color=INK2)
+    ax.text(0.5 * (x0 + xf), yd - 0.38, r"filled depth $v_s t$", ha="center", va="top",
+            fontsize=SMALL, color=INK)
+
+    # beams: in above the transducer, forward and diffracted out
+    ax.annotate("", xy=(x0 + 0.08, ymid + 1.25), xytext=(-2.8, ymid + 2.85),
+                arrowprops=dict(arrowstyle="-|>", color=INK, lw=2.8, mutation_scale=26), zorder=5)
+    ax.text(-2.9, ymid + 3.2, "X-ray", fontsize=BIG, color=INK)
+    ax.annotate("", xy=(9.0, ymid + 1.65), xytext=(x1, ymid + 0.1),
+                arrowprops=dict(arrowstyle="-|>", color=INK2, lw=2.4, mutation_scale=22))
+    ax.text(9.2, ymid + 1.8, r"$D_0$", va="center", fontsize=BIG, color=INK2)
+    ax.annotate("", xy=(9.0, ymid - 1.65), xytext=(x1, ymid - 0.1),
+                arrowprops=dict(arrowstyle="-|>", color=ORANGE, lw=3.0, mutation_scale=22))
+    ax.text(9.2, ymid - 1.8, r"$D_h$", va="center", fontsize=BIG, color=ORANGE)
+
+    # ---- right: the same snapshot, actually solved, eta vertical so peaks face the beam
+    eta = np.linspace(-2.6 * d.q, 2.6 * d.q, 4001)
+    I = rocking(alpha, eta, phi=d.phi(t), n_z=required_nz(alpha, alpha_ac))
+    axr.plot(I, eta / d.q, color=ORANGE, lw=2.2)
+    axr.fill_betweenx(eta / d.q, 0, I, color=ORANGE, alpha=0.16)
+    axr.set(xlim=(0, 1.55 * I.max()), ylim=(-2.75, 2.75), xticks=[], yticks=[-2, -1, 0, 1, 2])
+    axr.set_xlabel(r"$I(\eta)$", fontsize=SMALL, labelpad=1)
+    axr.set_ylabel(r"$\eta / q$", fontsize=SMALL, labelpad=0)
+    axr.tick_params(labelsize=SMALL, length=4)
+    for s in ("top", "right", "bottom"):
+        axr.spines[s].set_visible(False)
+    axr.grid(False)
+    for n in (0, 1, 2):
+        axr.annotate(f"$n={n}$", (float(np.interp(n * d.q, eta, I)), n), fontsize=SMALL,
+                     color=ORANGE, va="center", xytext=(6, 0), textcoords="offset points")
+
     OUT.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT / "f0_scheme.png", dpi=400)  # half the card width, so twice the dpi to print like the rest
     print("wrote", OUT / "f0_scheme.png")
