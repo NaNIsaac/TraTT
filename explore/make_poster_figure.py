@@ -52,7 +52,7 @@ def collapse(ax, geometry, law, lawlabel, title, small=7.5, ms=4):
                 color=c, ls="none", label=rf"$S$={S:g}, $\alpha$={alpha:g}, $n$={n}")
     s = np.linspace(0, 2.3, 500)
     ax.plot(s, law(s), color=INK, lw=1.4, label=lawlabel, zorder=0)
-    ax.set(xlim=(0, 2.3), ylim=(-0.03, 1.08), xlabel=r"$\alpha_n\tilde t$,  $\alpha_n=\alpha|J_n(S)|$",
+    ax.set(xlim=(0, 2.3), ylim=(-0.03, 1.08), xlabel=r"$\alpha_n\tilde t$,  $\alpha_n=\alpha\left|J_n(S)\right|$",
            ylabel=r"$I(\eta=nq,\,\tilde t)$", title=title)
     ax.legend(fontsize=small, frameon=False, loc="lower right" if geometry == "bragg" else "upper right")
 
@@ -63,7 +63,7 @@ def order_panel(ax):
     t = np.linspace(0.0, 1.0, 201) + OFF
     for n, c, m in zip((1, 2, 3), HUES, MARK):
         tstar = 1 / (2 * alpha * np.abs(jv(n, Ss)))
-        ax.plot(Ss, tstar, color=c, label=rf"$n={n}$: $1/(2\alpha|J_{n}(S)|)$")
+        ax.plot(Ss, tstar, color=c, label=rf"$n={n}$: $1/(2\alpha\left|J_{n}(S)\right|)$")
         pts = []
         for S in (1.0, 2.0, 3.0, 4.0):
             if 1 / (2 * alpha * abs(jv(n, S))) < 0.95:
@@ -77,7 +77,7 @@ def order_panel(ax):
                 arrowprops=dict(arrowstyle="->", color=INK2, lw=0.8))
     ax.set(xlim=(0.3, 4.5), ylim=(0.2, 1.2), xlabel=r"modulation index $S$",
            ylabel=r"first maximum $\tilde t^{*}$",
-           title=r"c  Formation order follows $|J_n(S)|$ ($\alpha$=2; points: simulation)")
+           title=r"c  Formation order follows $\left|J_n(S)\right|$ ($\alpha$=2; points: simulation)")
     ax.legend(fontsize=7.5, frameon=False, loc="upper right")
 
 
@@ -113,7 +113,7 @@ def main(out="figures/poster_mapping.png"):
         a.grid(color=GRID, lw=0.6)
         a.set_axisbelow(True)
     fig.suptitle("Satellite n forms as a crystal of the filled depth with coupling "
-                 r"$\pi\alpha|J_n(S)|$ — curves are closed forms, no fit;"
+                 r"$\pi\alpha\left|J_n(S)\right|$ — curves are closed forms, no fit;"
                  r" points are full Takagi–Taupin ($\alpha_{\rm ac}$=20)", fontsize=10)
     fig.savefig(out)
     print("wrote", out)

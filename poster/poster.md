@@ -21,7 +21,7 @@ Temporal Pendellösung of the main reflection: DeCamp et al., Nature 413, 825 (2
 
 ![](figures/poster/f0_scheme.png){E0}
 
-> **Key result.** Behind the front, satellite $n$ is a crystal of the filled depth $v_s t$ with coupling $\pi\alpha|J_n(S)|$. Formation runs on a dynamical clock, $t_{tr}/(\alpha|J_n(S)|)$: the transit time only ends the transient. {E1}{E9}{E33}
+> **Key result.** Behind the front, satellite $n$ is a crystal of the filled depth $v_s t$ with coupling $\pi\alpha\left|J_n(S)\right|$. Formation runs on a dynamical clock, $t_{tr}/(\alpha\left|J_n(S)\right|)$: the transit time only ends the transient. {E1}{E9}{E33}
 
 ## Model
 
@@ -31,9 +31,9 @@ Temporal Pendellösung of the main reflection: DeCamp et al., Nature 413, 825 (2
 
 ## Filled-depth mapping: one law, no fit
 
-- Laue: $I(nq,t) = \sin^2(\pi\alpha_n t)$, a temporal Pendellösung with period $\Lambda_P/(v_s|J_n(S)|)$, independent of $L$. {E1}
+- Laue: $I(nq,t) = \sin^2(\pi\alpha_n t)$, a temporal Pendellösung with period $\Lambda_P/(v_s\left|J_n(S)\right|)$, independent of $L$. {E1}
 - Bragg: $I(nq,t) = \tanh^2(\pi\alpha_n t)$, formation time $0.95\,t_{tr}/\alpha_n$, capped at $t_{tr}$. {E9}
-- Formation order follows the Bessel ladder: channel $n$ first peaks at $t^*/t_{tr} = 1/(2\alpha|J_n(S)|)$, so $S$ reorders the channels (at $S=3$: $n=2$, then 1, then 3). {E1}{E24}
+- Formation order follows the Bessel ladder: channel $n$ first peaks at $t^*/t_{tr} = 1/(2\alpha\left|J_n(S)\right|)$, so $S$ reorders the channels (at $S=3$: $n=2$, then 1, then 3). {E1}{E24}
 
 ![Points: full Takagi–Taupin for four $(S, \alpha, n)$; lines: closed forms, no fit parameter.](figures/poster/f1_collapse.png){E1}{E9}
 
@@ -62,7 +62,7 @@ Satellite $n$ reads the last $t_{tr}$ of the drive, $\Theta_n = \int J_n(S\,A(t-
 
 %% 0 | fit parameters: one law for every order, Laue and Bragg {E1}{E9}
 %% 1–3 % | phase walls vs stacking-fault theory {E56}
-%% ~1 % | in-situ calibration of S, $\alpha|J_2|\geq 0.5$ {E13}
+%% ~1 % | in-situ calibration of S, $\alpha\left|J_2\right|\geq 0.5$ {E13}
 
 - Every order, Laue and Bragg, runs on one dynamical clock, set by its own extinction length. {E1}{E9}{E33}
 - Si 440 at 17–30 keV with a 1–2 GHz drive: $\tau_1$ = 17–30 ns. {E20}

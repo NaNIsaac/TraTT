@@ -41,8 +41,10 @@ def style():
         "axes.edgecolor": INK2, "axes.labelcolor": INK, "text.color": INK, "xtick.color": INK2,
         "ytick.color": INK2, "axes.spines.top": False, "axes.spines.right": False,
         "figure.facecolor": "white", "savefig.facecolor": "white", "savefig.dpi": 200,
-        "font.family": FONT, "mathtext.fontset": "custom", "mathtext.rm": FONT,
-        "mathtext.it": f"{FONT}:italic", "mathtext.bf": f"{FONT}:bold", "mathtext.sf": FONT,
+        # Text in the poster's own face; math in STIX, the same pairing poster/build.py uses, so
+        # an axis label and a panel equation are set identically. An all-Plex math fontset has no
+        # \cdot and no \sim and falls back to DejaVu for them, and its \int is a text-sized glyph.
+        "font.family": FONT, "mathtext.fontset": "stix",
     })
 
 
@@ -104,7 +106,7 @@ def f1():
     h, lab = ax[1].get_legend_handles_labels()
     ax[1].legend(h, lab[:-1] + ["closed form (line)"], frameon=False, loc="lower right", fontsize=SMALL - 2)
     for a in ax:
-        a.set_xlabel(r"$\alpha_n\tilde t$,   $\alpha_n=\alpha|J_n(S)|$")
+        a.set_xlabel(r"$\alpha_n\tilde t$,   $\alpha_n=\alpha\left|J_n(S)\right|$")
     ax[1].set_ylabel("")
     ax[1].tick_params(labelleft=False)          # shared y axis: one set of tick labels
     finish(fig, ax, "f1_collapse")

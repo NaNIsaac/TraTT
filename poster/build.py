@@ -6,7 +6,14 @@ is still required; the checks only catch what a machine can see.
 
 Look (v2). Group identity from the ICAMD 2025 poster (navy header, logos, three-colour stripe, A0,
 two columns), with a less "default slide" finish:
-- IBM Plex Sans throughout (poster/fonts, SIL OFL), math in the same face (italic for variables);
+- text in IBM Plex Sans (poster/fonts, SIL OFL); math in STIX, so a variable is a serif italic
+  and is told apart from the sans body at a glance. Plex Sans was the math face too until the
+  specimen showed what it costs: it has no \cdot and no \sim, so "h . u_0" and "R ~ 1" were
+  silently falling back to DejaVu, and its \int is a text-sized glyph that vanishes in the
+  Theta_n equation. Computer Modern ("cm") fixes both but its display integral overshoots the
+  line box and collides with the line below, so STIX is the one that fits this layout. Set
+  TRATT_MATH=cm|plex|dejavuserif to re-compare. Absolute values are \left|..\right|: a bare
+  STIX | is the height of a lowercase l and reads as one;
 - borderless rounded cards with a faint shadow; the section head sits inside its card: an orange
   number badge, a navy semibold title and a hairline divider;
 - bullets are small orange squares at x-height; the key message is a navy band with white text;
@@ -48,10 +55,18 @@ for _f in sorted((ROOT / "poster" / "fonts").glob("*.ttf")):
 FONT = "IBM Plex Sans"
 # Word-by-word placement needs text widths that scale linearly with dpi; hinting breaks that and
 # makes long words overrun the next one in a preview rendered at another dpi.
+import os  # noqa: E402
+
+# Math face. IBM Plex Sans has no \cdot and no \sim, so a custom all-Plex fontset silently
+# falls back to DejaVu for "h . u_0" and "R ~ 1"; its \int is also a text-sized glyph, which
+# the Theta_n equation needs to be bigger than. Set TRATT_MATH to compare.
+MATH = os.environ.get("TRATT_MATH", "stix")
+_math = ({"mathtext.fontset": "custom", "mathtext.rm": FONT, "mathtext.it": f"{FONT}:italic",
+          "mathtext.bf": f"{FONT}:bold", "mathtext.sf": FONT}
+         if MATH == "plex" else {"mathtext.fontset": MATH})
 matplotlib.rcParams.update({"text.hinting": "none", "text.hinting_factor": 1, "font.family": FONT,
-                            "mathtext.fontset": "custom", "mathtext.rm": FONT, "mathtext.it": f"{FONT}:italic",
-                            "mathtext.bf": f"{FONT}:bold", "mathtext.sf": FONT,
-                            "pdf.fonttype": 42})   # TrueType in the PDF: editable, accepted by print shops
+                            "pdf.fonttype": 42,   # TrueType in the PDF: editable, accepted by print shops
+                            **_math})
 import matplotlib.image as mpimg  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.patches import FancyBboxPatch  # noqa: E402
