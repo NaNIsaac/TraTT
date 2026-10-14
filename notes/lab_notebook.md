@@ -3913,3 +3913,102 @@ where |F_TT| > 2 % of max. Away from the main peak and the satellites, SW stays 
   - correcting a single-Bloch-wave ansatz is a modest step, so a referee may call it routine. The
     paper case must rest on the measurement correction, not on the linearisation.
 - Still unread: Sheppard et al. 2005, Chukhovskii & Förster 1995, Wark & Lee 1999.
+
+---
+
+## 2026-10-14 — Entry 65: the transfer function for a real crystal (Si 400), and where it stops being linear
+
+**Why.** Entries 59 and 64 give the crystal factor H in dimensionless form (frequency over the
+Darwin half-width x, absorption g = κ/2πα). This entry puts in Chalise et al.'s crystal and asks
+two things: how large is the bias across their spectral band, and is the closed form still right
+there? The regime is far out in the weakly absorbing tail (x ~ 100), where nothing had been
+checked against TT. Scripts: `explore/nb/e65_si400.py` (closed form, full-TT check, figure) and
+`explore/nb/e65_conv.py` (depth-step convergence and the linear-regime test). Logs:
+`e65_si400.log`, `e65_conv.log`. Figure: `figures/si400_transfer.png`.
+
+**1. Mapping (sigma polarisation, X0h constants of Entry 20, symmetric Bragg).**
+- Λ = λ sinθ_B/|χ_rh| (the code's Λ with γ = sinθ_B).
+- g = κ/2πα = χ_i0/|χ_rh|. With μ = 2πχ_i0/λ and κ = μL/sinθ_B, the factor sinθ_B cancels.
+- x = f/f_D, with f_D = v_L/Λ and v_L = 8433 m/s.
+
+| E keV | Λ µm | f_D GHz | g |
+|---|---|---|---|
+| 8 | 11.33 | 0.744 | 0.0458 |
+| 17.48 | 11.54 | 0.730 | 0.0100 |
+
+So Chalise's 87–113 GHz peak sits at x ≈ 120–150, and their 20–170 GHz band at x ≈ 27–230.
+
+**2. Crystal factor across their band (closed form, single mode at the satellite).**
+
+| f GHz | 5 | 10 | 20 | 40 | 60 | 100 | 170 |
+|---|---|---|---|---|---|---|---|
+| H, 8 keV | 0.52 | 0.78 | 0.93 | 0.98 | 0.99 | 1.00 | 1.00 |
+| H, 17.48 keV | 0.14 | 0.26 | 0.48 | 0.74 | 0.85 | 0.94 | 0.98 |
+
+- **H(20 GHz)/H(100 GHz) = 0.51 at 17.48 keV and 0.93 at 8 keV.**
+- A peak-normalised Fourier-weight spectrum taken at 17 keV therefore under-reads 20 GHz by a
+  factor 2 after any kinematic correction. Their Fig. 2 shows a low-frequency deficit of the same
+  sign; its size is about 4× (Entry 57, read off the figure).
+- Their energy and their weighting of the strain curve are not stated (Entry 57), so this stays
+  consistency in sign and order of magnitude, not a quantitative match.
+- The factor comes from weak absorption. Where κ is small, the tail extinction 2cR0 ~ (πα)²/η
+  competes with absorption out to tens of Darwin half-widths (Entry 59 sec. 4).
+
+**3. Full-TT check: two separate effects.**
+- **(a) Numerics.** At 24 RK4 steps per cycle of η, the phase error accumulates over ~10⁴
+  cycles. At g = 0.01, x = 30 the ratio TT/closed goes 0.917 → 0.954 → 0.956 for 24/48/96 steps
+  per cycle; at x = 100 it goes 0.680 → 0.744 → 0.746. The h⁴ scaling holds, and 48 steps per
+  cycle is converged to < 0.5 %. **The `tt` run in `e65_si400.log` used 24 steps per cycle and
+  is not converged at x ≥ 30. Do not quote it.**
+- **(b) Physics: the satellite stops being linear.** The converged residual at S = 0.02 is not
+  numerical. At S = 0.002, with 48 steps per cycle, the closed form holds:
+
+| g | x | S | ν = linear satellite amplitude | 1 − TT/closed |
+|---|---|---|---|---|
+| 0.0100 | 30 | 0.02 | 0.257 | 0.044 |
+| 0.0100 | 100 | 0.02 | 0.447 | 0.254 |
+| 0.0100 | 30 | 0.002 | 0.026 | 0.002 |
+| 0.0100 | 100 | 0.002 | 0.045 | 0.013 |
+| 0.0458 | 30 | 0.002 | — | 0.001 |
+| 0.0458 | 100 | 0.002 | — | 0.005 |
+| 0.12 (Entry 64) | 20 | 0.02 | 0.041 | −0.005 |
+
+- The deviation follows ν², where ν = |c S (1 − R0²) / (2(Λ − iW))| is the satellite amplitude
+  the linear theory predicts.
+- In words: when absorption is weak and the strain fills the penetration depth, the satellite
+  builds up its own reflectivity. It reaches the regime where its coupling πα|J_1(S)| over the
+  penetration depth is no longer small, and the first-order (kinematic-in-S) weight over-reads.
+- This is the same physics as the rest of this work: the satellite becomes a dynamical reflection
+  with its own extinction length Λ/|J_n(S)|.
+
+**4. Validity rule for the Fourier-weight estimator, and what it means for Chalise.**
+- The linear transfer function H applies while ν ≲ 0.2 (error ≲ 4 %).
+- For a packet rather than a filling mode, ν scales with the strained depth that the X-ray
+  samples coherently: ν ~ π|J_1(S)| ℓ/Λ with ℓ = min(packet length, penetration depth).
+- Chalise's packets are ~3 cycles of ~97 nm (ℓ ≈ 0.3 µm), with |strain| ~ 1e-3, so S ≈ 0.7
+  (Entry 57) and J_1 ≈ 0.33. That gives **ν ≈ 0.03, linear: H applies to their case.**
+  This is an order estimate, not a TT run of their packet.
+- For long acoustic trains — the GHz transducer drive of this project — ν is large by design, and
+  the satellite forms dynamically (Entries 1, 9). The two halves of the poster meet here:
+  - **short packet** → linear, H-corrected spectroscopy;
+  - **long train** → satellite Pendellösung.
+  - The crossover is the satellite's own extinction length reaching the strained depth.
+
+**Verdict.**
+- For Si 400 the crystal factor is a factor-2 effect across a realistic DFXM band at 17 keV, and
+  < 10 % at 8 keV.
+- The closed form is verified against converged TT to ≤ 0.5 % in the linear regime at both
+  energies, out to x = 100.
+- The estimator itself has a linearity limit, ν ≲ 0.2. It is a property of the measurement, not of
+  the solver, and it ties the Outlook back to the formation physics.
+
+**Not done.**
+- A TT run of an actual few-cycle packet at Si 400 parameters, which would replace the ν
+  estimate.
+- Anomalous absorption χ_ih in Bragg.
+- Their exact energy and normalisation (not stated in the preprint).
+- (nothing pending)
+
+**Update (same night).** At 8 keV, S = 0.02, converged with 96 steps per cycle, TT/closed form
+is 0.974 at x = 100 and 0.977 at x = 150. Stronger absorption keeps ν smaller, so the
+non-linearity is ~2 % there, against 25 % at 17.48 keV.

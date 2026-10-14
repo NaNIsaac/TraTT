@@ -1,0 +1,15 @@
+g=0.01 x=100 per_cycle= 24 n_z= 231730: TT / closed form = 0.6798
+g=0.01 x=100 per_cycle= 48 n_z= 463205: TT / closed form = 0.7437
+g=0.01 x=100 per_cycle= 96 n_z= 926155: TT / closed form = 0.7464
+g=0.01 x=150 per_cycle= 24 n_z= 346322: TT / closed form = 0.6260
+g=0.01 x=150 per_cycle= 48 n_z= 692389: TT / closed form = 0.7119
+g=0.01 x=150 per_cycle= 96 n_z=1384522: TT / closed form = 0.7148
+g=0.0458 x=30 per_cycle= 24 n_z=  15768: TT / closed form = 0.9720
+g=0.0458 x=30 per_cycle= 48 n_z=  31280: TT / closed form = 0.9811
+g=0.0458 x=30 per_cycle= 96 n_z=  62305: TT / closed form = 0.9816
+g=0.0458 x=100 per_cycle= 24 n_z=  50796: TT / closed form = 0.9505
+g=0.0458 x=100 per_cycle= 48 n_z= 101336: TT / closed form = 0.9730
+g=0.0458 x=100 per_cycle= 96 n_z= 202417: TT / closed form = 0.9738
+g=0.0458 x=150 per_cycle= 24 n_z=  75816: TT / closed form = 0.9403
+g=0.0458 x=150 per_cycle= 48 n_z= 151376: TT / closed form = 0.9758
+g=0.0458 x=150 per_cycle= 96 n_z= 302497: TT / closed form = 0.9770

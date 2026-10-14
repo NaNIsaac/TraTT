@@ -1,0 +1,16 @@
+Si 400 at 8 keV: Lambda = 11.33 um, f_D = 0.744 GHz, g = 0.0458
+Si 400 at 17.48 keV: Lambda = 11.54 um, f_D = 0.730 GHz, g = 0.0100
+  8 keV  H(f):  5GHz:0.521  10GHz:0.775  20GHz:0.926  40GHz:0.980  60GHz:0.991  87GHz:0.996  100GHz:0.997  113GHz:0.997  150GHz:0.999  170GHz:0.999  300GHz:1.000
+     H(20 GHz)/H(100 GHz) = 0.929
+  17.48 keV  H(f):  5GHz:0.135  10GHz:0.264  20GHz:0.480  40GHz:0.739  60GHz:0.854  87GHz:0.922  100GHz:0.939  113GHz:0.952  150GHz:0.972  170GHz:0.978  300GHz:0.993
+     H(20 GHz)/H(100 GHz) = 0.511
+  g=0.0458 x=   3.0 (alpha=20.8, n_z=2256): TT / closed form = 0.9998
+  g=0.0458 x=  10.0 (alpha=20.8, n_z=5756): TT / closed form = 0.9910
+  g=0.0458 x=  30.0 (alpha=20.8, n_z=15757): TT / closed form = 0.9742
+  g=0.0458 x= 100.0 (alpha=20.8, n_z=50760): TT / closed form = 0.9523
+  g=0.0458 x= 150.0 (alpha=20.8, n_z=75762): TT / closed form = 0.9381
+  g=0.0100 x=   3.0 (alpha=95.4, n_z=9417): TT / closed form = 0.9992
+  g=0.0100 x=  10.0 (alpha=95.4, n_z=25450): TT / closed form = 0.9961
+  g=0.0100 x=  30.0 (alpha=95.4, n_z=71258): TT / closed form = 0.9181
+  g=0.0100 x= 100.0 (alpha=95.4, n_z=231586): TT / closed form = 0.6799
+  g=0.0100 x= 150.0 (alpha=95.4, n_z=346107): TT / closed form = 0.6263

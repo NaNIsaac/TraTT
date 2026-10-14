@@ -63,7 +63,7 @@ Temporal Pendellösung of the main reflection: DeCamp et al., Nature 413, 825 (2
 ## Outlook: Bragg oscillations as a phonon spectrometer
 
 - The Fourier weight of $R(t)$ is the strain spectrum times a crystal transfer function $H(\omega)$, closed form at first order in $S$; full TT agrees to 2–5 %. {E59}
-- It holds inside the Darwin width, where the plane-wave perturbation of Sondhauss & Wark (2003) is off by ×3–8. {E64}
+- It holds inside the Darwin width, where the plane-wave perturbation of Sondhauss & Wark (2003) is off by ×3–8. Si 400 at 17 keV: **×2** bias at 20 GHz. {E64}{E65}
 
 ![(a) Fourier weight over the kinematic law vs phonon frequency, $\kappa/2\pi\alpha$ = 0.12: three packets, one curve; divide it out to recover the spectrum. (b) Satellite weight of the first-order forms over full TT, single mode.](figures/poster/f5_outlook.png){E59}{E64}
 

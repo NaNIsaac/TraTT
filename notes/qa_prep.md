@@ -92,12 +92,31 @@ Never say a SAW experiment is uninteresting. It measures a different quantity.
 
 ### Q. "What about Sondhauss & Wark's time-dependent dynamical diffraction theory?"
 
-**This one only touches the Outlook line, so route it there.** "Acta Cryst. A59 (2003) — closed
-access, requested through the library, not read. Its abstract says it contains perturbative
-analytical solutions, so I do not claim the first-order solution step. What has no visible
-precedent is using it as a transfer function: the field's own 2023 review doesn't cite the paper
-and contains no occurrence of Takagi, Darwin or extinction, and the 2026 paper that would need
-the correction doesn't have it." {E60}{E61}
+**Read in full (Acta Cryst. A59, 7–13). It is the Outlook panel's comparison, so point at it.** {E64}
+
+**Concede.** "Their Sec. 4 is the first-order perturbative solution of TT for a phonon. The
+linearisation is theirs, and so is the idea of fitting mode contents with a linear solution.
+I don't claim either."
+
+**Then, with the figure.** "Their solution uses a plane-wave ansatz with constant perfect-crystal
+amplitudes. They themselves say it is unsafe when the satellite is within about one rocking-curve
+width of the main peak (their Fig. 4). I evaluated their eq. 29 in our variables. Against full TT
+it is 2 % off at 20 Darwin half-widths, 22 % at 5, a factor 3 at 1 and a factor 8 at 0.5. Keeping
+the Bloch-wave depth dependence turns it into our closed form, which holds to 1 % everywhere,
+inside the Darwin plateau included. That regime is exactly where a Fourier-weight spectrum is
+biased." {E64}
+
+### Q. "What is new in the Outlook panel, then?"
+
+"Three things, none of them in the 2003 paper or in Chalise et al. 2026:
+1. The Fourier weight of R(t) used as the spectral estimator, written as the strain spectrum times
+   a crystal transfer function H(ω).
+2. H collapses on one curve in phonon frequency over the Darwin half-width, and depends strongly on
+   absorption, κ/2πα = χ_i0/|χ_h|.
+3. A first-order form that is valid inside the Darwin width, where the plane-wave one fails."
+{E59}{E64}
+
+If they ask for a real crystal, see the Si 400 numbers in §6b. {E65}
 
 ### Q. "So what is actually yours?"
 
@@ -217,6 +236,24 @@ higher order improve **every** axis at once (lower frequency, lower strain, less
 with 3 % noise. The design rule is α|J₂(S)| ≥ 0.5; the S = 1 case failed at +9.4 % precisely
 because α₂ = 0.35 and the n = 2 trace never completed half an oscillation. {E13}
 
+### 6b. The Outlook in a real crystal: Si 400, symmetric Bragg (Chalise et al.'s case) {E65}
+
+| | 8 keV | 17.48 keV |
+|---|---|---|
+| f_D = v_L/Λ (one Darwin half-width) | 0.74 GHz | 0.73 GHz |
+| absorption g = χ_i0/\|χ_h\| | 0.046 | 0.010 |
+| crystal factor H at 20 GHz | 0.93 | 0.48 |
+| H(20 GHz)/H(100 GHz) | 0.93 | **0.51** |
+
+- "At 17 keV a peak-normalised Fourier-weight spectrum under-reads 20 GHz by a factor 2, even
+  after the kinematic correction. The cause is weak absorption: the tail extinction competes with
+  absorption out to tens of Darwin widths."
+- **If asked whether this explains their Fig. 2.** "Same sign, same order of magnitude. Their
+  energy and normalisation are not stated, so I don't claim a quantitative match."
+- **Linearity limit, if asked.** "The estimator is linear only while the satellite's own amplitude
+  ν ≲ 0.2. A few-cycle packet is far below that (ν ≈ 0.03). A long GHz train is far above it, and
+  that is exactly where the satellite forms dynamically — the rest of the poster."
+
 ---
 
 ## 7. Negative results — volunteer these, they buy credibility
@@ -237,7 +274,7 @@ because α₂ = 0.35 and the n = 2 trace never completed half an oscillation. {E
 |---|---|
 | "time-dependent Takagi–Taupin" | "Takagi–Taupin with a travelling deformation, solved at each instant" |
 | "Stokes / anti-Stokes", "Floquet sidebands" (energy sense) | "channels at η = nq"; no photon-energy axis here |
-| "we derived the transfer function" (as new) | "a closed-form transfer function — prior art not yet settled, Sondhauss & Wark requested" |
+| "we derived the first-order solution" | "the linearisation is Sondhauss & Wark 2003; ours keeps the Bloch-wave depth dependence and holds inside the Darwin width" |
 | "temporal Pendellösung is new" | "the organising principle, from DeCamp 2001, extended to every order" |
 | "satellite extinction length ~ Λ/\|J_n\| is ours" | "that is the steady-state ingredient, from Polikarpov and the superlattice literature" |
 | any number not on this sheet | "I don't have that checked — can I take your email?" |
