@@ -28,9 +28,9 @@ Temporal Pendellösung of the main reflection: DeCamp et al., Nature 413, 825 (2
 
 > **Key result.** Each satellite diffracts from the filled depth $v_s t$, on its own clock $\tau_n = \Lambda_P/(v_s\left|J_n(S)\right|)$. **Transit time sets the window; extinction length sets the clock.** {E1}{E9}{E33}
 
-## Model
+## Model: two-beam Takagi–Taupin, verified to $10^{-9}$
 
-- Two-beam Takagi–Taupin, travelling acoustic deformation, Laue and Bragg. {E0}
+- Travelling acoustic deformation, Laue and Bragg geometry. {E0}
 - $\alpha = L/\Lambda_P$, $S = h\cdot u_0$, $R = \Lambda_{ac}/\Lambda_P$; the lattice is static while the field is inside, $\beta \leq 1.2\times10^{-2}$. {E0}{E62}
 - Verified to $10^{-9}$ against analytic limits and $3\times10^{-7}$ against an independent exact Floquet solver. {E0}{E42}
 
