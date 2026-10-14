@@ -6,7 +6,9 @@ is still required; the checks only catch what a machine can see.
 
 Look (v3, lab template). Matches the CUPT lab posters for KPS 2026 (J. Jang, poster_refs): navy
 header with the IHS shield left and the white CUPT logo right, three-colour stripe, white page,
-thin dark-outlined boxes with "■ Title" heads, an Acknowledgement box at the bottom, Arial text.
+thin dark-outlined boxes with "■ Title" heads, an Acknowledgement box at the bottom.
+Text in Source Sans 3 (the lab posters use Arial). A QR code to the repository sits in the
+Acknowledgement box (poster/assets/qr_repo.png, made once with segno).
 v2 (gray page, shadowed cards, orange number badges, Plex Sans) is in git history (c381842).
 Kept from v2:
 - text in IBM Plex Sans (poster/fonts, SIL OFL); math in STIX, so a variable is a serif italic
@@ -53,7 +55,7 @@ from matplotlib import font_manager  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 for _f in sorted((ROOT / "poster" / "fonts").glob("*.ttf")):
     font_manager.fontManager.addfont(str(_f))
-FONT = "Arial"   # the lab template face; Plex files stay registered for v2
+FONT = "Source Sans 3"   # poster/fonts, SIL OFL; humanist, narrower than Arial, reads well at distance
 # Word-by-word placement needs text widths that scale linearly with dpi; hinting breaks that and
 # makes long words overrun the next one in a preview rendered at another dpi.
 import os  # noqa: E402
@@ -89,7 +91,7 @@ SPEC = dict(
     stripe=("#3a3a3a", "#e04b3a", "#f08a3c"),
 )
 PT_MM = 25.4 / 72
-CAP, XH = 0.70, 0.52        # IBM Plex Sans cap height and x-height / em
+CAP, XH = 0.66, 0.49        # Source Sans 3 cap height and x-height / em
 
 
 # ───────────── manuscript ─────────────
@@ -324,8 +326,15 @@ def build(preview_dpi=60, extra=None, save=True):
     fy = H - s["footer_h"]
     ax.text(M + s["pad"], fy + 6 + s["head_pt"] * PT_MM * 0.9, "■ Acknowledgement", fontsize=s["head_pt"] - 6,
             color=s["ink"], family=FONT, fontweight="bold", va="baseline", zorder=3)
+    qr = ASSETS / "qr_repo.png"
+    qw = s["footer_h"] - M * 0.75 - 6 if qr.exists() else 0
+    if qw:
+        P.image(qr, W - M - 3 - qw, fy + 3, qw, h=qw)
+        P.flow("code and lab notebook", W - M - 6 - qw - 70, fy + 3 + qw / 2 - 4, 68, s["caption_pt"],
+               s["ink2"], align="center")
     P.flow(" · ".join(v for k, v in meta.items() if k in ("footer", "contact")), M + s["pad"],
-           fy + 8 + s["head_pt"] * PT_MM, W - 2 * M - 2 * s["pad"], s["caption_pt"] + 2, s["ink"])
+           fy + 8 + s["head_pt"] * PT_MM, W - 2 * M - 2 * s["pad"] - (qw + 80 if qw else 0), s["caption_pt"] + 2,
+           s["ink"])
     P.box(M, fy, W - 2 * M, s["footer_h"] - M * 0.75, s["card"], r=0, z=1, ec=s["edge"], lw=1.6)
 
     cw = (W - 2 * M - (s["cols"] - 1) * s["gap"]) / s["cols"]

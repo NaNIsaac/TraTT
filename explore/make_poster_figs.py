@@ -28,7 +28,7 @@ from tratt.drive import Drive  # noqa: E402
 OUT = ROOT / "figures" / "poster"
 for _f in sorted((ROOT / "poster" / "fonts").glob("*.ttf")):     # same typeface as the poster text
     mpl.font_manager.fontManager.addfont(str(_f))
-FONT = "IBM Plex Sans"
+FONT = "Source Sans 3"   # same face as poster/build.py
 
 FIG_W = 14.4          # inches = poster card inner width (~366 mm)
 BIG, SMALL = 24, 20   # printed pt

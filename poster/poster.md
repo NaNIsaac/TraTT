@@ -67,7 +67,7 @@ Temporal Pendellösung of the main reflection: DeCamp et al., Nature 413, 825 (2
 
 %% $\tau_n \propto 1/\left\vert J_n\right\vert$ | clock: set by each order's own extinction length {E1}{E9}
 %% $\Theta_n$ | memory: $\Theta_n=\int J_n(S A)\,d\zeta$ reads the last $t_{tr}$ of the drive {E28}{E30}
-%% $R \lesssim 0.3$ | validity: independent satellites to 5 % {E54}
+%% $R \lesssim 0.3$ | validity: 5 % accuracy for independent satellites {E54}
 
 A travelling acoustic front makes every Bragg satellite a dynamical probe: its own clock, its own memory of the drive, valid while the channels stay resolved. {E33}
 
