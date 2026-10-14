@@ -4012,3 +4012,30 @@ So Chalise's 87–113 GHz peak sits at x ≈ 120–150, and their 20–170 GHz b
 **Update (same night).** At 8 keV, S = 0.02, converged with 96 steps per cycle, TT/closed form
 is 0.974 at x = 100 and 0.977 at x = 150. Stronger absorption keeps ν smaller, so the
 non-linearity is ~2 % there, against 25 % at 17.48 keV.
+
+**Update 2 — a few-cycle packet in full TT (`explore/nb/e65_packet.py`, `e65_packet.log`).**
+- Setup: the Entry 59 packet with α = 40, κ = 6 (g = 0.024), R_D = 0.2 (x ≈ 5), S = 0.02 / 0.2 / 0.7.
+  The table gives W/S relative to the S = 0.02 run.
+
+| S | ν estimate (πα\|J_1\|τ_d) | ν² | at η = q₀ (spectral peak) | at η = 2q₀ (twice the peak) |
+|---|---|---|---|---|
+| 0.2 | 0.19 | 0.035 | 0.973 | 1.221 |
+| 0.7 | 0.62 | 0.385 | 0.738 | 2.604 |
+
+- **Two different non-linearities.**
+  - **(i) At the peak: saturation.** The weight falls by about ν² (2.7 % against 3.5 %; 26 % against
+    38 %). This confirms the Entry 65 rule for packets, with ν = πα|J_1(S)|τ_d.
+  - **(ii) In the wings: harmonic generation.** At 2q₀ the weight grows to 1.2× and 2.6× its linear
+    value. This is the J₂(S) term of the Bessel expansion, a kinematic effect, already listed as
+    candidate bias (ii) in Entry 57. It depends on S itself, not on ν. Where the linear spectrum is
+    small, a harmonic of the strong peak dominates.
+- **Chalise's case.** In physical units, ν ≈ π|J_1(S)|ℓ/Λ ≈ 0.03 (ℓ ≈ 0.3 µm), so (i) is
+  negligible. But S ≈ 0.7 (Entry 57), so (ii) is not.
+  - **Hypothesis, not checked:** the second harmonic of their 87 GHz peak sits at 174 GHz, which is
+    where Entry 57 saw an unexplained feature in their reflectivity spectrum (150–170 GHz).
+  - The difference frequency 113 − 87 = 26 GHz falls in their low-frequency band too.
+  - Checking this needs their packet and energy, so it is not done here.
+- **Rule for the estimator, both parts.**
+  - Saturation is controlled by ν ≲ 0.2.
+  - Harmonics are controlled by S itself (|J₂/J₁| ≈ S/4).
+  - Only the first is a dynamical-diffraction effect. The second is kinematic and known in kind.
