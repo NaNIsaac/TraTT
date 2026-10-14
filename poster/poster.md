@@ -58,17 +58,17 @@ Temporal Pendellösung of the main reflection: DeCamp et al., Nature 413, 825 (2
 
 ## When does the independent-satellite picture fail?
 
-- Accurate to 5 % up to $R \lesssim 0.3$; measured boundary **0.34–0.57**, depending on $S$. {E53}{E54}
+- Accurate to 5 % up to $R \lesssim 0.3$; computed boundary **0.34–0.57**, depending on $S$. {E53}{E54}
 - Past it the channels talk through sidebands of the forward beam — the same third-order path, $\pi\alpha (R/2)^2 C_n(S)$, that brings a Bessel-dark order back. {E44}{E45}{E50}{E52}
 
 ![Population error of the independent-channel picture. Each point is one $(\alpha, \alpha_{ac}, S)$, exact acoustic-phase average.](figures/poster/f4_regime.png){E54}
 
 ## Take home
 
-%% CLOCK | $\tau_n=\Lambda_P/(v_s\left|J_n(S)\right|)$, set by each order's own extinction length {E1}{E9}
-%% MEMORY | the last $t_{tr}$ of the drive, not the final amplitude {E30}
-%% VALIDITY | independent satellites to 5 % for $R \lesssim 0.3$ {E54}
+%% $\tau_n \propto 1/\left\vert J_n\right\vert$ | clock: set by each order's own extinction length {E1}{E9}
+%% $\Theta_n$ | memory: $\Theta_n=\int J_n(S A)\,d\zeta$ reads the last $t_{tr}$ of the drive {E28}{E30}
+%% $R \lesssim 0.3$ | validity: independent satellites to 5 % {E54}
 
 A travelling acoustic front makes every Bragg satellite a dynamical probe: its own clock, its own memory of the drive, valid while the channels stay resolved. {E33}
 
-- Si 440 at 17–30 keV, 1–2 GHz: $\tau_1$ = 17–30 ns. Outlook: a closed-form transfer function maps Bragg oscillations to phonon spectra. {E20}{E59}
+- Si 440 at 17–30 keV, 1–2 GHz: $\tau_1$ = 17–30 ns. Outlook: a first-order transfer function maps Bragg oscillations to phonon spectra within a few %, also inside the Darwin width. {E20}{E59}{E64}
