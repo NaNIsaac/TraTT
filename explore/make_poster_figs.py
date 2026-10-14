@@ -8,6 +8,8 @@ f1  filled-depth mapping: Laue sin^2 and Bragg tanh^2 collapse      (make_poster
 f2  time-resolved rocking curve near n = 1 and its centre cut        (make_map_figure.compute; Entries 22, 23)
 f3  path memory: transient-only satellite, up vs down a pulse       (make_memory_figure.panel_a/b; Entries 28, 30)
 f4  population error of the independent-channel picture vs R        (make_phase_figure.merged; Entry 54)
+f5  outlook: Fourier weight / kinematic law (Entry 59, e58 data) and the satellite weight of the
+    first-order forms against full TT (Entry 64, e64_sw.json); reads stored results only
 """
 
 from __future__ import annotations
@@ -153,7 +155,7 @@ def f0():
 def f1():
     import make_poster_figure as M
     style()
-    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 6.9), constrained_layout=True, sharey=True)
+    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.6), constrained_layout=True, sharey=True)
     M.collapse(ax[0], "laue", lambda s: np.sin(np.pi * s) ** 2, r"$\sin^2(\pi\alpha_n\tilde t)$",
                r"Laue: $\sin^2(\pi\alpha_n\tilde t)$", small=SMALL - 4, ms=9)
     M.collapse(ax[1], "bragg", lambda s: np.tanh(np.pi * s) ** 2, r"$\tanh^2(\pi\alpha_n\tilde t)$",
@@ -173,7 +175,7 @@ def f2():
     style()
     r = M.compute()
     deta, t, I, an = r["deta"], r["t"], r["I"], r["an"]
-    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.9), constrained_layout=True,
+    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.2), constrained_layout=True,
                            gridspec_kw=dict(width_ratios=[1.25, 1]))
     im = ax[0].imshow(I, origin="lower", aspect="auto", cmap="Blues", vmin=0, vmax=I.max(),
                       extent=[deta[0], deta[-1], t[0], t[-1]])
@@ -193,7 +195,7 @@ def f2():
 def f3():
     import make_memory_figure as M
     style()
-    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.55), constrained_layout=True)
+    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 6.0), constrained_layout=True)
     M.panel_a(ax[0], small=SMALL - 2, title=r"transient-only: $J_1(S_f)=0$")
     M.panel_b(ax[1], small=SMALL - 4, title="same strain, up vs down")
     for line in ax[0].lines + ax[1].lines:
@@ -238,6 +240,51 @@ def f4():
     finish(fig, ax, "f4_regime")
 
 
+def f5():
+    import json
+    sys.path.insert(0, str(ROOT / "explore" / "nb"))
+    from e59_transfer import G, T, packet, predict
+    style()
+    nb = ROOT / "explore" / "nb"
+    alpha, kappa, S = 8.0, 6.0, 0.02
+    wd = 2 * np.pi * alpha
+    A = json.load(open(nb / "e58_abs.json"))
+    D = json.load(open(nb / "e58_darwin.json"))
+    fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.8), constrained_layout=True)
+    cases = [(0.05, A["S0.02"], wd / 0.05), (0.2, D["RD0.2"], D["RD0.2"]["q0"]), (0.5, D["RD0.5"], D["RD0.5"]["q0"])]
+    for (RD, r, q0), c in zip(cases, (BLUE, ORANGE, AQUA)):
+        eta, Wn = np.array(r["eta"]), np.array(r["W"])
+        Wp, R0 = predict(alpha, kappa, S, q0, eta)
+        Wk = np.abs(R0) * np.abs(G(*packet(S, q0), eta)) * np.pi * alpha * S / kappa / T
+        o = np.argsort(eta)
+        ax[0].plot(eta[o] / wd, (Wp / Wk)[o], "-", color=c, lw=2.4)
+        ax[0].plot(eta / wd, Wn / Wk, "o", ms=7, color=c, mec="white", mew=0.6, label=rf"packet at {1 / RD:g} $\omega_D$")
+    ax[0].axhline(1, color=INK2, lw=1.2, ls=":")
+    ax[0].set(xscale="log", yscale="log", xlabel=r"phonon frequency / Darwin half-width",
+              ylabel="weight / kinematic law", title="one transfer curve: points TT, lines closed form")
+    ax[0].legend(frameon=False, loc="lower right", fontsize=SMALL - 2)
+    E = json.load(open(nb / "e64_sw.json"))
+    x, sw, ric = [], [], []
+    for k, r in E.items():
+        eta, W = np.array(r["eta"]), r["W"]
+        i = np.argmin(np.abs(eta - W))
+        tt = abs(complex(r["TT"][0][i], r["TT"][1][i]))
+        x.append(W / wd)
+        sw.append(abs(complex(r["SW"][0][i], r["SW"][1][i])) / tt)
+        ric.append(abs(complex(r["Riccati"][0][i], r["Riccati"][1][i])) / tt)
+    o = np.argsort(x)
+    x, sw, ric = np.array(x)[o], np.array(sw)[o], np.array(ric)[o]
+    ax[1].plot(x, sw, "s-", color=ORANGE, ms=10, lw=2.4, label="plane-wave perturbation (2003)")
+    ax[1].plot(x, ric, "o-", color=BLUE, ms=10, lw=2.4, label="this work (Bloch-wave form)")
+    ax[1].axhline(1, color=INK2, lw=1.2, ls=":")
+    ax[1].set(xscale="log", yscale="log", xlabel=r"phonon frequency / Darwin half-width",
+              ylabel="satellite weight / full TT", title="inside the Darwin width")
+    ax[1].set_yticks([1, 2, 4, 8], labels=["1", "2", "4", "8"])
+    ax[1].yaxis.set_minor_formatter(mpl.ticker.NullFormatter())
+    ax[1].legend(frameon=False, loc="upper right", fontsize=SMALL - 2)
+    finish(fig, ax, "f5_outlook")
+
+
 if __name__ == "__main__":
-    for name in (sys.argv[1:] or ["f0", "f1", "f2", "f3", "f4"]):
+    for name in (sys.argv[1:] or ["f0", "f1", "f2", "f3", "f4", "f5"]):
         globals()[name]()

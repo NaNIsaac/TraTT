@@ -83,7 +83,7 @@ NOTEBOOK = ROOT / "notes" / "lab_notebook.md"
 SPEC = dict(
     W=841, H=1189, margin=16, gap=14, cols=2, pad=13,
     header_h=130, stripe_h=5, footer_h=56,
-    title_pt=52, authors_pt=30, head_pt=40, badge_pt=30, body_pt=28, callout_pt=31, caption_pt=22,
+    title_pt=52, authors_pt=30, head_pt=40, badge_pt=30, body_pt=26, callout_pt=29, caption_pt=21,
     stat_pt=50, stat_label_pt=21, min_pt=20,
     leading=1.32, para_gap=7, panel_gap=11, fig_gap=4,
     navy="#0f2a3a", accent="#e8743b", page="#ffffff", card="#ffffff", edge="#4a4a4a", key="#fbf1d9",
