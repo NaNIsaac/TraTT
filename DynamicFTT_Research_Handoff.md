@@ -876,7 +876,7 @@ Entry 60이 남긴 유일한 미결 항목을 2차 자료로 좁혔다. 1차 자
 
 **포스터 조치: 변경 없음.** 전달함수는 Outlook 한 줄에만 있고 우선권 주장이 아니라 방향 제시다.
 
-**도서관 요청 대상.** Sondhauss & Wark, Acta Cryst. A59, 100–107 (2003), DOI 10.1107/S010876730201704X. 차선: Sheppard et al., Solid State Commun. 136, 181 (2005), DOI 10.1016/j.ssc.2005.05.056 (같은 섭동 접근을 사용).
+**도서관 요청 대상.** Sondhauss & Wark, Acta Cryst. A59, 7–13 (2003), DOI 10.1107/S010876730201704X. 차선: Sheppard et al., Solid State Commun. 136, 181 (2005), DOI 10.1016/j.ssc.2005.05.056 (같은 섭동 접근을 사용).
 
 ## 부록 안내
 

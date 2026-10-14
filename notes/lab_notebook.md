@@ -3622,7 +3622,7 @@ reproduces or applies a first-order Bragg transfer function. Several entries are
 **Poster.** No change. The transfer function appears only in the Outlook line, where it is stated
 as a direction, not as a priority claim.
 
-**Needed (library).** Sondhauss & Wark, Acta Cryst. A59, 100-107 (2003), DOI
+**Needed (library).** Sondhauss & Wark, Acta Cryst. A59, 7-13 (2003), DOI
 10.1107/S010876730201704X -- via the Sogang subscription or an IUCr reprint request. Second
 choice: Sheppard et al., Solid State Commun. 136, 181 (2005), DOI 10.1016/j.ssc.2005.05.056.
 
@@ -3781,3 +3781,135 @@ a visitor from the SAW community will otherwise assume a surface wave.
 - Nothing here says a SAW experiment is uninteresting; it says it measures a different quantity.
 
 ---
+
+## 2026-10-14 — Entry 64: Sondhauss & Wark (2003) read — what it already contains, and what Entry 59 adds
+
+**Source.** P. Sondhauss & J. S. Wark, Acta Cryst. A59, 7-13 (2003), DOI 10.1107/S010876730201704X.
+Full text, all 7 pages, read. File: `SondhaussWark2003_ActaA59_7.pdf` in the repo root, untracked
+(copyright), next to the Authier & Simon PDF. The page range cited in Entries 60-61 and the handoff
+(100-107) was wrong and has been corrected to 7-13.
+
+**1. What the paper does.**
+- Sec. 2-3: generalised time-dependent TT equation (their eq. 14) for non-uniform (optical-phonon)
+  displacements; the classical time-dependent TT equation is recovered as the special case of uniform
+  displacement (eq. 16). The explicit time-derivative terms matter only when Omega/omega is not
+  negligible (polaritons); for acoustic phonons they shift satellites by eq. (36), a relativistic
+  Doppler effect. Consistent with Entry 62 (quasi-static for our window).
+- Sec. 4, the relevant part: **first-order perturbative solution.** Split chi'_h = chi_h + delta chi_h
+  cos(Omega t - q.r) and D'_h = D_h^(p) + delta D'_h, drop delta chi * delta D. The result (eq. 25) is a
+  linear system with constant coefficients and the phonon as the source term. Two-beam case (eq. 26),
+  with the single-mode plane-wave ansatz delta D'_h = d_h^+ e^{i(Omega t - q.r)} + d_h^- e^{-i(...)}
+  (eq. 28), gives an algebraic solution (eq. 29):
+
+      d_h^± = (C/2) [chi_h dchi_hbar C D_0^(p) ± A_0 dchi_h D_h^(p)] / [±A_0 (±A_h + 2 beta_h) - chi_h chi_hbar C^2]
+
+  with A_0, A_h = (2/k) s.q - 2 Omega/omega (eq. 30) and beta_h the deviation parameter (eq. 27, 33).
+  Total field = D_h^(p) + satellites at |G_h ± q| oscillating at Omega (eq. 31).
+- Verified against full numerics for InSb 111 Bragg, 10 um, |q| = 1e8 rad/m, strain 0.1 % (Fig. 3:
+  "difference ... cannot be seen on the scale of the graph").
+- **Stated limits** (p. 12):
+  - reasonable while satellite peak intensity <= 10 % of the main peak;
+  - **not safe when the sidebands are within about one rocking-curve width of the main peak**, i.e.
+    phonon wavelength comparable to or longer than the extinction depth; Fig. 4 (|q| = 5e6 rad/m,
+    strain 0.01 %) shows visible disagreement there;
+  - inaccurate for crystals thin enough to show Laue (thickness) oscillations.
+- Proposed use (p. 12, one paragraph, no demonstration): because eq. (25) is linear, mode
+  contributions superpose, so a least-squares fit of a sum of analytic solutions to a measured
+  rocking curve "directly reveals information about the modes' occupation numbers", with an
+  ambiguity from the missing phase.
+
+**2. Against Entry 59, point by point.**
+
+| question (from Entry 60-61) | Sondhauss & Wark 2003 | Entry 59 |
+|---|---|---|
+| first-order perturbative solution of TT for an acoustic phonon in Bragg | **yes** (eq. 25-29) | yes, independently, in Riccati form |
+| form | single mode, plane-wave ansatz with constant d^±, two-field algebraic system | arbitrary packet G(W), linearised Riccati about the semi-infinite root R0 with boundary condition at depth, Lambda = i eta_c + 2 c R0 |
+| absorption | through complex chi_0 in beta_h (implicit) | explicit kappa; the weight depends strongly on kappa / 2 pi alpha (Entry 59 sec. 4) |
+| Fourier weight of the intensity oscillation as a spectral estimator | **no**; the oscillating cross term D^(p)* d^± is present in eq. 31 but not discussed; Fig. 3-4 show rocking curves | yes: W = heterodyne with r0, the transfer function H(omega) |
+| dividing out a crystal-dependent factor | no | yes |
+| one-curve collapse in omega / omega_D | no | yes (Entry 59 sec. 3) |
+| regime near the Darwin width (sidebands within ~1 rocking width) | **explicitly declared unsafe** for their solution (Fig. 4) | verified against full TT at R_D = 0.2, 0.5, i.e. inside and at the edge of the plateau: W_TT / W_pred median 0.99-1.02 |
+| use for measuring phonon populations | proposed: fit rocking curve with a sum of mode solutions | proposed: divide the measured Fourier weight by H(omega) |
+
+**3. Verdict.**
+- The first-order perturbative solution itself is **prior art**. Entry 59 must cite it and must not
+  call the linearisation new.
+- The idea of using the linear solution to extract phonon mode content is also **present in kind**
+  (S&W p. 12), as a rocking-curve fit, without demonstration.
+- Not in S&W:
+  - the time-Fourier weight of R(t) as the estimator, and its heterodyne weighting by r0;
+  - the explicit transfer function H(omega), its collapse on omega / omega_D, and its kappa dependence;
+  - a first-order form that stays valid where S&W say theirs fails: sidebands within about one
+    rocking-curve width.
+- That last point is the sharpest difference, and it is **stated, not shown**. S&W's failure in
+  Fig. 4 is for a different crystal, and their eq. 29 has not been evaluated in our variables. The
+  likely reason for the difference is that the constant-d ansatz ignores the depth dependence of
+  D^(p) and the surface boundary condition of delta D, which Entry 59 keeps through R0 and Lambda.
+  This is a hypothesis.
+- Equivalence of the two first-order forms far from the Darwin width (where both should be the
+  kinematic heterodyne) is plausible but not checked.
+
+**4. Smallest test that would turn the stated difference into a shown one (run; see section 5).**
+Evaluate S&W eq. 29 in the dimensionless symmetric-Bragg variables of `e59_transfer.py` (single mode,
+same alpha, kappa). Compare it with full TT and with the Entry 59 form at R_D = 0.05 (both should
+agree) and R_D = 0.5 (S&W expected to fail). Stop if S&W eq. 29 also holds at R_D = 0.5: then the
+remaining difference is only the estimator (Fourier weight vs rocking curve) and the H(omega)
+presentation.
+
+**Other notes.**
+- Their 10 % satellite-to-main-peak rule is a usable amplitude criterion for the nonlinear-S item of
+  Entry 59 "Not done".
+- Not read: Sheppard et al. 2005 (same approach, phonon Bragg switch); Chukhovskii & Förster 1995,
+  Wark & Lee 1999 (time-dependent TT).
+
+**5. Result of the section 4 test (run 2026-10-14).** Script `explore/nb/e64_sw_compare.py`, log
+`e64_sw.log`, data `e64_sw.json` (9 s).
+- Setup as in Entry 59: alpha = 8, kappa = 6 (kappa / 2 pi alpha = 0.12), S = 0.02. A single mode
+  phi = S cos(W (t - zeta)) fills the crystal. The estimator is the Fourier component F of R(t) at W,
+  over a rocking scan.
+- TT convergence (nt x2, n_z x2) is 1.4e-5 of max |F|.
+- Three first-order predictions, from the two-field form of the `solve_bragg` equation:
+  - **SW** is S&W eq. 28-29 read literally: constant perfect-crystal amplitudes (1, R0), constant
+    d^±, satellite amplitude read as the Dh perturbation. The 2 Omega/omega terms are dropped.
+  - **SWn** is the same, normalised to the incident wave (dR = B - R0 A).
+  - **Riccati** is the Entry 59 form. With the true Bloch wave (1, R0) e^{c R0 zeta} instead of
+    constants, the normalised two-field solution equals it identically (max difference 6e-16 of
+    max |F|). So the only modelling difference is that ansatz.
+
+| W in Darwin half-widths (R_D) | SW at satellite eta = ±W | SWn at satellite | Riccati at satellite | SW worst near main peak, abs(eta) < 1.5 w_D | Riccati complex error, max |
+|---|---|---|---|---|---|
+| 20 (0.05) | 1.022 | 1.021 | 1.005 | 3.5 | 0.01 |
+| 5 (0.2) | 1.220 | 1.207 | 1.003 | 3.7 | 0.01 |
+| 2 (0.5) | 1.687 | 1.567 | 1.001 | 4.4 | 0.01 |
+| 1 (1.0) | 3.014 | 1.673 | 1.000 | 6.2 | 0.00 |
+| 0.5 (2.0) | 8.450 | 12.96 | 1.000 | 9.4 | 0.00 |
+
+(The ratios in the satellite columns are |F_pred| / |F_TT|. The other errors are |F_pred - F_TT| / |F_TT|
+where |F_TT| > 2 % of max. Away from the main peak and the satellites, SW stays within 0.04-0.19.)
+
+**Reading.**
+- S&W's own warning (p. 12, Fig. 4) is reproduced in our variables. Their solution is fine at the
+  satellite when the satellite sits 20 Darwin half-widths out (2 %). It is 22 % off at 5, 69 % at 2,
+  a factor 3 at 1 and a factor 8 at 0.5.
+- It also fails near the main peak (factor 3-9) at every W. That is where the perfect-crystal field
+  is evanescent and a constant D^(p) is worst.
+- Normalising to the incident wave does not repair it. **The cause is the constant-amplitude ansatz:
+  it ignores the extinction of D^(p) with depth.** With the Bloch wave restored, the solution
+  becomes the Entry 59 form and agrees with TT to 1 % everywhere, including inside the Darwin plateau.
+- The section 3 difference is now **shown**, at one absorption (kappa / 2 pi alpha = 0.12) and one
+  small S. In the regime S&W declare unsafe, which is the regime Entry 59 sec. 3 identifies as the
+  biased part of the Chalise estimator, the first-order theory still works. It must use the
+  Bloch-wave depth dependence. Entry 59's Riccati linearisation does this automatically.
+
+**Novelty status (bounded, updated).**
+- Prior art: the linearisation itself (S&W 2003), and fitting mode contents with a linear solution
+  (S&W, proposed).
+- Not in S&W, and now demonstrated:
+  - a first-order form valid within about one rocking width of the main peak;
+  - its use as the transfer function H(omega) for the time-Fourier estimator;
+  - the omega / omega_D collapse and the kappa dependence.
+- Fair caveats:
+  - this is our reading of their eq. 28-29, and their own numerics (Fig. 3-4) may have used more;
+  - correcting a single-Bloch-wave ansatz is a modest step, so a referee may call it routine. The
+    paper case must rest on the measurement correction, not on the linearisation.
+- Still unread: Sheppard et al. 2005, Chukhovskii & Förster 1995, Wark & Lee 1999.

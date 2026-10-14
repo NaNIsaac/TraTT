@@ -1,0 +1,38 @@
+identity check W=1005: max |Bloch - Riccati| / max|F| = 5.8e-16
+identity check W=50: max |Bloch - Riccati| / max|F| = 2.3e-16
+
+R_D = 0.05 (W = 1005 = 20.0 Darwin half-widths), n_z = 9676
+  SW       |F_pred|/|F_TT| median 1.006 range [0.951, 4.537];  complex rel err median 0.011 max 3.54
+  SWn      |F_pred|/|F_TT| median 1.001 range [0.950, 1.060];  complex rel err median 0.004 max 0.15
+  Riccati  |F_pred|/|F_TT| median 1.000 range [0.995, 1.006];  complex rel err median 0.002 max 0.01
+   eta =  +1005.3: |F_TT| 1.019e-03  SW/TT 1.022  SWn/TT 1.021  Riccati/TT 1.005
+   eta =  -1005.3: |F_TT| 1.019e-03  SW/TT 1.022  SWn/TT 1.021  Riccati/TT 1.005
+
+R_D = 0.2 (W = 251 = 5.0 Darwin half-widths), n_z = 2419
+  SW       |F_pred|/|F_TT| median 1.066 range [0.830, 4.710];  complex rel err median 0.072 max 3.73
+  SWn      |F_pred|/|F_TT| median 1.023 range [0.822, 1.306];  complex rel err median 0.033 max 0.64
+  Riccati  |F_pred|/|F_TT| median 1.000 range [0.996, 1.008];  complex rel err median 0.002 max 0.01
+   eta =   +251.3: |F_TT| 3.181e-03  SW/TT 1.220  SWn/TT 1.207  Riccati/TT 1.003
+   eta =   -251.3: |F_TT| 3.181e-03  SW/TT 1.220  SWn/TT 1.207  Riccati/TT 1.003
+
+R_D = 0.5 (W = 101 = 2.0 Darwin half-widths), n_z = 967
+  convergence (nt x2, n_z x2): max |dF| / max|F| = 1.4e-05
+  SW       |F_pred|/|F_TT| median 0.978 range [0.689, 5.304];  complex rel err median 0.399 max 4.39
+  SWn      |F_pred|/|F_TT| median 0.962 range [0.653, 2.549];  complex rel err median 0.177 max 1.92
+  Riccati  |F_pred|/|F_TT| median 1.000 range [0.995, 1.005];  complex rel err median 0.001 max 0.01
+   eta =   +100.5: |F_TT| 4.411e-03  SW/TT 1.687  SWn/TT 1.567  Riccati/TT 1.001
+   eta =   -100.5: |F_TT| 4.411e-03  SW/TT 1.687  SWn/TT 1.567  Riccati/TT 1.001
+
+R_D = 1.0 (W = 50 = 1.0 Darwin half-widths), n_z = 771
+  SW       |F_pred|/|F_TT| median 0.956 range [0.633, 6.998];  complex rel err median 0.589 max 6.16
+  SWn      |F_pred|/|F_TT| median 0.918 range [0.538, 6.225];  complex rel err median 0.651 max 5.57
+  Riccati  |F_pred|/|F_TT| median 1.000 range [0.997, 1.003];  complex rel err median 0.001 max 0.00
+   eta =    +50.3: |F_TT| 3.205e-03  SW/TT 3.014  SWn/TT 1.673  Riccati/TT 1.000
+   eta =    -50.3: |F_TT| 3.205e-03  SW/TT 3.014  SWn/TT 1.673  Riccati/TT 1.000
+
+R_D = 2.0 (W = 25 = 0.5 Darwin half-widths), n_z = 673
+  SW       |F_pred|/|F_TT| median 4.611 range [0.675, 10.225];  complex rel err median 3.628 max 9.37
+  SWn      |F_pred|/|F_TT| median 4.506 range [0.502, 17.935];  complex rel err median 4.424 max 17.36
+  Riccati  |F_pred|/|F_TT| median 1.000 range [0.998, 1.003];  complex rel err median 0.000 max 0.00
+   eta =    +25.1: |F_TT| 5.068e-04  SW/TT 8.450  SWn/TT 12.960  Riccati/TT 1.000
+   eta =    -25.1: |F_TT| 5.068e-04  SW/TT 8.450  SWn/TT 12.960  Riccati/TT 1.000
