@@ -192,10 +192,6 @@ def demo() -> None:
     print("observe.demo: all checks passed")
 
 
-if __name__ == "__main__":
-    demo()
-
-
 def peak_fwhm(
     eta: NDArray[np.float64],
     y: NDArray[np.float64],
@@ -238,3 +234,7 @@ def peak_fwhm(
 
     lo, hi = crossing(-1), crossing(+1)
     return hi - lo, float(top), float(e[k])
+
+
+if __name__ == "__main__":
+    demo()

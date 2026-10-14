@@ -24,6 +24,31 @@ from tratt.drive import Drive
 __all__ = ["rocking_cube", "front_and_full", "satellite_cube"]
 
 
+def _default_nz(alpha: float, drive: Drive, eta: NDArray[np.float64], n_z: int | None) -> int:
+    return n_z or required_nz(alpha, drive.alpha_ac, S=drive.S, eta_max=float(np.max(np.abs(eta))))
+
+
+def _over_time(solve, drive: Drive, eta, times, steady: bool) -> NDArray:
+    """Stack ``solve(phi)`` over time, a block of times per RK4 sweep -> ``(n_times, n_eta)``.
+
+    Handing the drive a column of times makes phi(zeta) return shape (n_t, 1),
+    which broadcasts against eta, so one sweep covers several times at once.
+    Doing the whole series in one sweep is *slower*, not faster: the RK4 inner
+    loop is memory bound, and its temporaries fall out of cache. Measured on a
+    1501-point eta grid, the cost per time sample bottoms out near 5e4 live
+    elements, so the block is sized to that instead of to n_t.
+    """
+    # ponytail: the 5e4 figure is one machine's cache, not a law. If a sweep runs
+    # on other hardware and speed matters, re-measure by timing a few block sizes.
+    phase = drive.steady_phi if steady else drive.phi
+    block = max(1, 50_000 // max(eta.size, 1))
+    parts = []
+    for i in range(0, times.size, block):
+        tb = times[i : i + block]
+        parts.append(np.reshape(solve(phase(tb[:, None])), (tb.size, eta.size)))
+    return np.concatenate(parts, axis=0)
+
+
 def rocking_cube(
     alpha: float,
     drive: Drive,
@@ -38,27 +63,10 @@ def rocking_cube(
     ``steady=True`` swaps the traveling front for the same-phase full-profile
     reference. Everything else is held fixed.
     """
-    if n_z is None:
-        n_z = required_nz(alpha, drive.alpha_ac, S=drive.S, eta_max=float(np.max(np.abs(eta))))
-    phase = drive.steady_phi if steady else drive.phi
-    times = np.asarray(times, dtype=np.float64)
     eta = np.asarray(eta, dtype=np.float64)
-
-    # Handing the drive a column of times makes phi(zeta) return shape (n_t, 1),
-    # which broadcasts against eta, so one RK4 sweep covers several times at once.
-    # Doing the whole series in one sweep is *slower*, not faster: the RK4 inner
-    # loop is memory bound, and its temporaries fall out of cache. Measured on a
-    # 1501-point eta grid, the cost per time sample bottoms out near 5e4 live
-    # elements, so the block is sized to that instead of to n_t.
-    # ponytail: the 5e4 figure is one machine's cache, not a law. If a sweep runs
-    # on other hardware and speed matters, re-measure by timing a few block sizes.
-    block = max(1, 50_000 // max(eta.size, 1))
-    parts = []
-    for i in range(0, times.size, block):
-        tb = times[i : i + block]
-        I = rocking(alpha, eta, phi=phase(tb[:, None]), geometry=geometry, n_z=n_z)
-        parts.append(np.reshape(I, (tb.size, eta.size)))
-    return np.concatenate(parts, axis=0)
+    n_z = _default_nz(alpha, drive, eta, n_z)
+    return _over_time(lambda phi: rocking(alpha, eta, phi=phi, geometry=geometry, n_z=n_z),
+                      drive, eta, np.asarray(times, dtype=np.float64), steady)
 
 
 def front_and_full(
@@ -70,12 +78,10 @@ def front_and_full(
     n_z: int | None = None,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """The two cubes a formation-time analysis needs, on identical grids."""
-    if n_z is None:
-        n_z = required_nz(alpha, drive.alpha_ac, S=drive.S, eta_max=float(np.max(np.abs(eta))))
-    kw = dict(geometry=geometry, n_z=n_z)
+    n_z = _default_nz(alpha, drive, np.asarray(eta, dtype=np.float64), n_z)
     return (
-        rocking_cube(alpha, drive, eta, times, steady=False, **kw),
-        rocking_cube(alpha, drive, eta, times, steady=True, **kw),
+        rocking_cube(alpha, drive, eta, times, geometry=geometry, n_z=n_z, steady=False),
+        rocking_cube(alpha, drive, eta, times, geometry=geometry, n_z=n_z, steady=True),
     )
 
 
@@ -106,18 +112,8 @@ def satellite_cube(
     sees ``|D_h(S)|^2``. Report it as the acoustically induced amplitude
     difference, and read widths off it rather than off the raw window.
     """
-    if n_z is None:
-        n_z = required_nz(alpha, drive.alpha_ac, S=drive.S, eta_max=float(np.max(np.abs(eta))))
-    phase = drive.steady_phi if steady else drive.phi
-    times = np.asarray(times, dtype=np.float64)
     eta = np.asarray(eta, dtype=np.float64)
-
+    n_z = _default_nz(alpha, drive, eta, n_z)
     A0 = amplitude(alpha, eta, phi=None, geometry=geometry, n_z=n_z)
-    block = max(1, 50_000 // max(eta.size, 1))
-    parts = []
-    for i in range(0, times.size, block):
-        tb = times[i : i + block]
-        A = amplitude(alpha, eta, phi=phase(tb[:, None]), geometry=geometry, n_z=n_z)
-        parts.append(np.reshape(np.abs(np.reshape(A, (tb.size, eta.size)) - A0) ** 2,
-                                (tb.size, eta.size)))
-    return np.concatenate(parts, axis=0)
+    return _over_time(lambda phi: np.abs(amplitude(alpha, eta, phi=phi, geometry=geometry, n_z=n_z) - A0) ** 2,
+                      drive, eta, np.asarray(times, dtype=np.float64), steady)

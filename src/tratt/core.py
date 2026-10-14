@@ -11,12 +11,14 @@ geometry it enters both equations with the same coefficient, so a shared phase
 substitution removes it. Complex ``chi_0`` only leaves a common ``exp(-mu z)``,
 which cancels in every normalized observable.
 
-``alpha`` is real, which is the non-absorbing assumption: the coupling is really
-``C sqrt(chi_h chi_hbar)`` and that reduces to ``C |chi_h|`` only when
-``chi_hbar = chi_h*``. See DESIGN.md for the full assumption list.
-``ponytail: real alpha drops the Borrmann effect. If mode-selective damping turns
-out to matter in P8, make alpha complex -- the RK4 integrators already carry
-complex state, so only the signature and the input validation change.``
+Absorption. In Laue a complex ``alpha`` carries the Borrmann (anomalous) part; in
+Bragg normal absorption enters as ``eta -> eta + i kappa`` (see ``solve_bragg``).
+A real ``alpha`` and ``kappa = 0`` are the non-absorbing case. See DESIGN.md for
+the full assumption list.
+
+Cost. Each RK4 step needs the phase factor ``e^{i phi}`` at the start, middle and
+end of the step. The end of one step is the start of the next, so the factor is
+evaluated twice per step, not four times.
 
 Laue (transmission). Both beams travel +z; entrance ``D0(0)=1, Dh(0)=0``::
 
@@ -39,7 +41,7 @@ Analytic ground truth, asserted in ``tests/test_core.py``:
 
 from __future__ import annotations
 
-from typing import Callable, Protocol
+from typing import Protocol
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -93,8 +95,17 @@ def _state_shape(eta_a: NDArray[np.float64], phase) -> tuple[int, ...]:
     return np.broadcast_shapes(eta_a.shape, probe.shape)
 
 
-def _phase_factor(phi, zeta: float) -> NDArray[np.complex128]:
-    return np.exp(1j * np.asarray(phi(np.float64(zeta)), dtype=np.float64))
+def _couplings(phi, c, zeta: float) -> tuple[NDArray[np.complex128], NDArray[np.complex128]]:
+    """``(c e^{+i phi}, c e^{-i phi})`` at one depth."""
+    e = np.exp(1j * np.asarray(phi(np.float64(zeta)), dtype=np.float64))
+    return c * e, c * np.conj(e)
+
+
+def _check(alpha, n_z: int) -> None:
+    if np.real(alpha) < 0:
+        raise ValueError(f"alpha must be non-negative, got {alpha}")
+    if n_z < 1:
+        raise ValueError(f"n_z must be >= 1, got {n_z}")
 
 
 def solve_laue(
@@ -112,31 +123,29 @@ def solve_laue(
     centrosymmetric crystal (``chi_h = chi_hbar``, so the same coupling enters
     both equations). The common ``exp(-mu z)`` of ``chi_0''`` is still gauged out.
     """
-    if np.real(alpha) < 0:
-        raise ValueError(f"alpha must be non-negative, got {alpha}")
-    if n_z < 1:
-        raise ValueError(f"n_z must be >= 1, got {n_z}")
-
+    _check(alpha, n_z)
     eta_a = np.asarray(eta, dtype=np.float64)
     phase = ZERO_PHASE if phi is None else phi
     shape = _state_shape(eta_a, phase)
     D0 = np.ones(shape, dtype=np.complex128)
     Dh = np.zeros(shape, dtype=np.complex128)
     c = 1j * np.pi * alpha
+    ie = 1j * eta_a
     h = 1.0 / n_z
 
-    def f(zeta, d0, dh):
-        e = _phase_factor(phase, zeta)
-        return c * e * dh, c * np.conj(e) * d0 + 1j * eta_a * dh
+    def f(cp, cm, d0, dh):
+        return cp * dh, cm * d0 + ie * dh
 
+    start = _couplings(phase, c, 0.0)
     for i in range(n_z):
-        z = i * h
-        k1a, k1b = f(z, D0, Dh)
-        k2a, k2b = f(z + 0.5 * h, D0 + 0.5 * h * k1a, Dh + 0.5 * h * k1b)
-        k3a, k3b = f(z + 0.5 * h, D0 + 0.5 * h * k2a, Dh + 0.5 * h * k2b)
-        k4a, k4b = f(z + h, D0 + h * k3a, Dh + h * k3b)
+        mid, end = _couplings(phase, c, (i + 0.5) * h), _couplings(phase, c, (i + 1) * h)
+        k1a, k1b = f(*start, D0, Dh)
+        k2a, k2b = f(*mid, D0 + 0.5 * h * k1a, Dh + 0.5 * h * k1b)
+        k3a, k3b = f(*mid, D0 + 0.5 * h * k2a, Dh + 0.5 * h * k2b)
+        k4a, k4b = f(*end, D0 + h * k3a, Dh + h * k3b)
         D0 = D0 + (h / 6.0) * (k1a + 2 * k2a + 2 * k3a + k4a)
         Dh = Dh + (h / 6.0) * (k1b + 2 * k2b + 2 * k3b + k4b)
+        start = end
 
     return D0, Dh
 
@@ -161,32 +170,29 @@ def solve_bragg(
     is not included. Thick slab, kappa > 0 -> the Darwin-Prins root of
     ``c R^2 + i (eta + i kappa) R + c = 0`` (tests/test_core.py).
     """
-    if alpha < 0:
-        raise ValueError(f"alpha must be non-negative, got {alpha}")
-    if n_z < 1:
-        raise ValueError(f"n_z must be >= 1, got {n_z}")
-
+    _check(alpha, n_z)
     if kappa < 0:
         raise ValueError(f"kappa must be non-negative, got {kappa}")
 
     eta_a = np.asarray(eta, dtype=np.float64)
-    eta_c = eta_a + 1j * kappa
     phase = ZERO_PHASE if phi is None else phi
     R = np.zeros(_state_shape(eta_a, phase), dtype=np.complex128)
     c = 1j * np.pi * alpha
+    ie = 1j * (eta_a + 1j * kappa)
     h = -1.0 / n_z  # backward
 
-    def f(zeta, r):
-        e = _phase_factor(phase, zeta)
-        return -c * np.conj(e) - 1j * eta_c * r - c * e * r * r
+    def f(cp, cm, r):
+        return -cm - (ie + cp * r) * r
 
+    start = _couplings(phase, c, 1.0)
     for i in range(n_z):
-        z = 1.0 + i * h
-        k1 = f(z, R)
-        k2 = f(z + 0.5 * h, R + 0.5 * h * k1)
-        k3 = f(z + 0.5 * h, R + 0.5 * h * k2)
-        k4 = f(z + h, R + h * k3)
+        mid, end = _couplings(phase, c, 1.0 + (i + 0.5) * h), _couplings(phase, c, 1.0 + (i + 1) * h)
+        k1 = f(*start, R)
+        k2 = f(*mid, R + 0.5 * h * k1)
+        k3 = f(*mid, R + 0.5 * h * k2)
+        k4 = f(*end, R + h * k3)
         R = R + (h / 6.0) * (k1 + 2 * k2 + 2 * k3 + k4)
+        start = end
 
     if not np.all(np.isfinite(R)):
         raise FloatingPointError("Bragg Riccati integration diverged; raise n_z or lower alpha")

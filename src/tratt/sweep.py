@@ -74,8 +74,7 @@ def condition(
             row[f"t_f_induced_{e:g}"] = F_ind.t_f
             row[f"status_induced_{e:g}"] = F_ind.status
             row[f"t_f_window_{e:g}"] = F_win.t_f
-            row["a_induced"] = F_ind.a
-            row["a_window"] = F_win.a
+            row["a_induced"], row["a_window"] = F_ind.a, F_win.a   # the scales do not depend on eps
         rows.append(row)
     return rows
 

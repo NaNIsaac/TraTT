@@ -1,4 +1,4 @@
-"""DynamicFTT -- transient formation dynamics of acoustic Bragg satellites.
+"""TraTT -- transient formation dynamics of acoustic Bragg satellites.
 
 The solver produces one thing, the time-resolved rocking curve ``I(eta, t)``.
 Every result in the paper is an analysis of that cube; no observable is added to
@@ -11,6 +11,7 @@ Layout::
     cube.py     one parameter point -> I(eta,t)
     observe.py  I(eta,t) -> p_n(t), eta_c(t), sigma(t) -> formation times
     sweep.py    (alpha, S) grid -> t_f/t_tr map
+    floquet.py  exact harmonic solver for a fully filled crystal (cross-check of core)
 
 See DESIGN.md for the physics conventions and the analytic ground truth.
 """
