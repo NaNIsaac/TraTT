@@ -33,7 +33,7 @@ for _f in sorted((ROOT / "poster" / "fonts").glob("*.ttf")):     # same typeface
 FONT = "Source Sans 3"   # same face as poster/build.py
 
 FIG_W = 14.4          # inches = poster card inner width (~366 mm)
-BIG, SMALL = 24, 20   # printed pt
+BIG, SMALL = 26, 23   # printed pt; smallest label 21 pt (SMALL - 2), readable at ~1.5 m on A0
 INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 BLUE, ORANGE, AQUA, YELLOW = "#2a78d6", "#eb6834", "#1baf7a", "#eda100"
 
@@ -157,9 +157,9 @@ def f1():
     style()
     fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 5.6), constrained_layout=True, sharey=True)
     M.collapse(ax[0], "laue", lambda s: np.sin(np.pi * s) ** 2, r"$\sin^2(\pi\alpha_n\tilde t)$",
-               r"Laue: $\sin^2(\pi\alpha_n\tilde t)$", small=SMALL - 4, ms=9)
+               r"Laue: $\sin^2(\pi\alpha_n\tilde t)$", small=SMALL - 2, ms=9)
     M.collapse(ax[1], "bragg", lambda s: np.tanh(np.pi * s) ** 2, r"$\tanh^2(\pi\alpha_n\tilde t)$",
-               r"Bragg: $\tanh^2(\pi\alpha_n\tilde t)$", small=SMALL - 4, ms=9)
+               r"Bragg: $\tanh^2(\pi\alpha_n\tilde t)$", small=SMALL - 2, ms=9)
     ax[0].get_legend().remove()                      # one legend for both: the cases are the same
     h, lab = ax[1].get_legend_handles_labels()
     ax[1].legend(h, lab[:-1] + ["closed form (line)"], frameon=False, loc="lower right", fontsize=SMALL - 2)
@@ -197,7 +197,7 @@ def f3():
     style()
     fig, ax = plt.subplots(1, 2, figsize=(FIG_W, 6.0), constrained_layout=True)
     M.panel_a(ax[0], small=SMALL - 2, title=r"transient-only: $J_1(S_f)=0$")
-    M.panel_b(ax[1], small=SMALL - 4, title="same strain, up vs down")
+    M.panel_b(ax[1], small=SMALL - 2, title="same strain, up vs down")
     for line in ax[0].lines + ax[1].lines:
         if line.get_marker() not in ("None", None, ""):
             line.set_markersize(8)
@@ -221,7 +221,7 @@ def f4():
     for c, S in zip(hues, Ss):
         m = (P[:, 2] == S) & (P[:, 1] >= 2)
         ax.plot(P[m, 0] / P[m, 1], P[m, 3], "o", ms=8, color=c, mec="white", mew=0.5, ls="none", label=f"S={S:g}")
-    for e, lab in ((0.05, "5 %"), (0.2, "20 %"), (0.5, "50 %")):
+    for e, lab in ((0.05, "5 %"), (0.5, "50 %")):   # 20 % dropped: its label collides with 50 % at print size
         ax.axhline(e, color=INK2, lw=1.4, ls=":")
         ax.text(1.3e-3, e * 1.12, lab, fontsize=SMALL, color=INK2)
     # the boundary the panel is about, so the result is readable without decoding the scatter
