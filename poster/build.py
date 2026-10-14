@@ -4,8 +4,11 @@ Same idea as a print pipeline: the manuscript is canonical and read-only, every 
 from SPEC (mm, page origin top-left), and the build ends with machine checks. Looking at the PNG
 is still required; the checks only catch what a machine can see.
 
-Look (v2). Group identity from the ICAMD 2025 poster (navy header, logos, three-colour stripe, A0,
-two columns), with a less "default slide" finish:
+Look (v3, lab template). Matches the CUPT lab posters for KPS 2026 (J. Jang, poster_refs): navy
+header with the IHS shield left and the white CUPT logo right, three-colour stripe, white page,
+thin dark-outlined boxes with "■ Title" heads, an Acknowledgement box at the bottom, Arial text.
+v2 (gray page, shadowed cards, orange number badges, Plex Sans) is in git history (c381842).
+Kept from v2:
 - text in IBM Plex Sans (poster/fonts, SIL OFL); math in STIX, so a variable is a serif italic
   and is told apart from the sans body at a glance. Plex Sans was the math face too until the
   specimen showed what it costs: it has no \cdot and no \sim, so "h . u_0" and "R ~ 1" were
@@ -14,9 +17,7 @@ two columns), with a less "default slide" finish:
   line box and collides with the line below, so STIX is the one that fits this layout. Set
   TRATT_MATH=cm|plex|dejavuserif to re-compare. Absolute values are \left|..\right|: a bare
   STIX | is the height of a lowercase l and reads as one;
-- borderless rounded cards with a faint shadow; the section head sits inside its card: an orange
-  number badge, a navy semibold title and a hairline divider;
-- bullets are small orange squares at x-height; the key message is a navy band with white text;
+- bullets are small squares at x-height; the key message is a beige band (as on the ICAMD poster);
 - "%%" stat tiles for the few numbers a passer-by should take away.
 
 Manuscript syntax
@@ -52,7 +53,7 @@ from matplotlib import font_manager  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 for _f in sorted((ROOT / "poster" / "fonts").glob("*.ttf")):
     font_manager.fontManager.addfont(str(_f))
-FONT = "IBM Plex Sans"
+FONT = "Arial"   # the lab template face; Plex files stay registered for v2
 # Word-by-word placement needs text widths that scale linearly with dpi; hinting breaks that and
 # makes long words overrun the next one in a preview rendered at another dpi.
 import os  # noqa: E402
@@ -80,11 +81,11 @@ NOTEBOOK = ROOT / "notes" / "lab_notebook.md"
 SPEC = dict(
     W=841, H=1189, margin=16, gap=14, cols=2, pad=13,
     header_h=130, stripe_h=5, footer_h=56,
-    title_pt=62, authors_pt=32, head_pt=40, badge_pt=30, body_pt=28, callout_pt=31, caption_pt=22,
+    title_pt=52, authors_pt=30, head_pt=40, badge_pt=30, body_pt=28, callout_pt=31, caption_pt=22,
     stat_pt=50, stat_label_pt=21, min_pt=20,
     leading=1.32, para_gap=7, panel_gap=11, fig_gap=4,
-    navy="#0f2a3a", accent="#e8743b", page="#eceff3", card="#ffffff", shadow="#d5dae1",
-    ink="#1d2733", ink2="#5b6573", tint="#f3f5f8", rule="#e1e5ea",
+    navy="#0f2a3a", accent="#e8743b", page="#ffffff", card="#ffffff", edge="#4a4a4a", key="#fbf1d9",
+    ink="#111111", ink2="#4f5560", tint="#f2f4f7",
     stripe=("#3a3a3a", "#e04b3a", "#f08a3c"),
 )
 PT_MM = 25.4 / 72
@@ -223,12 +224,9 @@ class Page:
         a.axis("off")
         return h
 
-    def box(self, x, y, w, h, fc, r=2.5, z=1, shadow=False):
-        if shadow:
-            self.ax.add_patch(FancyBboxPatch((x + 0.6, y + 1.0), w, h, boxstyle=f"round,pad=0,rounding_size={r}",
-                                             fc=SPEC["shadow"], ec="none", zorder=z - 0.5))
+    def box(self, x, y, w, h, fc, r=2.5, z=1, ec="none", lw=0.0):
         self.ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle=f"round,pad=0,rounding_size={r}",
-                                         fc=fc, ec="none", zorder=z))
+                                         fc=fc, ec=ec, lw=lw, zorder=z))
 
 
 # ───────────── items ─────────────
@@ -238,16 +236,16 @@ def bullet(P, it, x, y, w, draw=True):
     if draw:
         d = s["body_pt"] * PT_MM * 0.24                     # marker side
         mid = y + s["body_pt"] * PT_MM * (1 - XH / 2)       # middle of the x-height of the first line
-        P.box(x + 0.5, mid - d / 2, d, d, s["accent"], r=0.5, z=3)
+        P.box(x + 0.5, mid - d / 2, d, d, s["ink"], r=0, z=3)
     return P.flow(it["text"], x, y, w, s["body_pt"], indent=7, draw=draw,
                   strong=s["accent"]) + s["para_gap"]
 
 
 def callout(P, it, x, y, w, draw=True):
     s = SPEC
-    y1 = P.flow(it["text"], x + 10, y + 9, w - 20, s["callout_pt"], "white", draw=draw, strong=s["accent"]) + 8
+    y1 = P.flow(it["text"], x + 10, y + 9, w - 20, s["callout_pt"], s["ink"], draw=draw, strong=s["accent"]) + 8
     if draw:
-        P.box(x, y, w, y1 - y, s["navy"], r=2.5, z=2)
+        P.box(x, y, w, y1 - y, s["key"], r=0, z=2)
     return y1 + s["para_gap"]
 
 
@@ -267,7 +265,7 @@ def stats(P, it, x, y, w, draw=True):
     y1 = max(bottoms) + 6
     if draw:
         for i in range(n):
-            P.box(x + i * (tw + g), y, tw, y1 - y, s["tint"], r=2.5, z=2)
+            P.box(x + i * (tw + g), y, tw, y1 - y, s["tint"], r=0, z=2)
     return y1 + s["para_gap"]
 
 
@@ -310,8 +308,10 @@ def build(preview_dpi=60, extra=None, save=True):
                                    s["stripe_h"], color=c, lw=0, zorder=1))
     logo_w = 0
     if (ASSETS / "logo_ihs.png").exists():
-        logo_w = 80
-        P.image(ASSETS / "logo_ihs.png", W - M - logo_w, 22, logo_w * 0.7, h=logo_w * 1.0)
+        logo_w = 100
+        P.image(ASSETS / "logo_ihs.png", M + 6, 22, 80 * 0.7, h=80 * 1.0)
+    if (ASSETS / "logo_cupt_white.png").exists():
+        P.image(ASSETS / "logo_cupt_white.png", W - M - 100, 40, 100)
     tw = W - 2 * M - 2 * logo_w
     y = 20 - s["title_pt"] * PT_MM * (s["leading"] - 1)
     for line in meta.get("title", "").split("//"):           # "//" in the title = manual line break
@@ -320,14 +320,13 @@ def build(preview_dpi=60, extra=None, save=True):
     y = P.flow(meta.get("authors", ""), M + logo_w, y + 13, tw, s["authors_pt"], "white", align="center")
     P.flow(meta.get("affiliation", ""), M + logo_w, y + 4, tw, s["authors_pt"] - 8, "#c9d6e0", align="center")
 
-    # footer
+    # footer: an Acknowledgement box, as on the lab posters
     fy = H - s["footer_h"]
-    lw_ = 0
-    if (ASSETS / "logo_cupt.png").exists():
-        lw_ = 150
-        P.image(ASSETS / "logo_cupt.png", W - M - lw_, fy + 8, lw_)
-    P.flow(" · ".join(v for k, v in meta.items() if k in ("footer", "contact")), M, fy + 12,
-           W - 2 * M - lw_ - 10, s["caption_pt"], s["ink2"])
+    ax.text(M + s["pad"], fy + 6 + s["head_pt"] * PT_MM * 0.9, "■ Acknowledgement", fontsize=s["head_pt"] - 6,
+            color=s["ink"], family=FONT, fontweight="bold", va="baseline", zorder=3)
+    P.flow(" · ".join(v for k, v in meta.items() if k in ("footer", "contact")), M + s["pad"],
+           fy + 8 + s["head_pt"] * PT_MM, W - 2 * M - 2 * s["pad"], s["caption_pt"] + 2, s["ink"])
+    P.box(M, fy, W - 2 * M, s["footer_h"] - M * 0.75, s["card"], r=0, z=1, ec=s["edge"], lw=1.6)
 
     cw = (W - 2 * M - (s["cols"] - 1) * s["gap"]) / s["cols"]
     top = s["header_h"] + s["stripe_h"] + 2 + s["panel_gap"] + 2
@@ -347,19 +346,8 @@ def build(preview_dpi=60, extra=None, save=True):
             x, w, y0 = M + col * (cw + s["gap"]), cw, ys[col]
         ix, iw = x + s["pad"], w - 2 * s["pad"]
         card_top = y0
-        # section head inside the card: number badge, title, hairline
-        bsz = s["badge_pt"] * PT_MM * 1.55
-        y = y0 + s["pad"] * 0.85
-        P.box(ix, y, bsz, bsz, s["accent"], r=2.0, z=3)
-        nb = s["badge_pt"] * PT_MM
-        ax.text(ix + bsz / 2, y + bsz / 2 + nb * CAP / 2, f"{num}", fontsize=s["badge_pt"], color="white",
-                family=FONT, fontweight="semibold", ha="center", va="baseline", zorder=4)
-        hx = ix + bsz + 5
-        hy = y + bsz / 2 - s["head_pt"] * PT_MM * (1 - CAP / 2) + 0.2   # first line centred on the badge
-        yh = P.flow(p["title"], hx, hy, iw - (hx - ix), s["head_pt"], s["navy"], weight="semibold")
-        y = max(y + bsz, yh) + 5
-        ax.plot([ix, ix + iw], [y, y], color=s["rule"], lw=1.6, zorder=3, solid_capstyle="butt")
-        y += 7
+        # section head inside the box: "■ Title", as on the lab posters
+        y = P.flow("■ " + p["title"], ix, y0 + s["pad"] * 0.7, iw, s["head_pt"], s["ink"], weight="bold") + 8
         # A wide panel with a figure is laid out side by side: text left, figure right (half width each).
         side = p["wide"] and any(it["kind"] == "fig" for it in p["items"])
         if side:
@@ -401,7 +389,7 @@ def build(preview_dpi=60, extra=None, save=True):
         if side:
             y = max(y, fyy)
         y += s["pad"] - s["para_gap"]
-        P.box(x, card_top, w, y - card_top, s["card"], r=3.0, z=1, shadow=True)
+        P.box(x, card_top, w, y - card_top, s["card"], r=0, z=1, ec=s["edge"], lw=1.6)
         y += s["panel_gap"]
         if p["wide"]:
             ys = [y] * s["cols"]
