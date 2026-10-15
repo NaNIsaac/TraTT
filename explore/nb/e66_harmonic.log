@@ -1,0 +1,8 @@
+f0=87 ncyc=0.9 T=140ps: S=0.71  K(f0)=1.009  K(2f0)=1.17  K max=1.28 at 158 GHz  |eps(2f0)|/|eps(f0)|=0.235
+f0=87 ncyc=0.9 T=1400ps: S=0.71  K(f0)=0.984  K(2f0)=1.20  K max=1.31 at 158 GHz  |eps(2f0)|/|eps(f0)|=0.235
+f0=87 ncyc=2 T=140ps: S=0.71  K(f0)=1.036  K(2f0)=1.74  K max=1.85 at 170 GHz  |eps(2f0)|/|eps(f0)|=0.108
+f0=87 ncyc=2 T=1400ps: S=0.71  K(f0)=0.980  K(2f0)=1.87  K max=1.98 at 170 GHz  |eps(2f0)|/|eps(f0)|=0.108
+f0=113 ncyc=0.9 T=140ps: S=0.55  K(f0)=1.003  K(2f0)=1.11  K max=1.22 at 202 GHz  |eps(2f0)|/|eps(f0)|=0.234
+f0=113 ncyc=0.9 T=1400ps: S=0.55  K(f0)=0.991  K(2f0)=1.13  K max=1.24 at 204 GHz  |eps(2f0)|/|eps(f0)|=0.234
+f0=113 ncyc=2 T=140ps: S=0.55  K(f0)=1.012  K(2f0)=1.51  K max=1.66 at 216 GHz  |eps(2f0)|/|eps(f0)|=0.107
+f0=113 ncyc=2 T=1400ps: S=0.55  K(f0)=0.988  K(2f0)=1.59  K max=1.73 at 218 GHz  |eps(2f0)|/|eps(f0)|=0.107

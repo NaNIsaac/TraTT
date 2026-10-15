@@ -4039,3 +4039,97 @@ non-linearity is ~2 % there, against 25 % at 17.48 keV.
   - Saturation is controlled by ν ≲ 0.2.
   - Harmonics are controlled by S itself (|J₂/J₁| ≈ S/4).
   - Only the first is a dynamical-diffraction effect. The second is kinematic and known in kind.
+
+---
+
+## 2026-10-15 — Entry 66: Chalise et al. Fig. 2 tails in full TT at Si 400 — second-order strain terms, not the crystal
+
+**Why.** Entry 65 left a hypothesis unchecked: the 150–170 GHz feature in their Fig. 2b may be the second
+harmonic of the 87 GHz packet. Entry 65 said this needed their packet and energy. A semi-infinite solver
+removes the cost problem, so the case is run here at the real crystal (Si 400, 17.48 keV) with an analytic
+packet of their peak strain. Script `explore/nb/e66_harmonic.py` (`check`, `run`, `fig`); data
+`e66_harmonic.json`, log `e66_harmonic.log`; figure `figures/si400_harmonic.png`.
+
+**1. Method: one ODE gives the whole R(t).**
+- The packet enters at t = 0 and moves at v = 1, so phi(zeta, t) = S g(t − zeta) depends on depth only
+  through s = t − zeta, the distance behind the front.
+- The Bragg Riccati equation has no other explicit depth dependence. Below the front the crystal is perfect,
+  so R = r0 there (Darwin–Prins root).
+- Integrate dR/ds = −dR/dzeta from s = 0 upward. The value at s = t is the surface reflectivity at time t.
+  This needs no slab thickness and no loop over time. One run (126 frequencies, 30k steps) takes about a
+  second.
+- **Check** against `solve_bragg` (α = 8, κ = 6, S = 0.3, R_D = 0.2): max |ΔR| = 2.9e-4 at |R| ≈ 0.24.
+  This equals the slab's back-face term with no packet (2.9e-4, 2.2e-4, 1.2e-4 at the three η). So the two
+  solvers agree up to the finite slab itself.
+- **Convergence:** 64 and 128 steps per cycle give identical K to 4 digits.
+- Units: length Λ = 11.54 µm (α = 1), time Λ/v_L = 1.368 ns, κ = 2πg = 0.063.
+  - S is set by peak strain 1e-3: S = ε GΛ/q0, which gives 0.71 at 87 GHz and 0.55 at 113 GHz.
+  - The packet is the Entry 58 shape: φ = S e^{−s/τ_d} sin(q0 s), so the strain starts with a step, as in
+    their Fig. 2a. The decay is 0.9 cycles (their peak FWHM ≈ 30 GHz) or 2 cycles.
+  - Window 140 ps (their Fig. 2a: entry at 60 ps, end at 200 ps) and 1400 ps.
+- **Measure:** K(f) = (W(f; S)/S) / (W(f; S/100)/(S/100)), the non-linear over the linear weight at the
+  same frequency.
+  - The linear transfer function (Entry 59/65 H, the heterodyne factor, the window) cancels in K.
+  - So K is the strain non-linearity alone.
+
+**2. Results (140 ps window; 1400 ps changes K by ≤ 0.1).**
+
+| packet | S | K(f0) | K(2f0) | K max (at) | K at 20 / 30 / 40 GHz |
+|---|---|---|---|---|---|
+| 87 GHz, 0.9 cyc | 0.71 | 1.009 | 1.17 | 1.28 (158 GHz) | 0.88 / 0.81 / 0.81 |
+| 87 GHz, 2 cyc | 0.71 | 1.036 | 1.74 | 1.85 (170 GHz) | 0.65 / 0.62 / 0.69 |
+| 113 GHz, 0.9 cyc | 0.55 | 1.003 | 1.11 | 1.22 (202 GHz) | 0.93 / 0.86 / 0.84 |
+| 113 GHz, 2 cyc | 0.55 | 1.012 | 1.51 | 1.66 (216 GHz) | 0.75 / 0.68 / 0.71 |
+
+- **Scaling** (87 GHz, 0.9 cycles, S = 0.71 / 0.36 / 0.18): (K − 1)/S is constant at 140–158 GHz
+  (0.32–0.40) and at 200 GHz (−0.42 to −0.52).
+  - The deviation is the second-order (J₂ and mixing) term interfering with the first-order one.
+  - It is not ν² saturation: at the peak K = 1.01, as Entry 65 predicted (ν ≈ 0.03).
+- **High-frequency wing.**
+  - The weight rises above the linear value from about 1.3 f0 up to 2 f0, by 20–85 % at the maximum.
+  - It falls below the linear value just past 2 f0 (K ≈ 0.5–0.7 at 200–230 GHz for the 87 GHz packet).
+  - In their normalised units, the shoulder lies at 0.2–0.35 of the peak, where the strain is 0.1–0.2.
+- **Low-frequency wing.**
+  - The difference-frequency terms reduce the weight to K = 0.6–0.9 at 20–40 GHz.
+  - The longer packet gives the larger reduction.
+
+**3. Against their Fig. 2 (figure downloaded from the arXiv HTML; numbers read off the image).**
+- **Location.**
+  - For 87 GHz, the computed shoulder ends at 158–170 GHz. They see a step in the reflectivity curve at about
+    165 GHz.
+  - For 113 GHz, the computed shoulder is at 200–216 GHz. Their reflectivity curve is above the strain curve
+    from about 155 GHz upward.
+  - The location therefore agrees with the hypothesis of Entry 65.
+- **Size and sign.**
+  - Their excess at 170–240 GHz is about +0.02 of the peak.
+  - Here the excess is +0.05 to +0.1 of the peak before 2 f0, and the deficit past 2 f0 is of the same order.
+  - Their strain spectrum has a notch near 165 GHz (b) and 215 GHz (d), which the analytic packet does not
+    have. The sign past 2 f0 depends on the packet's phase structure, so a shape match is not expected.
+- **Low frequencies: two factors multiply.**
+  - At 20 GHz, the crystal factor of Entry 65 gives H(20)/H(100) = 0.51.
+  - The strain non-linearity gives K = 0.65–0.88.
+  - Together that is 0.33–0.45, so the reflectivity under-reads 20 GHz by 2.2–3×. Their figure shows about 4×.
+  - Both factors are in their forward model, since they solve TT with the full phase.
+
+**Verdict.**
+- At their strain (1e-3 at 87–113 GHz, S = 0.55–0.71), the reflectivity-spectrum estimator is linear at the
+  peak (≤ 4 %), but not in the wings.
+- Second-order strain terms change the weight by tens of percent at 1.3–2.5 f0 and at f ≲ 0.5 f0.
+- The location of the extra weight agrees with the unexplained 150–170 GHz feature in their Fig. 2b.
+- The hypothesis of Entry 65 moves from "unchecked" to "consistent in location and order of magnitude". The
+  shape and sign are not tested, because their packet is not available.
+- **Physics class.** K is kinematic in kind. It is the Bessel/mixing expansion, candidate bias (ii) of
+  Entry 57, and is known in principle. What is new is the size at their stated strain and the separation of
+  this effect from the crystal factor H.
+- **Usable criterion (the Entry 57 stop rule).**
+  - The non-linear part grows as S while the linear part does not.
+  - Two runs or measurements at different fluence would separate the two parts.
+  - Scaling (W/S at f) between fluences changes by (K − 1) ∝ S in the wings, and stays flat where the
+    spectrum is linear.
+  - This criterion needs only a fluence series, not their packet.
+
+**Not done.**
+- Their actual udkm1Dsim packet. The notch in their strain spectrum and the exact shoulder shape need it.
+- How they combine angle-resolved FFTs into one spectrum (Entry 57). Here the weight is taken at ω = |η|,
+  as in Entry 58.
+- Instrument resolution (their Sec. IV).
