@@ -4212,3 +4212,1735 @@ order, and linear envelope. It does not map thickness-dependent Pendellösung
 overshoot, arbitrary envelope shapes, absorption, or an experimental detection limit.
 The mechanism is the one already documented in Entry 15; the new result is its
 parameter map and explicit checks, not a claim of a newly discovered mechanism.
+
+---
+
+## 2026-10-22 — Entry 68: is the linearity limit of the Fourier-weight estimator set by one number? (falsification run for the paper's central claim)
+
+**Why.** `notes/paper_candidates.md` proposes as the paper's central claim that a satellite is a
+dynamical reflection with its own amplitude, and that this amplitude decides whether time-resolved
+Bragg reflectivity is a linear spectrometer of the strain (Entry 59/65 transfer function H) or a
+dynamically forming satellite (Entry 1/9 law). Isaac's question B3 asks whether the short-packet
+linear regime and the long-train dynamical regime are joined by **one** dimensionless criterion.
+Entry 65 proposed ν = πα|J_1(S)| ℓ/Λ on four points. Before building on it, try to break it.
+
+**Hypothesis under test (strong form).** With ν defined as the first-order satellite amplitude at
+the surface, ν = max_t |R_lin(t) − r0| (computed from a linear run and scaled by S/S_lin), the
+saturation of the Fourier weight at the spectral peak, 1 − K with
+K = (W(S)/S)/(W(S_lin)/S_lin), is a function of ν alone — the same for any packet length,
+absorption and satellite position.
+
+**Falsification rule, fixed before the run.** If at equal ν the value of 1 − K spreads by more than
+a factor 2 across (g, x, ncyc), the strong form is false.
+
+**Setup.** `explore/nb/e68_nu_collapse.py` (`run`, `stats`, `fit2`, `conv`, `window`, `fig`);
+data `e68_nu_collapse.json`; logs `e68_nu_collapse.log`, `e68_stats.log`; figure
+`figures/paper/e68_nu_collapse.png`. Reproduce: `uv run python explore/nb/e68_nu_collapse.py run stats fit2 fig`
+(28 s for `run`).
+- Semi-infinite symmetric Bragg, σ, normal absorption only, retarded-time ODE of Entry 66 (one
+  integration gives R(t)); length unit Λ (α = 1), κ = 2πg.
+- Packet φ = S g(s), g = e^{−s/τ_d} sin(q0 s), τ_d = ncyc/x, q0 = 2πx (satellite at x Darwin
+  half-widths). Strain starts with a step at the front, as in Entries 58–66.
+- Grid: g ∈ {0.01, 0.046, 0.12} (Si 400 at 17.5 keV, 8 keV, and Entry 59), x ∈ {2, 5},
+  ncyc ∈ {1, 3, 10, 30}, S ∈ {0.03, 0.06, 0.1, 0.15, 0.2, 0.3, 0.5, 1}, S_lin = 1e-3. 24 series,
+  192 nonlinear points. Weight read at η = q0 (also 0.8 q0 and 1.25 q0, stored, not analysed).
+- Window T = 5τ_d + 4/Re(Λ − iW) + 1. RK4 at 64 steps per cycle of (η + S q0).
+
+**Results.**
+
+1. Spread of 1 − K at fixed ν (log-log interpolation within each series, all 24 series):
+
+| ν | min | max | max/min | least / most saturating series |
+|---|---|---|---|---|
+| 0.1 | 0.0012 | 0.0175 | 14.1 | g=0.046, x=2, 30 cyc / g=0.01, x=2, 1 cyc |
+| 0.2 | 0.0050 | 0.0611 | 12.1 | same / g=0.01, x=5, 1 cyc |
+| 0.3 | 0.0116 | 0.1116 | 9.6 | same / g=0.01, x=2, 1 cyc |
+| 0.5 | 0.0370 | 0.2496 | 6.8 | same / g=0.01, x=5, 3 cyc |
+| 0.8 | 0.1151 | 0.4227 | 3.7 | same / g=0.01, x=5, 10 cyc |
+
+**The strong form is false.** At equal ν the saturation varies by an order of magnitude. Short
+packets (which need a large S to reach a given ν) saturate most; the longest packets least.
+
+2. It is not the local Bessel factor. Dividing K by 2J_1(S)/S widens the spread (26× at ν = 0.1),
+so the extra saturation of short packets is not J_1 saturation of the drive.
+
+3. Not a two-term law either. Fitting 1 − K = a S² + b ν² over the 144 points with S ≤ 0.3 gives
+a = 0.113, b = 0.49 with pred/actual 5–95 % = [0.35, 4.0]; forcing b = 2/3 (the Bragg tanh² law)
+drives a negative. A ν-only fit (b = 0.52) has 5–95 % = [0.19, 2.5]. The saturation depends on the
+packet's shape relative to the extinction structure, not only on its peak amplitude and on S.
+
+4. What survives, as a bound. Over the scanned domain, 1 − K ≤ 0.0175 at ν = 0.1, ≤ 0.061 at
+ν = 0.2, ≤ 0.11 at ν = 0.3, i.e. **1 − K ≤ 1.8 ν² for ν ≤ 0.3** in every series. So "ν ≲ 0.1
+guarantees linearity to 2 %" holds as a sufficient condition; ν is a usable safety number, not a
+crossover law. In the figure the Bragg law 1 − tanh²ν/ν² runs through the middle of the cloud
+within about a factor 3 for ν ≥ 0.1; the Laue sin² law is its lower edge.
+
+5. Same ν, different route (g = 0.01, x = 5, S ≤ 0.3): at ν ≈ 0.3 the 1-cycle series is off the
+grid (its S ≤ 0.3 points reach only ν = 0.09), the 10-cycle series gives 0.073, the 30-cycle series
+0.053. The route matters.
+
+**Checks.**
+- Step convergence: 64 vs 128 steps per cycle at g = 0.01, x = 2, 30 cycles, S = 0.1 and 0.3: K
+  differs by < 3e-7.
+- Window: doubling T at g = 0.01, x = 5 changes K by ≤ 4e-4 (1 cycle) and ≤ 1e-4 (30 cycles).
+- The retarded-time solver was checked against `solve_bragg` in Entry 66 (agreement to the slab's
+  back-face term, 3e-4).
+- The ν definition and the factor-2 rule were written in the script docstring before the run.
+
+**Scope.** Bragg, semi-infinite, symmetric, σ, normal absorption only (no χ_ih), one packet family
+(exponential decay, step strain front), S ≤ 1, satellite at 2 and 5 Darwin half-widths only (the
+inside-Darwin regime x < 1 is not scanned), weight at the spectral peak only, ν taken as the
+peak-in-time first-order amplitude. Not tried, deliberately (no second definition after the fact):
+a time-averaged ν, other packet shapes, Laue geometry.
+
+**Consequence for the paper (see `notes/paper_candidates.md`).** Question B3 gets a negative answer
+in its strong form: there is no single dimensionless number that maps the linear transfer function
+onto the dynamical satellite growth. The satellite's own amplitude ν is the right *quantity*
+(it is exactly the formation law's phase πα|J_n|t̃ in Laue), it gives a sufficient linearity bound,
+and it orders the regimes — but the saturation function is not universal. The central claim is
+reworded accordingly: H is the correction, ν ≲ 0.1 is the guarantee, and the crossover is a region,
+not a line.
+
+---
+
+## 2026-10-22 — Entry 69: Sondhauss & Wark (2003) vs Entry 59, aligned term by term (re-review, no recomputation)
+
+**Why.** BACKLOG T1a asks for the Entry 64 comparison with normalisation, boundary conditions,
+absorption, observable and approximations made explicit, and for one paragraph on what Entry 59
+adds. Nothing is recomputed: the numbers are those of `explore/nb/e64_sw.log` (2026-10-14) and
+Entry 65. **PDF not re-checked tonight**: `SondhaussWark2003_ActaA59_7.pdf` is untracked and absent
+from this worktree and from the shared checkout, so the S&W column is Entry 64's transcription of
+their eq. 25–31 and p. 12. Entry 64 §5 already found that the two-field S&W form with the Bloch
+wave restored equals the Entry 59 Riccati form to 6e-16, so the only modelling difference between
+the two first-order theories is the depth ansatz; the rest of the table is bookkeeping that a
+reader must have to compare numbers.
+
+**1. Alignment table.**
+
+| item | Sondhauss & Wark 2003 (transcription, Entry 64) | Entry 59 / 64 (this work) | matched in e64 by |
+|---|---|---|---|
+| equation | time-dependent TT (their eq. 14/16), two-beam eq. 26 with explicit ∂/∂t terms | quasi-static two-beam TT, frozen φ per instant (DESIGN.md) | dropping their 2Ω/ω terms; justified by β = 2πfL/c ≤ 1.2e-2 (Entry 62). Their eq. 36 Doppler shift of the satellite is not represented |
+| geometry, polarisation | InSb 111 symmetric Bragg, 10 µm, one polarisation | symmetric Bragg, σ, dimensionless α, κ; slab with back face hidden by e^−κ (κ = 6) or semi-infinite (Entry 66) | same dimensionless equation; InSb numbers not reproduced |
+| drive | one plane-wave phonon, δχ_h cos(Ωt − q·r); δχ from the displacement to first order | φ = S cos(W(t − ζ)), single mode, phase only (no δχ_h change of magnitude) | identical at first order in u: δχ_h = iχ_h h·u |
+| perturbation order | first: δχ·δD dropped (eq. 25) | first: Riccati linearised about R0 | same |
+| depth ansatz of the perturbation | constant d_h^±, constant perfect-crystal (D_0^p, D_h^p) (eq. 28–29) | δ(ζ) = (A_s, B_s) e^{(λ − isW)ζ} with λ = cR0, i.e. the actual semi-infinite Bloch wave, and the surface boundary condition | the **only** physical difference; kinds SW / SWn / Bloch in `e64_sw_compare.py` |
+| normalisation of the satellite amplitude | δD_h itself (eq. 31) | δR = B − R0 A, normalised to the incident wave | kind SWn removes this difference; it changes little (Entry 64 table) |
+| boundary conditions | implicit (plane waves, no surface condition on δ) | D0(0) = 1, R(1) = 0 → Darwin–Prins root R0 for the unperturbed state; δ(1) = 0 | Bloch kind |
+| absorption | complex χ_0 inside the deviation parameter β_h (implicit); χ_h'' present in their χ_h | normal absorption κ only (η → η + iκ); χ_ih **not** included | κ = 6, α = 8 (g = 0.12); not matched to InSb |
+| deviation variable | β_h (eq. 27, 33) | η (Darwin half-width 2πα); x = η/2πα | linear map |
+| observable | rocking curve of \|D_h^p + δD_h\|² at an instant (Fig. 3–4); no Fourier analysis | F(η) = mean_t[(\|R\|² − ⟨\|R\|²⟩) e^{iWt}] = conj(R0) δR_− + R0 conj(δR_+); H = \|F\| / kinematic law | F built from each kind's δR_± |
+| stated validity | satellite ≤ 10 % of main peak; sidebands farther than ~1 rocking width from the main peak; crystal thick enough for no Laue fringes (p. 12) | ν = \|δR_lin\| ≲ 0.1 (Entry 68 bound; ≲ 0.2 for ≲ 4 %, Entry 65); any η including the plateau; slab fringes suppressed by κ | their 10 % rule ≈ ν² ≲ 0.1 × I_main, the same kind of condition |
+| verification | numerics for InSb, Fig. 3 (agreement), Fig. 4 (failure near the main peak) | full TT, nt × 2 and n_z × 2 convergence 1.4e-5 of max \|F\| | `e64_sw.log` |
+| intended use | least-squares fit of a sum of mode solutions to a rocking curve → mode occupations (one paragraph, no demonstration) | divide the measured Fourier weight by H(ω; g) → strain spectrum; linearity bound ν | — |
+
+**2. The matched numbers (from `e64_sw.log`, α = 8, κ = 6, S = 0.02), ratio |F_pred|/|F_TT| at the satellite η = ±W:**
+
+| W / Darwin half-width | 20 | 5 | 2 | 1 | 0.5 |
+|---|---|---|---|---|---|
+| SW (constant amplitudes, δD_h) | 1.022 | 1.220 | 1.687 | 3.014 | 8.45 |
+| SWn (constant amplitudes, normalised) | 1.021 | 1.207 | 1.567 | 1.673 | 12.96 |
+| Bloch = Entry 59 Riccati | 1.005 | 1.003 | 1.001 | 1.000 | 1.000 |
+| SW worst near the main peak, \|η\| < 1.5 w_D | 3.5 | 3.7 | 4.4 | 6.2 | 9.4 |
+
+The first-order theories agree with each other and with TT where S&W say theirs is safe (2 % at 20
+half-widths). Inside about five half-widths they part, and the difference is the depth ansatz
+alone: normalising (SWn) does not repair it.
+
+**3. What Entry 59 adds, in one paragraph.** The linearisation of the Takagi–Taupin equations
+about the perfect-crystal solution, the superposition of modes, and the idea of reading phonon
+content from the linear solution are Sondhauss & Wark's (2003) and are cited as such. Entry 59
+keeps the depth dependence of the perfect-crystal Bloch wave and the surface boundary condition in
+the perturbation, which S&W's constant-amplitude ansatz drops; that single change makes the
+first-order solution hold to 1 % at every detuning, including the Darwin plateau and the near-peak
+region where S&W's own Fig. 4 and our e64 table show factors of 3–13. On top of that, Entry 59
+changes the observable from a rocking curve at an instant to the time-Fourier component of the
+reflectivity, and writes its magnitude as the strain spectrum times a crystal transfer function
+H(ω/ω_D; κ/2πα) that depends on the crystal only: it collapses onto one curve in ω/ω_D for
+different packets, depends strongly on absorption, and is a factor 2 across 20–100 GHz for Si 400
+at 17.5 keV (Entry 65). Entry 68 adds the validity bound ν ≲ 0.1 for the estimator. None of this
+touches the S&W time-derivative terms (Doppler shift, polaritons), which are outside the
+quasi-static model.
+
+**4. Still unresolved.** Whether an earlier Bloch-wave first-order form exists in Chukhovskii &
+Förster 1995 or Wark & Lee 1999 (unread); anomalous absorption χ_ih; asymmetric geometry; the
+Doppler term of their eq. 36 at GHz (expected ~Ω/ω ~ 1e-8, negligible, not computed).
+
+---
+
+## 2026-10-22 — Entry 70: signal maximum vs Fisher-information maximum, one case (directive B2)
+
+**Why.** Isaac's question B2: is the detuning where the signal is largest the detuning where the
+information about the acoustic parameters is largest? One case, as boss asked: the Entry 66 packet
+(87 GHz, decay 0.9 cycles, peak strain 1e-3, S = 0.71) at Si 400, 17.48 keV (g = 0.0100), with 8 keV
+(g = 0.0458) as the crystal-factor control. Script `explore/nb/e70_fisher.py` (`run`, `diag`, `fig`);
+data `e70_fisher.json`, `e70_fisher_f30.json`; logs `e70_fisher.log`, `e70_fisher_f30.log`; figures
+`figures/paper/e70_fisher.png`, `e70_fisher_f30.png`. Reproduce:
+`uv run python explore/nb/e70_fisher.py run fig` (24 s) and `E70_FMIN=30 uv run python explore/nb/e70_fisher.py run fig`.
+
+**Measurement model.** R(t) = |R|² at one detuning η (one angle), sampled uniformly over a window
+T (140 ps as in their Fig. 2a; 1400 ps check), additive Gaussian noise of constant σ. Signal:
+W(η) = Fourier weight at ω = |η| (Entries 58–66). Information: per-detuning Fisher matrix
+I_ij(η) = σ⁻² Σ_t ∂R/∂θ_i ∂R/∂θ_j for θ = (S, f0, τ_d), central differences (1 %; 0.5 % changes
+I_ii by ≤ 4.6e-3). Reported: argmax of I_ii and of the marginal precision 1/[I⁻¹]_ii.
+
+**Pre-registered rule (in the script docstring before the run).** For S, "different" only if
+|f_I(S) − f_W| exceeds both one Darwin half-width (0.73 GHz) and 10 % of f0 (8.7 GHz). For f0 and
+τ_d a flank maximum is expected from Fourier theory and is not a finding; a crystal effect is
+claimed only if the 17.48 keV maximum differs from the 8 keV one by more than 10 % of f0.
+
+**Result on the pre-registered grid (10–260 GHz).** W and I_SS both peak at the grid edge, 10 GHz,
+at both energies and both windows. `diag`: the linear run (S/100, scaled) gives the same edge
+maximum (W(10)/W(87) = 3.05 vs 2.92), so this is not the second-order S² term; it is the
+first-order low-frequency rise of W ∝ |r0||φ̂| ∝ |ε̂|/ω² (Entry 59 §1, strain step at the front)
+read through a window holding 1.4 cycles at 10 GHz. **Post-hoc change, labelled as such:** the grid
+is cut at 30 GHz (≥ 4.2 cycles in 140 ps). Everything below is from that rerun.
+
+| | 17.48 keV, 140 ps | 17.48 keV, 1400 ps | 8 keV, 140 ps | 8 keV, 1400 ps |
+|---|---|---|---|---|
+| f_W (signal max) | 84 | 84 | 84 | 84 |
+| f_I(S), argmax I_SS | 87 | 87 | 87 | 87 |
+| f_I(f0) | 79 | 80 | 79 | 80 |
+| f_I(τ_d) | 87 | 87 | 87 | 87 |
+| marginal precision S / f0 / τ_d | 30 / 87 / 85 | 30 / 88 / 49 | 30 / 87 / 85 | 30 / 88 / 49 |
+
+**Reading.**
+- Amplitude: f_I(S) − f_W = 3 GHz, below the 8.7 GHz threshold. **They coincide.** B2 is answered
+  "no" for the amplitude in this case, as the trivial expectation said (R is linear in S).
+- Frequency: the information sits on the low flank (79–80 GHz against a peak at 84), which is
+  Fourier theory (the f0 derivative of a peaked spectrum is largest on the flanks); the marginal
+  precision, which has to separate f0 from S and τ_d, moves back to the peak (87–88). Not a finding.
+- Crystal: the 8 keV and 17.48 keV columns are identical to the GHz. **No crystal effect** on any
+  maximum, far below the 10 % criterion. Entry 71 explains why: in 140 ps to 1.4 ns the packet is
+  0.1 to 1 Λ deep and neither absorption nor the extinction phase has acted.
+- The marginal-precision maxima at the grid edge (S at 30 GHz, τ_d at 49 GHz for 1400 ps) are
+  where the three derivatives are least collinear, not a signal feature; not interpreted.
+- The kinematic H = 1 reference (|r0| |φ̂| and its derivatives) also peaks at the grid edge after the
+  φ̂ correction, so it does not discriminate here; it is kept in the JSON, not used.
+
+**Verdict.** For a picosecond packet read at one angle, the signal maximum and the Fisher maximum
+for the amplitude coincide, the frequency information is on the flank as in any spectrum, and the
+crystal moves nothing. **B2 yields no paper figure from this case.** The place where B2 could still
+bite is a long train at a weakly absorbing reflection (window ≫ 1/κ), where H(ω) is not flat
+(Entry 71); not computed.
+
+**Scope.** Gaussian noise, constant σ, one angle at a time (no angle-resolved joint FIM), one packet
+shape, S = 0.71 (second-order wings present, Entry 66), semi-infinite symmetric Bragg, σ, normal
+absorption only.
+
+---
+
+## 2026-10-22 — Entry 71: the crystal factor H needs a long window; Entry 65 §2 corrected for the Chalise case
+
+**Why.** Entry 70 found the 8 keV and 17.48 keV responses of a 140 ps packet measurement identical,
+although Entry 65 gives H(20 GHz)/H(100 GHz) = 0.51 at 17.48 keV and 0.93 at 8 keV. Entry 65 computed
+H for a steady single mode filling the crystal; Entry 65 §2 and Entry 66 §3 then applied that number
+to Chalise et al.'s 140 ps measurement. Test whether that step was allowed. Script
+`explore/nb/e71_window_H.py`, data `e71_window_H.json`, log `e71_window_H.log`. Reproduce:
+`uv run python explore/nb/e71_window_H.py` (11 s).
+
+**Setup.** Full semi-infinite TT (Entry 66 solver), the Entry 66 packet at S/100 (linear), windows
+140 ps, 1.4 ns, 14 ns; H_meas(f) = W(f) / (|r0(f)| |φ̂(f)|) with φ̂ = ε̂/ω (Entry 59 §1), normalised
+at 100 GHz; compared with the steady closed form H(f)/H(100) of Entry 65.
+**Pre-registered rule:** Entry 65's number for their case stands only if H_meas(20)/H_meas(100) at
+140 ps is within 20 % of 0.51 (17.48 keV); if it is near 1, Entry 65 §2 is wrong for short windows.
+(The first run of the script normalised by |ε̂| instead of |φ̂|; the printed ratios were the correct
+ones times 100 GHz/f. Fixed before the numbers below; the rule was not changed.)
+
+**Result**, H_meas(f)/H_meas(100 GHz):
+
+| f GHz | 20 | 30 | 40 | 60 | 87 | 150 |
+|---|---|---|---|---|---|---|
+| steady H, 17.48 keV (Entry 65) | 0.511 | 0.676 | 0.786 | 0.909 | 0.982 | 1.034 |
+| 140 ps window, 17.48 keV | 1.015 | 1.043 | 1.039 | 1.009 | 0.957 | 1.039 |
+| 1.4 ns | 0.999 | 0.999 | 1.000 | 0.999 | 0.996 | 1.006 |
+| 14 ns | 0.944 | 0.975 | 0.986 | 0.994 | 0.998 | 1.004 |
+| steady H, 8 keV | 0.929 | 0.968 | 0.983 | 0.994 | 0.999 | 1.002 |
+| 8 keV at 20 GHz, 140 ps / 1.4 ns / 14 ns | 1.014 / 0.998 / 0.958 | | | | | |
+
+**The rule fires: Entry 65 §2 is wrong for a 140 ps measurement.** The crystal factor is flat to
+±4 % (140 ps, leakage) and to 0.1 % (1.4 ns) at both energies. The steady suppression begins to
+appear only at 14 ns (0.944 against 0.511 steady).
+
+**Why, in one line.** The steady H = κ/|κ − 2cR0| with |2cR0| ≈ π/x (per Λ, x = f/f_D) is the
+modulus of the infinite depth integral of e^{−(κ + iπ/x)ζ}. Over a finite depth T (the window in
+units of Λ/v_L = 1.368 ns) the integral is (1 − e^{−(κ+iπ/x)T})/(κ + iπ/x), which tends to T for
+small T: no suppression. Hand check at T = 10.3 (14 ns): the ratio of this expression at 20 GHz to
+that at 100 GHz is 0.947, against 0.944 from TT. So H needs the window, and hence the strained
+depth, to exceed both 1/κ (16 Λ = 185 µm = 22 ns at 17.48 keV) and x/π (8.7 Λ at 20 GHz). A
+picosecond packet 0.1 Λ deep sees none of it.
+
+**Consequences.**
+- Entry 65 §2 ("a peak-normalised Fourier-weight spectrum taken at 17 keV under-reads 20 GHz by a
+  factor 2") holds for a **steady or long acoustic train** read over tens of ns, the poster's own
+  GHz-transducer geometry, and **not** for the Chalise et al. 140 ps packet. Entry 66 §3's "two
+  factors multiply, 0.33–0.45" is withdrawn: only the second-order factor K = 0.65–0.88 applies
+  to their window, which leaves most of their ~4× low-frequency deficit unexplained by this model
+  (instrument, their windowing and normalisation are the remaining candidates, Entry 57).
+- `notes/qa_prep.md` §6b and the poster Outlook sentence quoting the Si 400 numbers are right only
+  with the window condition attached. The poster is frozen; the correction goes to
+  `notes/paper_candidates.md` and the paper.
+- Entry 59's closed form itself is not wrong: it is the infinite-window limit, and its TT checks
+  (κ = 6, T ≥ 0.6 L ≫ 1/κ) satisfied the condition. The window condition was never stated; it is now.
+- For the paper this moves H from "correction for picosecond-ultrasonics spectra" to "property of
+  long-train (GHz) measurements", i.e. into the same experiment as the formation law. The two
+  halves of P1/P2 now share one window condition and one apparatus.
+
+**Not done.** A windowed closed form (the finite-T integral above, with G(W) for the packet);
+the intermediate regime T ~ 1/κ; windows beyond 14 ns (the packet is then 10 Λ deep and the
+quasi-static and plane-wave assumptions should be rechecked).
+
+---
+
+## 2026-10-22 — Entry 72: which histories time-resolved diffraction does not distinguish (directive B1)
+
+**Why.** Isaac's question B1: can two acoustic fields that steady-state diffraction cannot tell apart
+be told apart in time-resolved diffraction? Inside this model the steady state of a filled
+constant-amplitude wave knows only (S, q); any two drive histories with the same final amplitude are
+indistinguishable there, and Entries 28–31 already show them distinguishable in the transient. The
+quantitative content of B1 is therefore the converse: **what does the transient not distinguish?**
+By the accumulated-coupling law, order n reads only the running mean of J_n(S A(s)) over the last
+transit. Script `explore/nb/e72_history_degeneracy.py` (`law`, `tt`, `fig`); data
+`e72_history_degeneracy.json`; log `e72_history_degeneracy.log`; figure
+`figures/paper/e72_history_degeneracy.png`. Reproduce: `uv run python explore/nb/e72_history_degeneracy.py` (7 s).
+
+**Construction.** History 1: linear ramp A_1(s) = clip(s, 0, 1) (T = t_tr, then held). History 2:
+J_1(S A_2(s)) = J_1(S A_1(s)) + δ(s), δ = 0.1 sin(2π(s − 0.2)/0.5) on s ∈ [0.2, 0.7], zero outside;
+inverted on the monotone branch of J_1 (S = 1.5, S A ≤ 1.84). The envelopes differ by up to 0.167
+(a 17 % amplitude wobble during the ramp; A_2 is non-monotone). For t ∈ [0.7, 1.2] the window
+[t − 1, t] holds the whole wobble, whose mean is zero, so Θ_1 is identical there by construction.
+Both histories end in the same filled state S = 1.5.
+
+**Pre-registered rule (docstring, before the TT run).** Laue, α = 0.5, α_ac = 40 (R = 0.0125,
+Entry 67 conditions), 8 carrier phases at fixed envelope time, η = +q and +2q, n_z = 2800:
+(i) |ΔI_1| < 1e-3 for t ∈ [0.7, 1.2] → order-1 degeneracy confirmed, else claim #21 fails here;
+(ii) TT difference traces agree with the law's to 1e-3 at every t, both orders;
+(iii) if the law predicts max|ΔI_2| > 3e-3 in the window and TT confirms, order 2 breaks the
+degeneracy at this S; if the law predicts less, "not resolved at this S", no claim.
+
+**Results.**
+
+| | law | full TT |
+|---|---|---|
+| max\|ΔI_1\|, t ∈ [0.7, 1.2] | 8.4e-11 | **8.8e-7** |
+| max\|ΔI_1\|, outside the window | 2.50e-2 | 2.50e-2 |
+| max\|ΔI_2\|, in window | 1.25e-3 | 1.25e-3 |
+| max\|ΔI_2\|, outside | 5.82e-3 | 5.82e-3 |
+| max\|ΔI_TT − ΔI_law\|, n = 1 / 2 | — | 2.5e-6 / 4.4e-6 |
+| max\|I_TT − I_law\| (each history), n = 1 / 2 | — | 1.9e-5 / 6.7e-5 |
+| convergence (8 → 16 phases, n_z × 2), n = 1 / 2 | — | 5.7e-6 / 5.3e-5 |
+
+- (i) **Confirmed.** Two histories whose envelopes differ by 17 % give the same first-order
+  satellite to 9e-7 while the window contains the perturbation, and differ by up to 2.5e-2 before
+  and after. The order-1 transient reads only the t_tr running mean of J_1(S A), as the law says.
+- (ii) **Confirmed** at 4e-6, three orders below the threshold, on a non-monotone envelope.
+  Claim #21 (Entry 33) survives this attempt.
+- (iii) **Not resolved at this S.** The law predicts 1.25e-3 for the order-2 difference inside the
+  window, below the pre-set 3e-3; TT reproduces the number but no claim is made that order 2
+  breaks the degeneracy. (At S = 1.5 the n = 2 satellite is weak, I_2 ≤ 0.085; a larger S is outside
+  the monotone-inversion construction used here and was deliberately not tried tonight.)
+
+**Answer to B1, bounded.** Yes, the transient distinguishes histories the steady state cannot, but
+only up to a known equivalence class: at each order n it measures the moving average of J_n(S A)
+over one transit, so histories that differ by a zero-mean (per window) perturbation of J_n(S A)
+are degenerate at that order. Different orders have different kernels, so multi-order readout
+reduces, and may remove, the degeneracy; the size of that effect at S = 1.5 is 1e-3 and was not
+claimed. This is a consequence of the Θ_n law (confirmed phenomenon within the model), not a new
+mechanism, and it is the precise sense in which "time-resolved diffraction reads the drive history":
+through a t_tr low-pass filter, order by order.
+
+**Scope.** Laue, no absorption, α = 0.5 (no Pendellösung crossing), R = 0.0125, one perturbation
+shape, n = 1, 2 only. The Bragg reading tanh²(πα|Θ_n|) is exact at resonance (Entry 30), so the
+same degeneracy holds there; not run.
+
+---
+
+## 2026-10-23 — Entry 73: what S = 0.5–6 means physically (T1c, directive C)
+
+**Why.** The poster's maps run S = 0.5–6 without saying what displacement, strain, stress and drive
+power that is. Script `explore/nb/e73_realisability.py` (constants only, no TT; 1 s), data
+`e73_realisability.json`, log `e73_realisability.log`. X-ray constants from X0h (Entry 20);
+c44 = 79.6 GPa, ρ = 2329 kg m⁻³, v_T = 5846 m/s (textbook, not re-verified); acoustic nonlinearity
+parameter β ≈ 5 (order of magnitude, not verified). Geometry: symmetric Laue, bulk shear wave along the
+surface normal polarised along h (Entry 6), L = 3 Λ_P.
+
+**Definitions.** u0 = S d/(2π); strain ε = K u0 = S d/Λ_ac (Λ_ac = v_T/f); stress σ = c44 ε; energy
+density w = ½ c44 ε²; intensity I = v_T w; second-harmonic strain after L, ε2/ε = (β/2) k ε L;
+R = Λ_ac/Λ_P (independent-satellite rule R ≤ 0.1, Entries 19, 54); β_qs = 2πfL/c (Entry 62).
+
+**1. Displacement vs strain.** [Corrected in Entry 80: u0 = 15.3 pm × S; the 7.6 is the S = 0.5 row.] u0 does not depend on frequency: u0 = 7.6 pm × S for Si 440 (d = 96 pm),
+so S = 6 is u0 = 92 pm = 0.95 d — the atoms move by almost one lattice spacing of the reflection. The
+strain is what elasticity sees, and it is small: ε = 1.6e-5 × S at 1 GHz, 3.3e-5 × S at 2 GHz (Si 440).
+A large S is a large absolute displacement at a small strain, because Λ_ac/d ≈ 6×10⁴.
+
+**2. Table, Si 440 (same for 17.48 and 30 keV except R, β_qs and ε2/ε, which scale with L).** [The ε2/ε columns and the harmonic parts of the verdict are withdrawn for this shear geometry in Entry 80.]
+
+| f GHz | S | u0 pm | u0/d | ε | σ MPa | w J/m³ | I W/cm² | ε2/ε (17.48 keV, L = 163 µm) | ε2/ε (30 keV, L = 296 µm) |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | 0.5 | 7.6 | 0.08 | 8.2e-6 | 0.65 | 2.7 | 1.6 | 0.004 | 0.007 |
+| 1 | 1 | 15.3 | 0.16 | 1.6e-5 | 1.3 | 11 | 6.3 | 0.007 | 0.013 |
+| 1 | 2 | 30.6 | 0.32 | 3.3e-5 | 2.6 | 43 | 25 | 0.014 | 0.026 |
+| 1 | 3 | 45.8 | 0.48 | 4.9e-5 | 3.9 | 97 | 56 | 0.022 | 0.039 |
+| 1 | 4 | 61.1 | 0.64 | 6.6e-5 | 5.2 | 172 | 100 | 0.029 | 0.052 |
+| 1 | 6 | 91.7 | 0.95 | 9.9e-5 | 7.8 | 386 | 226 | 0.043 | 0.078 |
+| 2 | 1 | 15.3 | 0.16 | 3.3e-5 | 2.6 | 43 | 25 | 0.029 | 0.052 |
+| 2 | 2 | 30.6 | 0.32 | 6.6e-5 | 5.2 | 172 | 100 | 0.058 | 0.105 |
+| 2 | 3 | 45.8 | 0.48 | 9.9e-5 | 7.8 | 386 | 226 | 0.086 | 0.157 |
+| 2 | 6 | 91.7 | 0.95 | 2.0e-4 | 15.7 | 1546 | 904 | 0.173 | 0.314 |
+
+Other reflections at the same S and f: Si 400 has 1.41× and Si 220 2× the strain, stress and ε2/ε
+(d larger), and 4× the intensity for 220. R at 1 / 2 GHz: 0.108 / 0.054 (440, 17.48 keV),
+0.059 / 0.030 (440, 30 keV), 0.137 / 0.069 (400), 0.161 / 0.081 (220). β_qs ≤ 1.2e-2 everywhere.
+
+**3. Sharp front vs smooth waveform.** A resonant transducer of quality factor Q rings up over ~Q/f.
+At Si 440: rise/t_tr = 0.36 / 1.08 / 3.59 for Q = 10 / 30 / 100 at 1 GHz and 17.48 keV (0.18 / 0.54 /
+1.79 at 2 GHz; 0.20 / 0.59 / 1.97 at 1 GHz and 30 keV). The step-onset law (poster Fig. 1 collapse)
+needs rise ≲ 0.2 t_tr, i.e. Q ≲ 5 at 1 GHz: unlikely for a resonant device. **The regime a real
+transducer gives is the ramp regime of Entry 67 (T/t_tr = 0.2–4)**, already mapped by the Θ_n law
+with ≤ 8e-5 error against TT, so no new TT run is needed to replace the sharp front by a smooth one.
+Within a cycle, the waveform stays sinusoidal while ε2/ε is small; above ~10 % (S ≥ 4 at 2 GHz, or
+S = 6 at 30 keV) the Entry 35 harmonic non-ideality applies (law error 0.014 at ε2 = 0.2).
+
+**4. Two validities, separately.**
+- **Elastic wave.** Linear elasticity holds throughout (ε ≤ 2e-4, σ ≤ 31 MPa, orders of magnitude
+  below fracture); the first correction is finite-amplitude harmonic generation, ε2/ε ≤ 5 % for
+  S ≤ 3 at 1 GHz and ≤ 2 at 2 GHz (17.48 keV), reaching 17–31 % at S = 6, 2 GHz. Attenuation at
+  1–2 GHz over 0.3 mm is ≤ 2 % amplitude (Entry 35 estimate, textbook order). So the elastic side is
+  **valid for all S ≤ 6 at 1 GHz, and for S ≤ 2–3 at 2 GHz as a clean sinusoid**.
+- **TT equation.** Two-beam, symmetric, quasi-static (β_qs ≤ 1.2e-2), and the displacement enters
+  the phase exactly for any u0 (the model never linearises in u). The independent-satellite reading
+  needs R ≤ 0.1: 1 GHz at 17.48 keV sits at the edge (0.108); 2 GHz, or 30 keV, is inside. Not
+  assessed: X-ray beam divergence against the Darwin width, lateral acoustic inhomogeneity.
+- **Drive power.** The one number this model cannot judge. S = 1 at 1 GHz is 6 W/cm² of acoustic
+  intensity, S = 6 at 2 GHz is 900 W/cm². A pulsed drive of ~100 ns (≥ 2 t_tr) at 1 kHz is a duty
+  cycle of 1e-4, so average powers are mW/cm² and heating is not the issue; the peak conversion of a
+  GHz bulk transducer is. **No verified transducer number is in hand**; this is a library/Isaac item.
+
+**Verdict (Si 440, 17.48–30 keV).**
+
+| S | 1 GHz | 2 GHz |
+|---|---|---|
+| 0.5–2 | **feasible**: ε ≤ 3.3e-5, I ≤ 25 W/cm² (pulsed), ε2/ε ≤ 3 % | **feasible**: ε ≤ 6.6e-5, I ≤ 100 W/cm², ε2/ε ≤ 10 % |
+| 3–4 | **limit**: I = 56–100 W/cm², ε2/ε 2–5 % | **limit**: I = 230–400 W/cm², ε2/ε 9–21 % (harmonics must be modelled) |
+| 6 | **limit**: I = 230 W/cm², ε2/ε 4–8 % | **not as a clean wave**: I = 900 W/cm², ε2/ε 17–31 % |
+
+"feasible / limit" here is on the elastic and TT side with the drive power unverified; a transducer
+delivering ≥ 50 W/cm² peak at 1–2 GHz would make the limit column feasible.
+
+**Consequence for the paper.** The poster's S = 3–6 overshoot cases (Entry 67 B, C) are at the
+limit at 1 GHz and need a transducer number; the S ≤ 2 regime (where the first satellite forms with
+τ_1 = 17–30 ns) is where the proposal should be written. The ramp regime, not the step, is the
+observable one.
+
+---
+
+## 2026-10-23 — Entry 74: directive questions B3 and B4, classified against what exists (no new computation)
+
+**Why.** BACKLOG T1b asks for one entry per directive question with the result classed as
+confirmed / in prior art / unverified. B1 is Entry 72, B2 is Entry 70. B3 and B4 are answered by
+entries already in this notebook; per the handoff rule (do not re-open what is already tested, do
+not recompute), this entry only states the classification and the evidence. Nothing was run.
+
+**B3. Can the short-pulse linear transfer function and the long-train dynamical satellite growth be
+joined by one dimensionless criterion?**
+- Answer: **no in the strong form, yes as a bound.** Entry 68 (pre-registered, 24 series, 192 points):
+  at fixed first-order satellite amplitude ν the saturation of the Fourier weight spreads by ×14
+  (ν = 0.1) to ×3.7 (ν = 0.8) across packet length, absorption and satellite position; a two-term
+  law a S² + b ν² does not capture it either. What holds is 1 − K ≤ 1.8 ν² for ν ≤ 0.3 on the scanned
+  domain, so ν ≲ 0.1 is a sufficient linearity condition.
+- Entry 71 adds the other half of the junction: the crystal factor H of the linear regime needs the
+  window to exceed max(1/κ, x/π) Λ/v_s, which is tens of ns, i.e. the long-train regime. So the two
+  regimes meet in one experiment (GHz train, tens of ns), not in one number.
+- Class: the ν bound is **confirmed** (within the model, Bragg, one packet family); the universal
+  crossover is **falsified**; the window condition is **confirmed** (Entry 71, hand check 0.3 %).
+- Prior art: none found for the bound or the window condition; S&W 2003 give a 10 % satellite rule
+  of the same kind (Entry 64 §1).
+
+**B4. When the independent-satellite approximation fails, are there unexpected quantitative features?**
+- Answer: **yes, one, already found and bounded: Bessel-zero resurrection.** Entries 45, 51, 52, 54:
+  a satellite dark at a Bessel zero reappears through a third-order path with
+  g_eff = πα (R/2)² C_n(S), population P = sin²[πα (R/2)² C_n(S)] ∝ α⁶/α_ac⁴ (confirmed without a fit
+  to < 1 % for R ≤ 0.1, four decades; renormalised zero S* − j = (R/2)² C_n/J'_{−n} to < 0.3 % at
+  R ≤ 0.67), derived independently as an effective 2×2 Hamiltonian (Entry 52) and verified against the
+  exact Floquet solver (Entry 42).
+- Also bounded: the approximation holds (population error < 5 %) for R ≤ 0.34–0.57 depending on S
+  (Entry 54); the first corrections are inter-order coherence and forward-beam sidebands at O(R²)
+  (Entry 51); no order-space localisation (Entry 51 C); the R ~ 1 main-line dark window is the known
+  X-ray/neutron–acoustic resonance (Entin; Iolin–Entin; Raitman; Entry 50).
+- Observability (Entry 54): the resurrected order dominates the phase-averaged exit intensity only
+  within |α_ac − integer| ≲ 1.3e-3 and an angular half-width w/q ≲ 2e-4; its share of the
+  |η − q| < 0.45 q integral is 4.4e-5. **Theory, not an experiment proposal** (Entry 51 E).
+- Class: **confirmed within the model** (full TT + Floquet, no fit); **"possibly new" only** until
+  Entin (JETP Lett. 26, 392 (1977); JETP 77, 214 (1979)) and Iolin–Entin (JETP 85, 1692 (1983)) are
+  read in full (Entry 50, poster_outline "Before printing"). Not re-opened tonight.
+- For the paper: P4 in `notes/paper_candidates.md` (N 4, E 1, G 2): a future project, not the thesis
+  paper.
+
+**What T1b leaves open.** B1's order-2 degeneracy breaking at larger S (Entry 72 iii); B2 for a
+long train at weak absorption (Entry 70 verdict); B3's windowed closed form (Entry 71 "Not done");
+B4's two unread Soviet papers.
+
+---
+
+## 2026-10-23 — Entry 75: the crystal factor as a closed form in the window length (T2a)
+
+**Why.** Entry 71 showed that H of Entry 65 is the infinite-window limit and gave a hand estimate
+for a 14 ns window (0.947 against TT 0.944). BACKLOG T2a: write that estimate as a closed form
+H(f; T_w), find the window where H is flat and the window where the Entry 65 factor 2 is back, and
+test the closed form against TT over the whole range. Script `explore/nb/e75_window_cf.py`.
+
+**Pre-registered rule (written before the run).** The closed form is the Entry 59/65 first-order
+form with each depth integral truncated at the window, i.e. 1/(Λ − isW) replaced by
+[1 − e^{(Λ − isW)T}]/(Λ − isW) (derivation in §1 below; it assumes a packet short against
+min(1/κ, x/π) and fully inside the window, the "CF-A" form; "CF-B" keeps the packet's Laplace
+transform and has no such assumption). Comparison: full semi-infinite TT (Entry 66 solver) at
+S/100 for the Entry 66 packet (87 GHz, 0.9 cycles), Si 400 at 17.48 keV and 8 keV, satellite
+frequencies 20–150 GHz, windows 0.14 ns to 300 ns. The weight is the Fourier component at |η| of
+|R(t)|² − |R0|² over [0, T_w] (static level subtracted, not the window mean, so that no leakage
+term enters either side; the difference from Entry 71's definition is reported, not used in the
+rule). Convergence checks: step 64 → 128 per cycle at one window, S/100 → S/1000 at one window;
+the analytic continuation of the unstrained Riccati past the packet is checked against the RK4
+integration at 14 ns (must reproduce Entry 71's 0.944 to 0.1 %).
+- If |W_TT / W_CF-A − 1| > 1 % at any (f, T_w) with the convergence checks passing, CF-A is
+  **rejected** as the closed form in T_w; CF-B is then tested with the same rule. If both fail,
+  "no closed form in T_w at first order" is recorded and the rule is not changed.
+- The flat window and the revival window are read from the closed form only after it passes:
+  T_flat = largest window with H(20)/H(100) ≥ 0.9, T_half where the ratio is halfway
+  (0.756 at 17.48 keV), T_90 where it is within 10 % of the steady 0.511. Each is confirmed by one
+  TT point.
+
+**Setup (as run).** Si 400 symmetric Bragg, 17.48 keV (κ = 0.0629 per Λ, Λ = 11.54 µm, Λ/v_L =
+1.369 ns) and 8 keV; Entry 66 packet g = e^{−s/τ} sin(q0 s), f0 = 87 GHz, 0.9 cycles (τ = 10 ps),
+plus 10 and 100 cycles (τ = 115 ps, 1.15 ns) for the scope of the packet-free form; peak strain
+1e-5 (S/100 of Entry 66) and 1e-6 for the convergence check; f = 20–150 GHz; 13 windows 0.14–300 ns.
+TT: the Entry 66 semi-infinite Riccati in s = t − ζ, RK4 (64 steps per cycle of the highest
+frequency) through the packet to s_p = 30 τ; beyond s_p the crystal is unstrained and the Riccati has
+constant coefficients, so u = (R − r1)/(R − r2) = u_p e^{Λ(s − s_p)} exactly, |R|² − |R0|² is a sum
+of exponentials and its Fourier integral over [s_p, T_w] is analytic: every window costs nothing
+beyond one RK4 through the packet (0.2 s; 17 s for the 100-cycle packet). Reproduce:
+`uv run python explore/nb/e75_window_cf.py run posthoc fig` (110 s), data `e75_window_cf.json`,
+log `e75_window_cf.log`, figure `figures/paper/e75_window_H.png`.
+
+**1. The closed form.** With δ(t) = −ic(1 − R0²) S ∫₀ᵗ e^{Λ(t−s)} g(s) ds (Entry 59 linearisation,
+Λ = i(η + iκ) + 2cR0), one integration by parts gives, for the window [0, T_w],
+
+    F_T(W) = ∫₀ᵀ δ e^{iWt} dt = ic(1 − R0²) S [G_T(W) − e^{(Λ+iW)T} L_T(Λ)] / (Λ + iW),
+    G_T(W) = ∫₀ᵀ g e^{iWs} ds,   L_T(Λ) = ∫₀ᵀ g e^{−Λs} ds,
+    Ĩ(η)  = conj(R0) F_T(η) + R0 conj(F_T(−η))     (Fourier component of |R|² − |R0|² at η).
+
+CF-B keeps G_T and L_T (analytic for the damped sinusoid). CF-A, the packet-free crystal factor, sets
+L_T = G(−η), G_T = G (packet short against the window and against 1/|Λ − iη|), which is the Entry 65
+cos-mode form with every kernel 1/(Λ − isW) replaced by [1 − e^{(Λ − isW)T}]/(Λ − isW); its
+resonant term alone is Entry 71's hand estimate, H(f; T_w) ≈ H_∞(f) |1 − e^{−(κ + iπ/x) T_w}|.
+H is the weight divided by |G_T(η)| |R0| πS/κ (kinematic law), so TT, CF-A and CF-B are compared as
+absolute numbers, not normalised at 100 GHz.
+
+**2. Checks.** Analytic continuation vs plain RK4 to 14 ns: ratio 1.00000–1.00049. Mean-subtracted
+weight at 14 ns normalised at 100 GHz: 20 GHz 0.944, i.e. Entry 71's TT number reproduced. Step
+64 → 128 per cycle: ≤ 2e-5. S/100 → S/1000: H changes by −0.19 % (20 GHz) to +0.27 % (150 GHz),
+so TT at S/100 carries a 0.2–0.3 % second-order residual; the 0.78–0.80 % of CF-B for the 10- and
+100-cycle packets falls to 0.08 % and 0.21 % at S/1000 (post-hoc run), so it is the same residual.
+
+**3. Result: the rule fires on CF-A, CF-B passes.** Worst |H_TT/H_CF − 1| over all (f, T_w):
+
+| packet | energy | CF-A (packet-free) | CF-B (packet kept) |
+|---|---|---|---|
+| 0.9 cycles, τ = 10 ps | 17.48 keV | **8.3 %** (0.14 ns, 87 GHz); 2.1 % at 0.5 ns; ≤ 0.6 % for T_w ≥ 1.4 ns | 0.30 % |
+| 0.9 cycles | 8 keV | 8.3 %; same pattern | 0.30 % |
+| 10 cycles, τ = 115 ps | both | 41 % | 0.78 % (0.08 % at S/1000) |
+| 100 cycles, τ = 1.15 ns | both | 49 % | 0.80 % (0.21 % at S/1000) |
+
+So **CF-A is rejected** as a 1 % closed form in T_w, per the rule; **CF-B is the closed form in
+T_w**: exact to first order in S at every window from 0.14 ns to 300 ns, both energies, three packet
+lengths, with the residual equal to the second-order term of TT. CF-A's failure is at windows
+T_w ≲ 1 ns ≈ 100 τ only, and its cause is in the dropped term: L_T(Λ) − G(−η) ≈ i(Λ − iη) ∂G/∂W, i.e.
+the packet's group delay t_g = ∂ arg G/∂W shortens the effective window to T_w − t_g. Post-hoc check
+(written after the run, not pre-registered): CF-A with T_w → T_w − t_g(η) is within 1.3 % at 0.14 ns
+and 0.5 % from 0.5 ns on, so the mechanism is identified but the Taylor form is not a 1 % closed form
+at 0.14 ns either (the remaining part is the phase of the −η image term, which CF-A takes from a
+cos mode). Nothing was changed in the rule; the packet-free form stands only for T_w ≳ 100 τ.
+
+H_TT(f; T_w) for the 0.9-cycle packet at 17.48 keV (CF-B agrees to 0.3 %; steady H of Entry 65 is
+0.480 at 20 GHz, 0.940 at 100 GHz; the full table is in the log):
+
+| T_w ns | 20 GHz | 40 | 100 | 150 | H(20)/H(100) |
+|---|---|---|---|---|---|
+| 0.14 | 0.0063 | 0.0064 | 0.0062 | 0.0064 | 1.020 |
+| 1.4 | 0.0620 | 0.0621 | 0.0621 | 0.0624 | 0.999 |
+| 5 | 0.203 | 0.204 | 0.205 | 0.206 | 0.990 |
+| 14 | 0.447 | 0.467 | 0.473 | 0.475 | 0.944 |
+| 22 | 0.553 | 0.613 | 0.633 | 0.636 | 0.873 |
+| 30 | 0.582 | 0.702 | 0.741 | 0.747 | 0.785 |
+| 50 | 0.505 | 0.777 | 0.880 | 0.893 | 0.574 |
+| 80 | 0.468 | 0.756 | 0.935 | 0.959 | 0.501 |
+| 300 | 0.479 | 0.737 | 0.940 | 0.975 | 0.510 |
+
+**4. The boundaries (CF-B, confirmed by TT at the same windows, 17.48 keV).**
+
+| | H(20)/H(100) target | T_w | CF-B | TT |
+|---|---|---|---|---|
+| T_flat (10 % departure from flat) | 0.900 | 19.6 ns | 0.899 | 0.897 |
+| T_half (halfway to steady) | 0.756 | 32.8 ns | 0.754 | 0.752 |
+| T_90 (within 10 % of steady) | 0.560 | 52.2 ns | 0.560 | 0.558 |
+
+Flat to 1 % up to 5 ns, to 6 % at 14 ns; the factor 2 is back at about 50 ns (window), i.e. a train
+≥ 440 µm long at v_L. H(f; T_w) is not monotonic: at 20 GHz it overshoots to 0.58 at 30 ns and
+undershoots to 0.47 at 80 ns before settling at 0.48, which is the |1 − e^{−(κ + iπ/x)T}| ripple of
+period 2x Λ/v_L (75 ns at 20 GHz) damped by e^{−κT}; TT reproduces the ripple (0.501 at 80 ns against
+0.511 steady). At 8 keV (1/κ = 4.8 ns) H is steady from 30 ns on and the departure from flat is 7 %.
+Below 0.5 ns the ratio oscillates by ±3 % at the difference frequency: the −η image term of a real
+signal truncated at T_w, of relative size 1/(2ηT_w); this is the "leakage" Entry 71 saw at 140 ps,
+and it is in CF-B (TT sits on the curve), so it is a property of the estimator, not noise.
+
+**5. What this changes.**
+- Entry 71's wording "flat to ±4 % (140 ps, leakage)" is right in kind; the ±4 % is the image term
+  plus the packet's group delay, both first order and both in CF-B. Entry 71's consequences stand.
+- The paper's H is now H(f; T_w) = CF-B, one formula from the ps packet (H flat, estimator = kinematic
+  law) to the steady train (Entry 65), with T_flat, T_half, T_90 as the design numbers for the
+  long-train experiment. The packet-free short form is a stated approximation (T_w ≳ 100 τ).
+- A time-resolved measurement whose window is 20–50 ns at Si 400 / 17.48 keV sits on the steep part
+  of the curve: there the crystal factor depends on the window length itself, which a measurer must
+  know to 10 % to keep H to 5 % (slope of the right panel of the figure).
+
+**Checks and scope.** Symmetric Bragg, σ, normal absorption, plane wave, quasi-static, semi-infinite;
+first order in S (ν ≪ 0.1); packet entering at t = 0 from the surface. Windows > 14 ns put the packet
+front 10–220 Λ (0.1–2.5 mm) deep, so a real crystal must be that thick and the quasi-static
+assumption (v_L/c ≪ 1) still holds; the plane-wave assumption is untouched by the depth. Anomalous
+absorption (T2c) and asymmetry not included. Class: **confirmed** (CF-B) and **falsified** (CF-A as
+a universal form); prior art for the windowed first-order form not searched (T2d).
+
+---
+
+## 2026-10-23 — Entry 76: does the running-mean degeneracy class survive larger S? (T2b, Entry 72 iii)
+
+**Why.** Entry 72 established at S = 1.5 that order n of the transient reads only the t_tr running
+mean of J_n(S A), so two histories with the same running mean are degenerate at that order (TT
+difference 9e-7). Entry 72 (iii) left open whether the class breaks when S grows, where the
+independent-satellite coupling is stronger and the ramp crosses Bessel extrema. BACKLOG T2b.
+Script `explore/nb/e76_degeneracy_S.py`.
+
+**Pre-registered rule (written before the run).** Laue, α = 0.5, α_ac = 40 (R = 0.0125, the
+Entry 67 and 72 conditions), no absorption, 16 carrier phases at fixed envelope time, η = +q and +2q
+in one call, 151 times on [0, 1.5] t_tr, `required_nz(α, α_ac, S, 2q)`. Scan S = 1.5, 2, 3, 4, 5, 6.
+For each S two constructions, both from the linear ramp A_1 = clip(s, 0, 1):
+- (a) degenerate at order 1: J_1(S A_2) = J_1(S A_1) + δ, δ = ε sin(2π(s − a)/(b − a)) on [a, b],
+  zero outside, ε = 0.1, with [a, b] chosen inside one monotone branch of J_1(S s) with margin so
+  that the inversion exists and is continuous (Newton from x0 = S A_1(s)); for S ≥ 4 a second pair
+  is built on the descending branch (S s between 1.84 and 5.33), where the strain is large.
+- (b) degenerate at order 2: the same with J_2 on its rising branch (S s ≤ 3.05).
+The window where the whole wobble sits inside [t − 1, t] is t ∈ [b, a + 1]; there Θ_n of the
+degenerate order is identical by construction (checked numerically, law difference < 1e-8).
+- **Broken at order n, at this S** if max over the window of |I_n^TT(history 2) − I_n^TT(history 1)|
+  exceeds 5e-4, i.e. ten times the Entry 72 convergence error 5e-5. The convergence error is
+  re-measured at every S (16 → 32 phases and n_z × 2 at three times); if it exceeds 5e-5 at some S,
+  the threshold there is ten times the measured value and this is stated.
+- **Class holds** if no S ≤ 6 and no construction exceeds the threshold.
+- Side checks, not part of the verdict: the non-degenerate order's TT difference agrees with the
+  law's to 1e-3 (Entry 72 ii), and |I_TT − I_law| per S is recorded as the law's own error.
+- One exploratory row after the scan, labelled as such: the (a) construction at S = 3 with a larger
+  coupling ratio R = 0.1 (α = 1, α_ac = 10), to see whether R rather than S is what breaks the class.
+  It is not covered by the rule above.
+
+**Setup (as run).** As pre-registered. The interval [a, b] is chosen automatically inside the
+branch so that J_n(S s) ± ε stays in the branch range (a ≥ 0.02, b ≤ 0.95); history 2 is built by
+Brent inversion on a 30001-point grid and interpolated. At S = 1.5 the automatic interval
+[0.134, 0.759] differs from Entry 72's [0.2, 0.7]; the order-1 result (1.2e-6 against 8.8e-7) is
+the same in kind. Two runs of under two minutes each (`runA` S ≤ 3, `runB` S ≥ 4 + exploratory),
+140 s in all. Reproduce: `uv run python explore/nb/e76_degeneracy_S.py runA runB fig`; data
+`e76_degeneracy_S.json`, log `e76_degeneracy_S.log`, figure `figures/paper/e76_degeneracy_S.png`.
+
+**Results.** Degenerate order: max over the window of |I_n^TT(2) − I_n^TT(1)|; "other" is the
+non-degenerate order in the same window (TT, with the law's value in brackets); threshold 5e-4 at
+every S (the re-measured convergence error never exceeded the Entry 72 value: 5.1e-5 at S = 1.5,
+falling to 1.3e-6 at S = 6).
+
+| S | (a) same Θ_1, J_1 rising: ΔI_1 | other ΔI_2 | (a2) same Θ_1, J_1 descending: ΔI_1 | other ΔI_2 | (b) same Θ_2: ΔI_2 | other ΔI_1 | law error |
+|---|---|---|---|---|---|---|---|
+| 1.5 | 1.2e-6 | 2.1e-3 (2.1e-3) | — | — | 1.2e-6 | 6.6e-3 (6.6e-3) | 6.7e-5 |
+| 2 | 1.1e-6 | 2.3e-3 | — | — | 1.1e-6 | 1.4e-2 | 8.2e-5 |
+| 3 | 1.3e-6 | 2.2e-3 | — | — | 3.0e-7 | 2.0e-2 | 5.0e-5 |
+| 4 | 2.0e-6 | 1.9e-3 | 1.9e-6 | 9.3e-3 | 5.2e-7 | 1.3e-2 | 5.3e-5 |
+| 5 | 2.6e-6 | 1.4e-3 | 2.3e-6 | 1.4e-2 | 4.0e-7 | 9.2e-3 | 6.5e-5 |
+| 6 | 3.0e-6 | 9.9e-4 | 1.7e-6 | 1.0e-2 | 8.3e-7 | 6.7e-3 | 7.1e-5 |
+
+- **Verdict under the rule: the class holds for every S ≤ 6, at both orders and on both branches
+  of J_1.** The largest degenerate-order difference is 3.0e-6 (S = 6, rising branch), 170 times
+  below the threshold and 20 times below the law's own absolute error. Outside the window the same
+  pairs differ by 2e-3 to 3e-2, so the test has power.
+- The non-degenerate order's TT difference agrees with the law's to ≤ 9e-6 at every S (Entry 72 ii
+  extended to S = 6), so the law predicts which order does distinguish the two histories and by how
+  much: in the (a2) pairs the order-2 difference is 1e-2 while order 1 is blind to 2e-6.
+- The law's absolute error stays 5e-5 to 8e-5 over S = 1.5–6 (Entry 67's 8.7e-5 at S ≤ 5 extended
+  to 6), while the convergence error falls to 1e-6; the 1e-6 degenerate-order residual is therefore
+  real but is 20–50 times smaller than the law's own error, i.e. the degeneracy is more exact than
+  the law that predicts it: whatever corrects the law at O(1e-4) depends on the history almost
+  only through Θ_n.
+- Exploratory row (not under the rule), R = 0.1 (α = 1, α_ac = 10): the degenerate-order residual
+  rises to 2.4e-4 (S = 3) and 2.9e-4 (S = 6, descending branch), still under 5e-4, with the law's
+  error at 2e-3. Going from R = 0.0125 to 0.1 multiplies the residual by about 170 (between R² = 64
+  and R³ = 512, two points only), so the coupling ratio R, not S, is what erodes the class, as
+  Entry 54 found for the independent-satellite approximation itself. At R ~ 0.2 the residual would
+  reach the threshold by that scaling; not run, not claimed.
+
+**Answer to Entry 72 (iii) / T2b.** Raising S to 6 does not break the running-mean class at
+R = 0.0125; at every order the transient still reads only Θ_n to 3e-6. The order-2 reading of
+Entry 72 (iii) is now quantified across S: the pairs that are degenerate at order 1 differ at
+order 2 by 1e-3 (S = 1.5–6, rising branch) to 1.4e-2 (descending branch), so a two-order readout
+resolves them when the order-2 satellite is measured to better than that. Class: **confirmed**
+(within the model; the class is a consequence of the Θ_n law, Entry 33 claim #21, not a new
+mechanism).
+
+**Scope.** Laue, no absorption, α = 0.5, R = 0.0125 (one exploratory R = 0.1), linear ramp with one
+sinusoidal zero-mean wobble of 5–10 % in J_n, orders 1 and 2, η exactly at nq. Bragg not run
+(Entry 30: tanh² reading is exact at resonance, so the same degeneracy is expected). Windows where
+the wobble is only partly inside [t − 1, t] are not degenerate and are not claimed to be.
+
+---
+
+## 2026-10-23 — Entry 77: anomalous absorption χ_ih in the Bragg solver, and its effect on H (T2c)
+
+**Why.** Entries 59, 65, 75 use normal absorption only (η → η + iκ). The closed form H(x, g) has
+one crystal parameter, g = κ/2πα = χ_i0/|χ_rh|. For Si 400, X0h (Entry 20, `e20_units_x0h.py`)
+gives χ_ih/χ_i0 = 0.925 at 8 keV and 0.931 at 17.48 keV, so the two Bloch modes have very different
+absorption (Borrmann) and the question is whether H needs χ_ih as a second parameter at
+κ/2πα ≈ 0.01. BACKLOG T2c. Script `explore/nb/e77_chi_ih.py`; src change in `tratt.core.solve_bragg`
+(new keyword `kappa_h`), tests in `tests/test_core.py`.
+
+**Model.** For a centrosymmetric crystal χ_h = χ_hbar = χ_rh + iχ_ih, so both couplings become
+one complex number: c = iπα → iπα + κ_h/2 with κ_h = 2πα χ_ih/|χ_rh| (same units as κ; κ_h/κ =
+χ_ih/χ_i0). The linearisation of Entries 59/75 goes through unchanged with complex c, so the
+"extended closed form" is the same formula evaluated with complex c (R0 from c R0² + iη_c R0 + c = 0,
+Λ = iη_c + 2cR0). Sign: with the plus sign the semi-infinite static reflectivity is higher at η < 0,
+which is the Borrmann (low-absorption) edge; in the usual convention η ∝ θ − θ_B that is the
+low-angle side, where the standing-wave antinodes sit between the planes. The physical statement
+is convention-free: the side with the higher static reflectivity is the low-absorption side, and
+H is reported on both sides.
+
+**Pre-registered rule (written before the run).**
+1. Src: `solve_bragg(..., kappa_h=0)` reproduces the present results bit for bit at kappa_h = 0
+   (existing tests unchanged, plus an explicit equality test). New tests: the thick absorbing slab
+   with kappa_h > 0 reaches the root |R| < 1 of c R² + i(η + iκ) R + c = 0 with complex c to 1e-5;
+   the static reflectivity at η = −πα exceeds that at +πα for kappa_h > 0 and the two are equal at
+   kappa_h = 0; |R|² ≤ 1 with modulation. The full test suite runs after the change ([HEAVY],
+   approved by boss, BelowNormal).
+2. TT check of the extended closed form: single mode at (g, x) = (0.0100, 3 / 10 / 30 / 100) with
+   κ_h = 0.93 κ, as in `e65_si400.py tt`, both signs of η. Must agree to 1 %, else the extension is
+   wrong and the src change is suspect (the rule is on the physics, not on this check).
+3. Physics: H(f) from the extended closed form with κ_h = 0.93 κ against κ_h = 0, Si 400 at
+   17.48 keV (g = 0.0100) and 8 keV (g = 0.0458), f = 5–300 GHz, both signs of η; steady and at the
+   windows 14 ns and 52 ns (CF-B of Entry 75 with complex c). **If max over 20–150 GHz of
+   |H(κ_h)/H(0) − 1| exceeds 1 % at g = 0.0100 (either sign), the closed form needs χ_ih as a second
+   parameter**; otherwise one parameter suffices for Si 400 and the anomalous term is a stated
+   ≤ 1 % correction. The band is the Chalise et al. band (Entry 57); the number is reported
+   outside it too.
+4. Expectation written down beforehand (kinematic estimate): −2cR0 ≈ iπ/x + κ_h/x, so the real part
+   of κ − 2cR0 changes by (κ_h/κ)/x, i.e. ~3 % at 20 GHz and ~0.7 % at 100 GHz at 17.48 keV, with
+   opposite signs on the two sides; the effect on H is that times κ²/(κ² + (π/x)²). This puts the
+   answer near the 1 % threshold; the rule is not adjusted for it.
+
+**Src change (f175d12).** `solve_bragg(..., kappa, kappa_h=0.0)`: `c = i pi alpha + kappa_h / 2` for
+both couplings; `kappa_h < 0` rejected. Tests added to `tests/test_core.py`: bit-identical at
+`kappa_h = 0` (`np.array_equal`), complex Darwin–Prins root to 1e-5 (κ_h = κ/2 so that the
+low-absorption mode still hides the back face: at κ_h → κ that mode absorbs at κ − κ_h and a
+thickness of 1/κ is no longer thick, which is the Borrmann effect itself, seen first as a failing
+test at κ_h = 11, κ = 12), higher static reflectivity at η = −πα than at +πα for κ_h > 0 and equal
+at κ_h = 0, and the negative-value check. Full suite after the change: 58 passed in 41 s
+(BelowNormal, approved HEAVY). README and DESIGN.md item 4 updated (Laue still has no χ_h'').
+
+**Reproduce.** `uv run python explore/nb/e77_chi_ih.py run ttp ttm conv60 fig` (run 2 s; ttp
+45 s; ttm 50 s; conv60 72 s); data `e77_chi_ih.json`, log `e77_chi_ih.log`, figure
+`figures/paper/e77_chi_ih.png`.
+
+**1. TT check of the extended closed form (rule item 2).** Single mode, g = 0.0100 (α = 95.4,
+κ = 6), κ_h = 0.93 κ, S = 0.002 and 48 RK4 steps per cycle (Entry 65 §3; the first run of this
+script copied the unconverged 24-step, S = 0.02 settings of `e65 tt` and gave 0.92 and 0.68 at
+x = 30 and 100, which Entry 65 §3 already says not to quote; corrected before the numbers below,
+rule unchanged).
+
+| x | η > 0: TT / closed form | κ_h effect, TT / closed form | η < 0: TT / closed form | κ_h effect, TT / closed form |
+|---|---|---|---|---|
+| 3 | 1.0000 | 0.9991 / 0.9989 | 0.9982 | 0.9996 / 1.0011 |
+| 10 | 1.0007 | 0.9957 / 0.9964 | 1.0028 | 1.0049 / 1.0036 |
+| 30 | 1.0001 | 0.9913 / 0.9919 | 1.0015 | 1.0091 / 1.0083 |
+| 60 | 0.9896 (48/cycle), **0.9968 (96/cycle)** | 0.9913 / 0.9910 | 0.9890 (48/cycle) | 1.0090 / 1.0093 |
+
+The extended closed form holds to 0.3 % once converged (x = 60: 0.9893 → 0.9966 without κ_h and
+0.9896 → 0.9968 with it, 48 → 96 steps per cycle, so the 1 % at 48 steps is the h⁴ phase error of
+Entry 65 §3(a), not the extension); the κ_h-specific change of the weight agrees between TT and the
+closed form to 0.03–0.15 % (η > 0) and 0.08–0.15 % (η < 0). Item 2 passes.
+
+**2. The rule (item 3): H(κ_h)/H(0) − 1 in per cent, Si 400, κ_h/κ = 0.93.**
+
+| f GHz | 5 | 10 | 20 | 30 | 40 | 60 | 87 | 100 | 150 | 200 | 300 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 17.48 keV, η > 0, steady | −0.25 | −0.47 | −0.78 | −0.90 | −0.91 | −0.81 | −0.65 | −0.59 | −0.42 | −0.32 | −0.22 |
+| 17.48 keV, η < 0, steady | +0.25 | +0.47 | +0.79 | +0.92 | +0.94 | +0.84 | +0.67 | +0.61 | +0.43 | +0.33 | +0.23 |
+| 17.48 keV, η > 0, 14 ns | −1.93 | −1.84 | −0.96 | −0.64 | −0.48 | −0.32 | −0.22 | −0.19 | −0.13 | −0.09 | −0.06 |
+| 17.48 keV, η > 0, 52 ns | +0.20 | −1.49 | −1.06 | **−1.33** | −1.13 | −0.81 | −0.57 | −0.50 | −0.34 | −0.25 | −0.17 |
+| 17.48 keV, η < 0, 52 ns | −0.25 | +1.68 | +1.11 | **+1.39** | +1.17 | +0.83 | +0.59 | +0.51 | +0.35 | +0.26 | +0.18 |
+| 8 keV, η > 0, steady | −3.62 | −3.90 | −2.78 | −2.01 | −1.54 | −1.03 | −0.69 | −0.59 | −0.37 | −0.25 | −0.14 |
+| 8 keV, η < 0, steady | +3.97 | +4.46 | +3.17 | +2.30 | +1.79 | +1.24 | +0.89 | +0.79 | +0.55 | +0.44 | +0.32 |
+
+Maximum over the 20–150 GHz band at g = 0.0100: steady 0.91 % (η > 0) and 0.94 % (η < 0);
+14 ns window 0.96 % and 0.98 %; 52 ns window 1.33 % and 1.39 %. **The rule fires, by the 52 ns
+window: the closed form needs χ_ih as a second parameter** (at the steady limit and at 14 ns it
+would have passed by 0.02–0.09 %, i.e. the answer sits on the threshold, as the pre-registered
+estimate of item 4 said it would). At 8 keV (g = 0.046) the correction is 2.8–3.2 % in the band
+and up to 4.5 % at 5–10 GHz. The pre-registered estimate (κ_h/κ)/x × κ²/(κ² + (π/x)²) gives
+0.9 % at 20 GHz and 0.6 % at 100 GHz at 17.48 keV, against 0.8 % and 0.6 % computed: the mechanism
+is the one written down, a 1/x correction to the effective absorption with opposite signs on the
+two sides of the Bragg peak.
+
+**3. What is new in kind: a side asymmetry.** With χ_ih the crystal factor differs between the
+two detunings of the same phonon frequency, H(−η)/H(+η) = 1.016–1.019 across 20–60 GHz at
+17.48 keV and 1.03–1.06 at 8 keV (up to 1.087 at 10 GHz), the Borrmann edge being the stronger one.
+A satellite pair measured at ±ω therefore has a ratio that does not depend on the strain spectrum
+at all (|G(ω)| cancels) and reads χ_ih/χ_i0 and x directly; without χ_ih the pair is symmetric at
+every window (CF-B is even in η when c is imaginary). Not pre-registered, so a statement of what
+the model predicts, not a claim; it is the natural check for the second parameter in an experiment.
+
+**Consequences.** (i) The paper's H carries two crystal parameters, g = χ_i0/|χ_rh| and
+χ_ih/χ_i0, both tabulated (X0h), so no fitting is added; the second is a ≤ 1 % steady correction
+at Si 400 / 17.48 keV, 1.4 % at the 52 ns window, 3–4 % at 8 keV. (ii) Entries 59, 65, 71, 75 keep
+their numbers to within those percentages. (iii) The sign convention of `kappa_h` is fixed by the
+physics (higher static reflectivity on the low-absorption edge, η < 0 in the code); the detuning
+side in an experiment is identified by the same static asymmetry. Class: **confirmed** (the
+extension, TT to 0.3 %), **rule fired** (second parameter needed at the 1 % level), side asymmetry
+**predicted, unverified**.
+
+**Scope.** Centrosymmetric crystal (χ_h = χ_hbar), symmetric Bragg, σ, semi-infinite, first order
+in S, X0h ratio 0.93 taken as the same at both energies (0.925 / 0.931). The Borrmann mode's
+absorption depth is 1/(κ − κ_h) ≈ 14/κ ≈ 2.6 mm at 17.48 keV, so inside the Darwin width (x ≲ 1)
+the window condition of Entry 75 changes qualitatively; not computed, outside the phonon band.
+Laue χ_h'' remains excluded (DESIGN.md item 4).
+
+---
+
+## 2026-10-23 — Entry 78: the ±η side asymmetry of the crystal factor, tested with a packet in full TT (T2f)
+
+**Why.** Entry 77 §3 found, in the closed form, that with χ_ih the two detunings ±η of one phonon
+frequency get different crystal factors, and that their ratio A(f; T_w) = W(−η)/W(+η) cancels the
+strain spectrum, so it reads χ_ih/χ_i0 directly. That was a single-mode, steady statement from the
+closed form. Here it is tested with the Entry 66 packet in full TT at finite windows. BACKLOG T2f
+(added by tratt with this evidence). Script `explore/nb/e78_side_asymmetry.py`.
+
+**Pre-registered rule (written before the run).** Full semi-infinite TT (Entry 75 machinery, RK4
+through the packet, analytic continuation after it) with complex coupling c = iπ + κ_h/2
+(α = 1 in Λ units), Si 400 at 17.48 keV (g = 0.0100) and 8 keV (g = 0.0458), Entry 66 packet
+(87 GHz, 0.9 cycles) at S/100 (peak strain 1e-5), f = 20, 30, 40, 60, 87, 100, 150 GHz at both
+detunings η = ±W, windows 1.4, 14, 52, 300 ns. A_TT = W_TT(−η)/W_TT(+η); A_CF from CF-B of
+Entry 75 with the same complex c.
+1. κ_h = 0: A_TT = 1 within 0.5 % at every (f, T_w) (the form is even in η when c is imaginary;
+   the residual is the second-order term of Entry 75 §2). If not, the TT setup is suspect and
+   nothing below is claimed.
+2. κ_h = 0.93 κ: if |A_TT/A_CF − 1| > 0.5 % at any (f, T_w), **the prediction is rejected** as
+   stated (the closed form would be missing something the packet sees). Otherwise the asymmetry
+   is confirmed in the model, with its size as computed.
+3. Size, reported not judged: A − 1 in the 20–150 GHz band at each window, and dA/d(κ_h/κ) from
+   the closed form (the sensitivity with which the pair reads χ_ih/χ_i0).
+Convergence: S/100 → S/1000 at 14 ns (A must move by less than 0.2 %), step 64 → 128 per cycle.
+Amendment before the run (boss, BACKLOG T2f wording): the cancellation of the strain spectrum in A is
+checked with two packet spectra, 0.9 and 10 cycles, which must give the same A to 0.5 % at κ_h = 0.93 κ.
+Run order: Entry 79 (T2e) was run before this entry, on boss's instruction.
+Amendment 2 before the run (physics cross-review, PR #16): the measured weight ratio W(−η)/W(+η)
+also carries |R0(−η)|/|R0(+η)|, which is not 1 with χ_ih. A is therefore defined on W/|R0| (that is
+H(−η)/H(+η), what the closed form predicts), and the raw weight ratio W(−η)/W(+η) is reported next
+to it with the static |R0| ratio, so that the proposal states that the pair needs the static rocking
+curve as a second measurement, or an estimator built on W/|R0|.
+
+
+**Run.** `uv run python explore/nb/e78_side_asymmetry.py run fig` (10 s); data `e78_side_asymmetry.json`,
+log `e78_side_asymmetry.log`, figure `figures/paper/e78_side_asymmetry.png`. The first run was at
+S/100 (peak strain 1e-5) and failed the pre-registered S-convergence check (A moved by 0.54 % to
+S/1000) and, by the same amount, rule 1 (0.60 %): the ±η ratio is sensitive to the second-order term
+at a level the single-side H of Entry 75 (0.2–0.3 %) is not. The convergence check exists for this;
+the run was repeated at S/1000 (peak strain 1e-6), with S/1000 → S/10000 moving A by 0.054 % and the
+step doubling by < 1e-5. Rules unchanged. Numbers below are the S/1000 run.
+
+**Results.** A = H(−η)/H(+η) − 1 in per cent, κ_h = 0.93 κ; TT (CF-B in brackets):
+
+| T_w | 20 GHz | 30 | 40 | 60 | 87 | 100 | 150 |
+|---|---|---|---|---|---|---|---|
+| 17.48 keV, 1.4 ns | 0.26 (0.22) | 0.19 (0.14) | 0.15 (0.11) | 0.09 (0.07) | 0.05 (0.05) | 0.03 (0.04) | −0.03 (0.03) |
+| 17.48 keV, 14 ns | 2.00 (1.95) | 1.35 (1.30) | 1.02 (0.98) | 0.67 (0.65) | 0.45 (0.45) | 0.38 (0.39) | 0.20 (0.26) |
+| 17.48 keV, 52 ns | 2.24 (2.20) | 2.80 (2.75) | 2.36 (2.32) | 1.68 (1.65) | 1.17 (1.17) | 1.01 (1.02) | 0.62 (0.68) |
+| 17.48 keV, 300 ns | 1.62 (1.58) | 1.89 (1.84) | 1.91 (1.87) | 1.69 (1.67) | 1.34 (1.34) | 1.19 (1.21) | 0.80 (0.86) |
+| 8 keV, 14 ns | 5.83 (5.79) | 3.95 (3.90) | 2.97 (2.93) | 1.98 (1.96) | 1.35 (1.35) | 1.16 (1.17) | 0.72 (0.78) |
+| 8 keV, 300 ns | 6.17 (6.12) | 4.44 (4.39) | 3.42 (3.38) | 2.31 (2.29) | 1.59 (1.59) | 1.37 (1.38) | 0.86 (0.92) |
+
+- Rule 1 (κ_h = 0): max |A_TT − 1| = 0.060 % at both energies (second-order residual at S/1000).
+  Passed.
+- Rule 2 (κ_h = 0.93 κ): max |A_TT/A_CF − 1| = 0.060 % at both energies, every window, every f.
+  **The prediction is confirmed in the model.**
+- Spectrum cancellation: the 0.9-cycle and 10-cycle packets give the same A to 0.105 % (both
+  energies). The strain spectrum cancels, as claimed.
+- The |R0| ratio: |R0(−η)|/|R0(+η)| = 1.0000 at every f here (x = 27–205, kinematic tail, where
+  R0 ≈ −c/(iη_c) is even in η to O(κ_h/2η) ~ 1e-4), so the raw weight ratio equals A to 1e-4 in
+  this band. The physics-review caveat applies inside and near the Darwin width (x ≲ a few), where
+  the static asymmetry is 10 % (Entry 77 test, η = ±πα); a proposal that reads χ_ih from a ±ω pair
+  in the phonon band needs no second measurement at Si 400, but must say so with the x range.
+- Size and sensitivity: at 17.48 keV A − 1 reaches 1.9 % (steady, 30–40 GHz) and 2.8 % at the
+  52 ns window (the window ripple of Entry 75 is not even in η); at 8 keV 6.2 % at 20 GHz.
+  dA/d(χ_ih/χ_i0) = 0.017–0.020 (17.48 keV, 20–60 GHz) and 0.068 (8 keV, 20 GHz): a 0.1 % ratio
+  measurement at 8 keV resolves χ_ih/χ_i0 to 0.015, i.e. the Debye–Waller factor of the
+  reflection; at 17.48 keV to 0.05.
+- At short windows the asymmetry vanishes (0.03–0.3 % at 1.4 ns), as it must: it is a property of
+  the long-window crystal factor, zero when H is flat.
+
+**Answer to T2f.** Confirmed within the model: with χ_ih the two detunings of one phonon frequency
+carry different crystal factors, the ratio is independent of the strain spectrum (two packets agree
+to 0.1 %) and of |R0| in the phonon band, and it is a direct measure of χ_ih/χ_i0 with sensitivity
+0.02–0.07 per unit. Class: **confirmed** (full TT, two energies, four windows, two packets, no fit);
+**not observed**; prior art for a ±ω Borrmann asymmetry of acoustic satellites not searched (T2d).
+
+**Scope.** Symmetric Bragg, σ, centrosymmetric, semi-infinite, linear in S (S/1000), packet from the
+surface, x ≥ 27. Inside the Darwin width the |R0| ratio must be carried (Entry 77 §3 caveat). The
+asymmetry rides on the long-window H, so it needs the same window condition as Entry 75.
+
+---
+
+## 2026-10-23 — Entry 79: is the coupling ratio R what breaks the running-mean degeneracy class? (T2e)
+
+**Why.** Entry 76 held the class to S = 6 at R = 0.0125 and found, in one exploratory row at
+R = 0.1, a residual 170 times larger. BACKLOG T2e (boss): raise R and find where the class breaks.
+Script `explore/nb/e79_degeneracy_R.py` (reuses `e76_degeneracy_S.one_case`).
+
+**Pre-registered rule (written before the run).** Laue, no absorption, α_ac = 10 fixed (ten acoustic
+periods in the slab, satellites resolved at every α used), α = 0.125, 0.5, 1, 2, 3, i.e.
+R = α/α_ac = 0.0125, 0.05, 0.1, 0.2, 0.3; constructions (a) S = 3 (J_1 rising) and (a2) S = 6
+(J_1 descending) of Entry 76, 16 phases, η = q and 2q, 151 times, convergence re-measured per case
+(16 → 32 phases, n_z × 2).
+- **R-boundary exists** if, at some R ≤ 0.3, the degenerate-order TT difference in the window
+  exceeds 5e-4 (or ten times the measured convergence error if that is larger); the smallest such
+  R is the boundary and the law's own error |I_TT − I_law| at that R is reported next to it.
+- **R-independent** if no R ≤ 0.3 exceeds it.
+- Reported, not judged: the power law of the residual against R over the five points, and whether
+  the residual stays below the law's own error (Entry 76 found 20–50× below at R = 0.0125).
+
+**Results** (`uv run python explore/nb/e79_degeneracy_R.py run fig`, 33 s; data
+`e79_degeneracy_R.json`, log `e79_degeneracy_R.log`, figure `figures/paper/e79_degeneracy_R.png`).
+Degenerate-order TT difference in the window (same Θ_1), threshold 5e-4 (the measured convergence
+error never exceeded 3e-5):
+
+| R (α) | (a) S = 3: ΔI_1 | law error | (a2) S = 6: ΔI_1 | law error | other order ΔI_2, TT vs law |
+|---|---|---|---|---|---|
+| 0.0125 (0.125) | 5.4e-6 | 7.8e-5 | 4.8e-6 | 9.0e-5 | agree to 4e-6 |
+| 0.05 (0.5) | 6.1e-5 | 6.1e-4 | 7.7e-5 | 1.1e-3 | 7e-5 |
+| 0.1 (1) | 2.4e-4 | 2.3e-3 | 2.9e-4 | 2.1e-3 | 3e-4 |
+| 0.2 (2) | **3.3e-3** | 3.2e-2 | **1.5e-3** | 1.7e-2 | 1e-3 / 2e-3 |
+| 0.3 (3) | 1.8e-2 | 1.1e-1 | 4.2e-3 | 8.0e-2 | 5e-3 / 1e-2 |
+
+- **Verdict under the rule: an R-boundary exists, at R = 0.2** for both constructions (R = 0.1
+  holds, 0.2 breaks; the boundary lies between). The law's own error at R = 0.2 is 1.7–3.2e-2,
+  ten times the degeneracy residual.
+- Power law of the residual: R^2.5 (a) and R^2.1 (a2) over the five points. At every R the
+  residual stays below the law's absolute error by a factor 7–25: the running-mean reading remains
+  more exact than the law that predicts it, all the way to R = 0.3 where the law is off by 10 %.
+- Not a function of R alone: at R = 0.0125 the residual is 5.4e-6 here (α = 0.125, α_ac = 10) and
+  1.3e-6 in Entry 76 (α = 0.5, α_ac = 40, same S = 3 construction). The scan fixes α_ac; a scan at
+  fixed α would separate the two dependences (not run).
+
+**Answer to T2e.** The variable that erodes the class is the coupling ratio, as the Entry 76
+exploratory row suggested; the class is exact to 5e-4 for R ≤ 0.1, which is the same bound as the
+independent-satellite rule of Entry 19, and fails by 3e-3 at R = 0.2 while the law is already off
+by 3 %. For the paper: "order n reads the running mean of J_n(S A)" is stated with R ≤ 0.1, the
+regime of every poster case. Class: **confirmed with a boundary** (within the model, Laue, two
+constructions, orders 1–2).
+
+**Scope.** Laue, no absorption, α_ac = 10, α = 0.125–3 (Pendellösung crossings at α ≥ 1 do not
+change the picture), S = 3 and 6, one wobble shape.
+
+---
+
+## 2026-10-23 — Entry 80: corrections to Entry 73 after the physics cross-review (u0 text; harmonic column withdrawn for the shear geometry)
+
+**Why.** Physics cross-review of PR #16 (cb86016) raised two points on Entry 73: (a) §1 says
+u0 = 7.6 pm × S; (b) the second-harmonic column uses the cumulative growth law of a longitudinal
+wave, while the geometry is a pure shear wave along ⟨100⟩. Both recomputed here; nothing run but
+constants (`uv run python -c`, numbers below).
+
+**(a) u0.** u0 = S d/2π with d(440) = 96.01 pm gives **15.28 pm × S**. The table of Entry 73 §2
+already has 15.3 (S = 1) and 91.7 (S = 6); only the sentence in §1 was wrong (it quoted the S = 0.5
+row). Verdicts unchanged, since they rest on the strain.
+
+**(b) Harmonics of a pure shear wave along a 4-fold axis.** Accepted, with the following reasons.
+- Symmetry: propagation along x = [100], polarisation u_y (h = 440 in plane). A rotation by π
+  about x is a symmetry of the cubic crystal and maps u_y → −u_y, so the elastic energy is even in
+  the shear strain ε_xy and contains no term cubic in it: there is no collinear, cumulative second
+  harmonic of the shear wave itself. This is the standard result for shear waves in isotropic solids
+  (Zarembo & Krasil'nikov, Sov. Phys. Usp. 13, 778 (1971): shear waves generate no second
+  harmonic, the first self-distortion is the third harmonic; to be re-read before citing) and the
+  argument above extends it to the ⟨100⟩ axis of a cubic crystal.
+- The quadratic term ε_xy² ε_xx drives a longitudinal component at 2ω. It is not phase-matched:
+  Δk = 2ω(1/v_T − 1/v_L) gives a coherence length π/Δk = 4.8 µm at 1 GHz and 2.4 µm at 2 GHz,
+  against L = 163–296 µm, so that component is bounded by (β/4) k ε L_coh ≈ 1e-4 (S = 1) to 1.3e-3
+  (S = 6, 2 GHz) of the shear strain. It is also longitudinal, u ∥ x, so h·u = 0 for the in-plane
+  440 reflection: it does not enter the X-ray phase at all.
+- The cubic self-distortion is of order γ (kL) ε²: (kL) ε² = 4.7e-8 (S = 1, 1 GHz) to 2.5e-5
+  (S = 6, 2 GHz, 30 keV), so even with a third-order constant of order 10 the third harmonic is
+  ≤ 3e-4 of the fundamental.
+- The convention point: for a longitudinal wave the strain second harmonic from
+  u2 = β k² u1² x/8 is ε2/ε1 = (β/4) k ε1 x, not (β/2); the (β/2) form is the fluid-acoustics one
+  (p2/p1 = β ε k x/2 with ε the acoustic Mach number). Entry 73's column was therefore 2× too large
+  even for the longitudinal case under the solid-state β. Moot here.
+
+**Consequence: the ε2/ε column of Entry 73 §2 is withdrawn for the shear geometry**, and the
+verdict table becomes
+
+| S | 1 GHz | 2 GHz |
+|---|---|---|
+| 0.5–2 | **feasible**: ε ≤ 3.3e-5, I ≤ 25 W/cm² (pulsed) | **feasible**: ε ≤ 6.6e-5, I ≤ 100 W/cm² |
+| 3–4 | **limit by drive power only**: I = 56–100 W/cm² | **limit by drive power only**: I = 230–400 W/cm² |
+| 6 | **limit by drive power only**: I = 230 W/cm² | **limit by drive power only**: I = 900 W/cm²; the wave itself stays sinusoidal to ≤ 1e-3 |
+
+Entry 73 §3's "above ~10 % the Entry 35 harmonic non-ideality applies" no longer has a case in this
+geometry; Entry 35 stays relevant for longitudinal geometries (Si 400 Bragg with a longitudinal
+wave, the Chalise geometry), where the (β/4) form applies. Linear elasticity, attenuation, R and
+β_qs statements of Entry 73 §4 stand. Drive power is now the only limit on the elastic side for all
+S ≤ 6 at 1–2 GHz; it remains unverified (DotFiles#57).
+
+**Scope.** Symmetry argument plus order estimates, not a nonlinear elastic computation; third-order
+constants of Si not looked up (γ ~ 10 assumed as an order); isotropic-solid literature statement to
+be re-read. The Zarembo & Krasil'nikov reference is from memory and goes on the T2d list.
+
+---
+
+## 2026-10-23 — Entry 81: asymmetric Bragg geometry is an exact rescaling of the symmetric solver; the geometry factor of H (T2g)
+
+**Why.** DESIGN.md item 2 and paper_candidates §4 list asymmetric geometry (γ_0 ≠ |γ_h|) as a
+solver extension to decide on before writing, because the χ_0 gauge of the Laue solver depends on
+symmetry. For Bragg the χ_0 term already enters R through η → η + iκ with
+κ = μL(1/γ_0 + 1/|γ_h|)/2 (docstring of `solve_bragg`), so the question is only what the two
+unequal coupling terms do. Derivation first, then a TT test of it. Script `explore/nb/e81_asym_map.py`.
+
+**Derivation.** Two-beam Bragg, depth z, D_0' = (1/γ_0)[a_0 D_0 + b e^{+iφ} D_h],
+D_h' = (1/γ_h)[(a_0 + iη') D_h + b e^{−iφ} D_0], γ_h < 0, a_0 = ikχ_0/2, b = ikCχ_h/2
+(centrosymmetric, one b). For R = D_h/D_0:
+
+    R' = −c_h e^{−iφ} − i η_c R − c_0 e^{+iφ} R²,   c_h = bL/|γ_h|,  c_0 = bL/γ_0,
+    i η_c = −a_0 L (1/γ_0 + 1/|γ_h|) − iη' L/|γ_h|.
+
+With R̃ = R √(c_0/c_h) = R √(|γ_h|/γ_0) this is the symmetric equation with one coupling
+c_eff = √(c_0 c_h) = bL/√(γ_0|γ_h|), i.e. α_asym = L|χ_rh|/(λ√(γ_0|γ_h|)) (the standard
+asymmetric extinction length), κ as above, and the same strain phase φ. So:
+- **no solver change is needed**: `solve_bragg(alpha_asym, eta, phi, kappa, kappa_h)` and
+  |R|² = |R̃|² γ_0/|γ_h| give the asymmetric case exactly (the γ_0/|γ_h| factor is the usual
+  asymmetry factor of the reflectivity);
+- H(x, g) keeps its form, with g → g_asym = g_sym (√b + 1/√b)/2, b = γ_0/|γ_h|, since
+  κ scales with (1/γ_0 + 1/|γ_h|)/2 and 2πα with 1/√(γ_0|γ_h|); x = f/f_D with f_D = v/Λ_asym;
+  the window condition of Entry 75 is in units of Λ_asym/v; χ_ih/χ_i0 is unchanged.
+
+**Pre-registered rule (written before the run).** Semi-infinite TT with the two couplings kept
+distinct (c_h ≠ c_0), Entry 66 packet at S/100, Si 400 / 17.48 keV constants, b = 4 (γ_0 = 2|γ_h|),
+η at ±20, ±100 GHz, against `e66.surface_R`-style symmetric integration at c_eff with R̃ rescaled:
+- if max |R_asym(t) − R̃(t) √(γ_0/|γ_h|)| over t ∈ [0, 14 ns] exceeds 1e-6 (both at the same
+  RK4 grid), **the mapping is wrong** and a solver extension is needed;
+- otherwise the mapping is exact and the geometry factor of H is g → g (√b + 1/√b)/2, reported
+  for Si 400 at b = 1, 2, 4, 10 from the closed form (H(20)/H(100) and the window numbers T_flat,
+  T_half, T_90 rescaled).
+
+**Run.** `uv run python explore/nb/e81_asym_map.py run` (11 s); data `e81_asym_map.json`, log
+`e81_asym_map.log`. The asymmetry angle χ is solved from b = sin(θ_B + χ)/sin(θ_B − χ) at
+θ_B = 15.14°; Λ_asym/Λ_sym = √(γ_0|γ_h|)/sin θ_B; the same peak strain 1e-5 (S is unit-free).
+
+**Results.**
+
+| b = γ_0/\|γ_h\| | χ | Λ_asym µm | g_asym = g (√b + 1/√b)/2 | max \|R_asym − √b R̃\| (packet grid) | W_asym/(b W̃) − 1 at 14 ns | H_TT(b)/CF-B(g_asym) worst |
+|---|---|---|---|---|---|---|
+| 0.5 | −5.15° | 10.84 | 0.01061 | 7e-17 | 2e-12 | 0.30 % |
+| 2 | +5.15° | 10.84 | 0.01061 | 1e-16 | 1e-12 | 0.30 % |
+| 4 | +9.22° | 9.12 | 0.01251 | 0 | 0 | 0.30 % |
+
+- **Mapping exact** (rule: < 1e-6; found machine precision), so `solve_bragg` already covers
+  asymmetric Bragg: call it with α_asym = L|χ_rh|/(λ√(γ_0|γ_h|)), κ = μL(1/γ_0 + 1/|γ_h|)/2,
+  κ_h likewise, and multiply |R|² by γ_0/|γ_h|. The symmetric limit is the same function, so the
+  bit-identity test of T2g is satisfied by construction; no src change, no new test.
+- **One geometry factor** (boss's criterion, TT vs closed form 0.3 %): H keeps its form with
+  g → g (√b + 1/√b)/2 and the frequency axis in units of f_D = v/Λ_asym; the 0.30 % is the Entry 75
+  second-order residual at S/100, identical for all b (as it must be for an exact mapping). b and
+  1/b give the same H, since the factor is symmetric under √b ↔ 1/√b.
+
+Closed-form consequences for Si 400 at 17.48 keV (g_sym = 0.0100), 20 against 100 GHz:
+
+| b | Λ_asym µm | g_asym | steady H(20) / H(100) | ratio | T_flat / T_half / T_90 ns |
+|---|---|---|---|---|---|
+| 1 | 11.54 | 0.01001 | 0.480 / 0.939 | 0.511 | 19.6 / 32.7 / 52.3 |
+| 2 (or 0.5) | 10.84 | 0.01061 | 0.479 / 0.939 | 0.510 | 17.3 / 28.8 / 46.2 |
+| 4 | 9.12 | 0.01251 | 0.475 / 0.938 | 0.507 | 12.2 / 20.5 / 32.7 |
+| 10 | 6.48 | 0.01740 | 0.471 / 0.937 | 0.503 | 6.1 / 10.4 / 16.5 |
+
+- The steady crystal factor is almost geometry-independent at these x (the 20 GHz suppression
+  moves from 0.480 to 0.471 at b = 10), because in the kinematic tail H ≈ κ/|κ + iπ/x| depends on
+  g and x through the product g·x = κ/(2π)·f/f_D ∝ κΛ/v·f, and κΛ ∝ (1/γ_0 + 1/|γ_h|)√(γ_0|γ_h|)
+  changes by only (√b + 1/√b)/2 while the frequency scale changes by 1/Λ_asym — the two nearly
+  cancel for the ratio.
+- The **window numbers do shrink**: T_90 goes from 52 ns (symmetric) to 33 ns at b = 4 and 16.5 ns
+  at b = 10 (χ = 12.5°, grazing exit at 2.7°), because both the extinction depth Λ_asym and 1/κ in
+  physical units get shorter. So an asymmetric cut is a way to bring the steady H within a shorter
+  delay scan, at the price of the γ_0/|γ_h| intensity factor and a grazing beam.
+
+**Answer to T2g.** Asymmetric Bragg needs no solver extension: it is an exact rescaling, and the
+crystal factor has one geometry factor, g → g (√b + 1/√b)/2, with the window condition rescaled by
+Λ_asym. Class: **confirmed** (algebra + TT to machine precision; closed form at the usual 0.3 %).
+The open decision in paper_candidates §4 is closed. Laue asymmetry is a different matter (the χ_0
+term does not cancel there) and is not touched.
+
+**Scope.** σ polarisation, centrosymmetric, bulk wave along the surface normal (φ = φ(z, t)
+unchanged by the cut), semi-infinite; grazing-exit geometries (b ≳ 10) bring in the specular
+refraction and beam-footprint effects the plane-wave model does not have.
+
+---
+
+## 2026-10-23 — Entry 82: beam divergence and the crystal factor: angular convolution of H (T2k)
+
+**Why.** `notes/referee_pass.md` objection 2 names the cheapest missing computation: what a
+divergent (or polychromatic) beam does to H(f; T_w). BACKLOG T2k. Script `explore/nb/e82_divergence.py`.
+
+**Physics written down before the run.** A ray at detuning η' = η + δ rings, after the packet, at
+its own frequency Im Λ(η') ≈ η' with damping Re Λ ≈ −κ (Fig. 1a, Entry 75 §1). The Fourier
+weight at the nominal ω = |η| therefore collects, from a beam of angular distribution p(δ), only
+the rays within the ringing linewidth: the resonant denominator Λ(η') − iW = i(δ − π/x) − κ + …
+is a complex Lorentzian in δ of half-width κ, centred at the extinction shift π/x. The beam-averaged
+weight is the coherent sum W_conv(ω) = |∫ p(δ) Ĩ(η + δ; ω, T_w) dδ| (the rays' intensities add; the
+oscillating parts add as phasors). Expectations, to be confirmed or refuted by TT:
+(i) for σ ≫ κ + π/x the integral gives π p(π/x) × (the single-ray value × |κ − 2cR0|), so
+H_conv(f) → κ √(π/2)/σ, **flat in f** and reduced by κ/σ; the steady crystal factor of Entry 65
+and the window law of Entry 75 are then unobservable; (ii) with a finite window the ray response
+has width ~1/T_w instead of κ, so the window law survives only while 1/T_w ≳ σ, i.e. T_w ≲ 1/σ
+(0.7 ns at σ = 0.3 Darwin half-widths): the effective window is min(T_w, 1/σ, 1/κ); (iii) in
+angle, κ is 0.01 (17.48 keV) and 0.046 (8 keV) Darwin half-widths: 0.03 µrad and 0.4 µrad; in
+energy, 2 and 4 meV. If (i) holds, the long-window H needs a beam collimated and monochromatised
+to that level, or an angle-resolving detector, and the ps-packet proposal must say so.
+
+**Pre-registered rule (BACKLOG T2k, written before the run).** Full semi-infinite TT (Entry 75
+machinery), Entry 66 packet at S/1000, Si 400 / 17.48 keV, f = 20, 40, 100 GHz, windows 1.4,
+14, 52, 300 ns, Gaussian angular distribution of width σ = 0.3, 1, 3 Darwin half-widths (σ_η =
+2πσ in η units), on a non-uniform δ grid that resolves κ (spacing ≤ κ/3 near the centre) and
+reaches ±6σ. TT angle average: W_TT,conv(ω) = |Σ_k p_k Ĩ_TT(η + δ_k; ω)|, each ray a full TT run
+(vectorised over η). Closed form: the same sum with CF-B of Entry 75 evaluated at detuning η + δ_k
+and Fourier frequency ω = |η|.
+- If |W_TT,conv / W_CF,conv − 1| > 1 % at any (f, σ, T_w), "a divergence term is needed";
+  otherwise "closed form retained" (the convolution of CF-B is the closed form with divergence).
+- Reported either way: H_conv(f; T_w, σ)/H_conv(100 GHz) against T_w for each σ, with T_flat and
+  T_90 where they still exist, and H_conv/H_single at 300 ns against the expectation κ√(π/2)/σ.
+- Convergence: δ-grid spacing halved at one (f, σ, T_w) must change W_conv by < 0.2 %.
+
+**Run.** `uv run python explore/nb/e82_divergence.py run fig` (13 s); data `e82_divergence.json`, log
+`e82_divergence.log`, figure `figures/paper/e82_divergence.png`. The first run used a δ grid with
+du = 0.1 and failed the pre-registered 0.2 % grid-convergence check by 2 %; the grid was refined to
+du = 0.025 (527–711 rays per σ), where halving again changes W_conv by 6e-7 relative. Rule unchanged.
+
+**Results.** H_conv = beam-averaged Fourier weight at ω = |η| over the kinematic law of the nominal
+ray (so σ = 0 is the Entry 75 H); Si 400, 17.48 keV, S/1000.
+
+| σ (Darwin half-widths) | T_w | H_conv at 20 / 40 / 100 GHz | H(20)/H(100) | TT / closed form |
+|---|---|---|---|---|
+| 0 | 1.4 / 14 / 52 / 300 ns | 0.062 / 0.448 / 0.497 / 0.480 (20 GHz) | 1.001 / 0.946 / 0.561 / 0.511 | 0.9998–1.0001 |
+| 0.3 | 1.4 / 14 / 52 / 300 ns | 0.0386 / 0.0406 / 0.0406 / 0.0406 (all f equal to 0.3 %) | 0.999 / 0.998 / 0.998 / 0.998 | 0.9998–1.0001 |
+| 1 | all | 0.0124 (all f, all T_w) | 1.000–1.004 | 0.9998–1.0001 |
+| 3 | all | 0.0042 (all f, all T_w) | 1.007–1.013 | 0.9998–1.0001 |
+
+- **Rule: closed form retained.** Worst |W_TT,conv/W_CF,conv − 1| = 0.021 % over all (f, σ, T_w):
+  the convolution of CF-B over the beam is the closed form with divergence; no extra term.
+- **The expectation (i) holds.** For σ ≥ 0.3 Darwin half-widths H_conv is flat in f to 0.3 %
+  (σ = 0.3) and 1.3 % (σ = 3) at every window, and its value is κ√(π/2)/σ_η: 0.0418 / 0.0125 /
+  0.0042 expected against 0.0407 / 0.0124 / 0.0042 found (3 % low at σ = 0.3, where σ_η = 1.9 is
+  only 14× the Lorentzian half-width κ + π/x = 0.13 at 20 GHz).
+- **Expectation (ii) holds.** The window law disappears: H_conv is the same at 1.4 ns and at
+  300 ns (0.0386 vs 0.0406 at σ = 0.3, the 5 % difference being the 1/σ_η = 0.53 Λ/v = 0.7 ns
+  coherence time against the 1.4 ns window). The effective window is min(T_w, 1/σ_η, 1/κ); for
+  σ_η ≫ κ it is 1/σ_η, independent of f, which is why the crystal factor's shape is gone.
+- **Scale (iii).** κ in Darwin half-widths is g: at 17.48 keV the ringing half-width is 0.032 µrad
+  (Darwin half-width 3.18 µrad) or 2.1 meV; at 8 keV 0.38 µrad (of 8.33 µrad) or 4.4 meV. T_flat
+  and T_90 exist only for σ ≲ 0.01–0.05 Darwin half-widths; at σ ≥ 0.3 the ratio never departs
+  from 1 by 10 % and the boundaries do not exist.
+
+**What this means (the honest consequence for the paper).**
+1. The steady crystal factor of Entry 65, the window law and design numbers of Entry 75, the χ_ih
+   correction of Entry 77 and the ±η asymmetry of Entry 78 are properties of a *single ray*: they
+   are observable only with an incident beam whose spread in detuning is below the ringing width
+   κ + π/x, i.e. collimated to ≲ 0.03–0.4 µrad **and** monochromatic to ≲ 2–4 meV at Si 400, or
+   with an angle-resolving detector of that resolution (which removes the angular part only; the
+   energy part needs the monochromator). Ordinary beams (µrad, 1e-4 bandwidth = 35 µrad-equivalent
+   at a Si 111 monochromator) are 100–1000× too broad.
+2. For any such ordinary beam the measured Fourier weight is the **kinematic law times a flat
+   factor** κ√(π/2)/σ_η: the ringing of different rays dephases after 1/σ_η (0.7 ns at
+   σ = 0.3 half-widths, 0.07 ns at 3), so the estimator "divide by |R0|/ω" is correct as it stands,
+   with no crystal factor, as soon as the window exceeds the coherence time. This is the practical
+   content for the ps-ultrasonics community: Chalise et al.'s flat crystal factor (Entry 71) is
+   not only because their window is short but because any real beam makes it flat.
+3. The flat factor κ√(π/2)/σ_η is itself a measurable: it reads the beam's spread in detuning
+   (angle plus bandwidth) in units of the absorption, i.e. the coherence time of the ringing.
+   Not pre-registered; stated, not claimed.
+4. P1's experimental weight falls: the long-window measurement is an inelastic-scattering-grade
+   (meV) experiment, not a routine delay scan. The ±η asymmetry (Entry 78) is odd in δ and averages
+   to zero over a symmetric beam, so it also needs the single-ray resolution. The formation law
+   (P2) is a different observable (satellite centre intensity at η = q with S ~ 1) and is not
+   addressed here; its divergence sensitivity is the satellite's own rocking width (α|J_n| Darwin
+   half-widths), a separate question.
+5. Entries 65, 71, 75, 77, 78, 81 stand as single-ray results; what changes is their experimental
+   reach, which `notes/paper_candidates.md` and `notes/experiment_proposal.md` now state.
+
+**Class.** Confirmed (full TT beam average vs closed form 0.02 %; the flat limit from the first-
+order lineshape). Prior art: that a crystal's impulse response rings at the detuning and dephases
+over the beam's angular acceptance is textbook dynamical diffraction; its consequence for the
+Fourier-weight estimator was not found stated in the papers read (T2d unread list applies).
+
+**Scope.** Gaussian spread in detuning (angle and bandwidth combined into one σ), first order,
+Si 400 / 17.48 keV, f = 20–100 GHz, symmetric Bragg, σ polarisation. The energy-to-detuning
+conversion uses tan θ_B (symmetric Bragg). Not run at 8 keV (same formula, g = 0.046).
+
+---
+
+## 2026-10-23 — Entry 83: the beam condition at GHz-train frequencies, x ≈ 1–10 (T2m)
+
+**Why.** Entry 82 was run at x = f/f_D = 27–137 (the 20–100 GHz band), where the ringing
+half-width κ + π/x is 0.01–0.02 Darwin half-widths. For a GHz train x ≈ 1–5 and the extinction
+term π/x dominates: in Darwin half-widths the width is g + 1/(2x) = 0.15–0.5, so an ordinary
+high-resolution beam may already resolve it. BACKLOG T2m. Script `explore/nb/e83_lowx.py`
+(reuses the Entry 82 functions).
+
+**Pre-registered rule (BACKLOG T2m, written before the run).** Si 400 at 17.48 keV (g = 0.0100)
+and 8 keV (g = 0.0458), symmetric Bragg, Entry 66 packet at S/1000 (its spectrum at 0.5–8 GHz is
+finite and cancels in the ratio), x = 1, 2, 5, 10 (f = x f_D: 0.73–7.3 GHz at 17.48 keV, 0.52–5.2
+GHz at 8 keV), windows 52 and 300 ns, Gaussian beam spread σ = 0.03, 0.1, 0.2, 0.3, 0.5, 1, 2
+Darwin half-widths. For each (E, x, T_w) the table gives H_conv/H_single and the largest σ at
+which |H_conv/H_single − 1| ≤ 5 % (linear interpolation between scanned σ), in Darwin half-widths,
+µrad and meV.
+- If that σ_max at x = 1–5 exceeds ordinary beamline values (a few µrad in angle, a few meV to
+  tens of meV in energy with a high-resolution monochromator; ID28/HERIX-class), **"the GHz train
+  is measurable with an ordinary beam"** and the E scores of P2 and P1+P2 are re-evaluated;
+  otherwise "single-ray condition stands".
+- Expectation written beforehand: a Gaussian average of a Lorentzian of half-width w leaves the
+  centre value within 5 % for σ ≲ 0.25 w, so σ_max ≈ 0.25 (g + 1/(2x)) half-widths: 0.13 (x = 1),
+  0.07 (x = 2), 0.03 (x = 5) at 17.48 keV, i.e. 0.4, 0.2, 0.1 µrad; at 8 keV 1.2, 0.6, 0.4 µrad and
+  the corresponding meV. If this holds the relaxation is real but to ~µrad, not to "ordinary".
+- Convergence: δ-grid halving at one (E, x, σ, T_w) must change W_conv by < 0.2 %; TT vs closed
+  form convolution must agree to 1 % (else the Entry 82 setup fails at low x and nothing is claimed).
+
+**Run.** `uv run python explore/nb/e83_lowx.py run fig` (17 s); data `e83_lowx.json`, log
+`e83_lowx.log`, figure `figures/paper/e83_lowx.png`. TT beam average vs closed-form convolution:
+worst 0.24 % (rule: 1 %); δ-grid halving changes W_conv by < 1e-7. Windows 52 and 300 ns give the
+same numbers at 8 keV and differ by ≤ 2 % at 17.48 keV; the 300 ns (steady) values are quoted.
+
+**Results.** H_conv/H_single at 300 ns (σ in Darwin half-widths):
+
+| E | x (f) | σ = 0.03 | 0.1 | 0.2 | 0.3 | 0.5 | 1 | 2 | σ_max (5 %) |
+|---|---|---|---|---|---|---|---|---|---|
+| 17.48 keV | 1 (0.73 GHz) | 1.14 | 1.45 | 2.01 | 2.00 | 1.56 | 0.85 | 0.23 | < 0.03 hw (< 0.1 µrad, < 6 meV) |
+| | 2 (1.46 GHz) | 1.01 | 1.21 | 1.08 | 0.83 | 0.55 | 0.29 | 0.13 | 0.043 hw = 0.14 µrad = 9 meV |
+| | 5 (3.65 GHz) | 1.12 | 0.97 | 0.57 | 0.39 | 0.24 | 0.13 | 0.07 | < 0.03 hw |
+| | 10 (7.3 GHz) | 1.14 | 0.56 | 0.30 | 0.21 | 0.13 | 0.06 | 0.03 | < 0.03 hw |
+| 8 keV | 1 (0.74 GHz) | 1.01 | 1.07 | 1.28 | 1.24 | 0.96 | 0.51 | 0.14 | 0.076 hw = 0.63 µrad = 7 meV |
+| | 2 (1.49 GHz) | 1.01 | 1.13 | 0.99 | 0.78 | 0.54 | 0.29 | 0.12 | 0.053 hw = 0.44 µrad = 5 meV |
+| | 5 (3.72 GHz) | 1.04 | 0.86 | 0.55 | 0.40 | 0.25 | 0.14 | 0.08 | 0.037 hw = 0.31 µrad = 3.6 meV |
+| | 10 (7.44 GHz) | 0.95 | 0.59 | 0.35 | 0.25 | 0.16 | 0.08 | 0.04 | 0.031 hw = 0.26 µrad = 2.9 meV |
+
+(hw = Darwin half-width: 3.18 µrad / 206 meV at 17.48 keV, 8.33 µrad / 96 meV at 8 keV. "< 0.03"
+means the smallest scanned σ already departs by more than 5 %; the scan does not resolve below it.)
+
+- **Verdict under the rule: the single-ray condition stands.** The relaxation at low x is real
+  but modest: at 8 keV the 5 % tolerance allows 0.6 µrad / 7 meV at x = 1 and 0.4 µrad / 5 meV at
+  x = 2, against 0.38 µrad / 4.4 meV at x ≥ 27 (Entry 82); at 17.48 keV it is ≤ 0.14 µrad / 9 meV.
+  None of this is "a few µrad"; in energy, 5–9 meV is a high-resolution monochromator, not an
+  ordinary one. The E scores of P2 and P1+P2 are therefore not raised on this account.
+- The pre-run expectation σ_max ≈ 0.25 (g + 1/(2x)) was too optimistic by about 2× (0.136 vs
+  0.076 at x = 1, 8 keV) and wrong in form at x ≲ 2: there the beam average first *raises* the
+  weight (up to 2.0× at 17.48 keV, 1.3× at 8 keV, for σ = 0.2–0.3 hw) before suppressing it,
+  because the single-ray resonance is centred at the extinction shift π/x away from the nominal
+  detuning (0.5 Darwin half-widths at x = 1): a beam of that width lands on the peak that the
+  nominal ray misses. The 5 % criterion is therefore violated by overshoot, not only by
+  dephasing, and the beam-averaged factor at x ~ 1–2 is a strong, non-monotonic function of σ.
+- At σ ≥ 1 hw the flat law of Entry 82 is approached only for x ≳ 10 (17.48 keV: H_conv = 0.0069
+  at x = 10 against κ√(π/2)/σ_η = 0.0063 at σ = 2 hw); at x = 1–5 the beam-averaged factor is
+  smaller still (0.0009–0.0073), so the "ordinary beam → kinematic law × flat factor" statement
+  holds for the ps-packet band and not for a GHz train, where the factor depends on x and σ
+  together.
+
+**What this changes.** (i) For the GHz-train (P2) apparatus the beam condition is 0.3–0.6 µrad
+and 4–7 meV at 8 keV, somewhat easier than for the ps band but still a high-resolution beam;
+`notes/experiment_proposal.md` §0 is corrected (the "ordinary high-resolution beam" sentence is
+withdrawn). (ii) DotFiles#56 (poster Q&A on the withdrawn Si 400 factor 2) gets the stronger
+reason: with an ordinary beam there is no crystal factor at all in the ps band, and at GHz the
+beam-averaged factor is not the single-ray one either. (iii) The satellite-centre observable of
+P2 (formation law at η = q, S ~ 1) was not computed here; its divergence sensitivity is a separate
+question (the satellite's own rocking width, α|J_n| Darwin half-widths) and stays open.
+
+**Class.** Confirmed (full TT beam average, two energies, four x, seven σ, two windows, no fit).
+**Scope.** As Entry 82; x = 1 sits at the Darwin edge where the kinematic normalisation is only a
+common factor; the Entry 66 packet's spectrum at 0.7–7 GHz cancels in the ratio; symmetric Bragg
+Si 400, while the poster's train is Si 440 Laue (not computed; the Laue satellite is a different
+observable).
+
+**Addendum to Entries 82–83 after the physics cross-review (PR #16, same day).** (a) Independent
+reproduction of Entry 82 agreed (0.0406 / 0.0124 / 0.561). (b) The phasor sum is exact for any
+transverse coherence (reflection diagonal in k_x, Parseval over exit angles), stronger than the
+"intensities add" argument used above; it fails only for a partly angle-resolving detector with a
+coherent beam, or a laterally non-uniform front. (c) **Correction:** the quadrature sum of angle and
+bandwidth ("1e-4 bandwidth = 35 µrad-equivalent") assumes them uncorrelated; after a crystal
+monochromator they are DuMond-correlated and only the projection onto η counts: dispersive
+(Si 111 DCM + Si 400 sample) is as written, a non-dispersive (+,−) matched arrangement cancels the
+bandwidth in η and leaves the first crystal's intrinsic width, and an asymmetric (+,−) collimator
+with |b| ≪ 1 gives σ_η ≈ √|b| half-widths with routine optics. σ_η must be computed from the optics.
+The single-ray numbers (0.03–0.4 µrad, 2–4 meV) stand as the requirement on σ_η. (d) The 2 meV
+requirement is transform-compatible with ≥ 0.9 ps pulses; synchrotron bunches of 50–100 ps cannot
+resolve 20 GHz regardless. (e) **Same phenomenon, two normalisations:** physics' exploratory
+CF-B value "0.756 at x = 2, σ = 0.3, g = 0.010" is H_conv(x = 2)/H_conv(flat) = p(π/x)/p(0) ≈
+exp[−(π/x)²/2σ_η²] = 0.71, and Entry 83 gives exactly that: 0.830 × 0.037 / 0.0406 = 0.756. Both
+say: an ordinary beam does not see the single-ray H, but in the GHz regime (x ≲ 10, f ≲ f_D/(2σ))
+it sees a frequency-dependent, non-monotonic beam-averaged factor that carries the beam's
+η-distribution at the extinction shift π/x; this factor is computable (CF-B convolution, TT to
+0.24 %) and falsifiable once σ_η is known from the optics. It is a pre-registration candidate
+(not run as such; the Entry 83 scan is its first map), and it means P1 + P2 still share an
+observable in the GHz regime even though the single-ray H needs an IXS-grade beam.
+
+---
+
+## 2026-10-23 — Entry 84: beam divergence and the formation law at the satellite centre (T2n)
+
+**Why.** Entries 82–83 settled the beam condition for the Fourier-weight estimator (P1). The
+poster's observable (P2) is different: the centre intensity of the n-th satellite, I_n(t̃) =
+sin²(πα|J_n(S)|t̃) in Laue, tanh² in Bragg (Entries 1, 9; Fig. 4b), a step-front drive at S ~ 1.
+Its angular scale is the satellite's own rocking width, w_n = 2πα|J_n(S)| in η (the Darwin-like
+half-width with coupling α_n = α|J_n|), which is |J_n(S)| = 0.3–0.6 main Darwin half-widths, i.e.
+0.5–1 µrad at Si 440 / 17.48 keV. BACKLOG T2n. Script `explore/nb/e84_satellite_divergence.py`.
+
+**Pre-registered rule (BACKLOG T2n, written before the run).** The four poster cases
+(S, α, n) = (0.5, 2, 1), (1.5, 2, 1), (2, 4, 2), (1.5, 4, 1), α_ac = 20, step front, Laue and Bragg,
+t̃ = 0–1 (61 points + the poster's offset 0.0037), full TT `rocking_cube` on an η grid
+nq + δ with spacing w_n/40 to ±5σ_η, Gaussian weights; σ_η = 0.1, 0.3, 1 × w_n. Metrics on the
+first maximum of I_n(t̃) (parabolic interpolation): its time (the "period") and its height (the
+"amplitude"), beam-averaged against single-ray.
+- **"P2 is measurable with an ordinary beam"** if at σ_η = 1 × w_n both |Δperiod| ≤ 1 % and
+  |Δamplitude| ≤ 5 % in every case and geometry; otherwise the table of the largest σ_η meeting
+  both, with w_n in µrad for Si 440 / 17.48 keV (Laue) and Si 400 / 8 keV (Bragg).
+- Check, not verdict: the beam average of the independent-satellite closed form (two-beam slab of
+  thickness t̃ with coupling α_n at detuning δ, computed with the lossless solvers at φ = 0 by the
+  scaling α → α_n t̃, η → δ t̃) must agree with the TT beam average to 2 %, else the independent-
+  satellite picture fails off-centre and the closed form is not used.
+- Expectation written beforehand: the satellite rocking curve at the first maximum has half-width
+  ≈ w_n, so σ_η = 0.3 w_n should cost ~5–10 % in amplitude and shift the maximum earlier by a few
+  per cent, and σ_η = w_n should halve the amplitude: the rule is expected to fail at 1 × w_n and
+  the condition to land at σ_η ≈ 0.2–0.3 w_n, i.e. 0.1–0.3 µrad — the same sub-µrad class as P1.
+- Reported, not pre-registered: for σ_η ≫ w_n the beam average becomes the integrated satellite
+  population, P_n(t̃) ∝ ∫_0^{2πα_n t̃} J_0(x) dx in Laue (the classic integrated Laue intensity of a
+  slab of coupling α_n t̃), which is a divergence-free observable with its own formation law; its
+  TT beam average at σ_η = 3 w_n is compared with that integral.
+
+**Run.** `uv run python explore/nb/e84_satellite_divergence.py run fig` (131 s, one run; eight
+case–geometry pairs × five σ); data `e84_satellite_divergence.json`, log
+`e84_satellite_divergence.log`, figure `figures/paper/e84_satellite_divergence.png`. Single-phase
+samples on the poster's offset grid (no carrier-phase average), as in Fig. 4b.
+
+**Results.** First maximum of the beam-averaged centre intensity against the single ray:
+Δperiod = time shift, Δamp = height change. w_n = 2πα|J_n(S)|; |J_n(S)| is w_n in main Darwin
+half-widths; the last two columns give w_n in angle.
+
+| geometry | (S, α, n) | σ_η = 0.1 w_n: Δperiod / Δamp | 0.3 w_n | 1 w_n | 3 w_n | largest σ_η meeting both (scan) | w_n, Si 440 / 17.48 keV | w_n, Si 400 / 8 keV |
+|---|---|---|---|---|---|---|---|---|
+| Laue | (0.5, 2, 1) | +0.1 % / −0.3 % | +0.7 % / −2.6 % | −7 % / −25 % | −7 % / −62 % | 0.3 w_n | 0.43 µrad | 2.0 µrad |
+| Laue | (1.5, 2, 1) | +0.8 % / −0.6 % | +1.1 % / −6.7 % | −14 % / −40 % | −19 % / −73 % | 0.1 w_n | 0.99 µrad | 4.7 µrad |
+| Laue | (2, 4, 2) | −1.1 % / −1.3 % | −5.9 % / −7.7 % | −19 % / −38 % | −32 % / −72 % | < 0.1 w_n | 0.62 µrad | 2.9 µrad |
+| Laue | (1.5, 4, 1) | +11 % / −0.8 % | −2.9 % / −7.8 % | −12 % / −39 % | −11 % / −71 % | < 0.1 w_n (metric, see below) | 0.99 µrad | 4.7 µrad |
+| Bragg | (0.5, 2, 1) | 0.0 % / −0.2 % | −0.2 % / −1.4 % | −1.1 % / −13 % | −1.3 % / −52 % | 0.3 w_n | 0.43 µrad | 2.0 µrad |
+| Bragg | (1.5, 2, 1) | −0.1 % / −0.1 % | −0.9 % / −1.0 % | −1.0 % / −20 % | −1.0 % / −62 % | 0.3 w_n | 0.99 µrad | 4.7 µrad |
+| Bragg | (2, 4, 2) | 0.0 % / −0.1 % | −0.2 % / −0.7 % | −0.2 % / −21 % | +0.7 % / −63 % | 0.3 w_n | 0.62 µrad | 2.9 µrad |
+| Bragg | (1.5, 4, 1) | 0.0 % / 0.0 % | −0.2 % / −0.1 % | −2.4 % / −21 % | −9 % / −60 % | 0.3 w_n | 0.99 µrad | 4.7 µrad |
+
+- **Verdict under the rule: the condition table applies.** At σ_η = 1 w_n the amplitude falls by
+  13–21 % (Bragg) and 25–40 % (Laue) in every case, far outside 5 %. The largest scanned σ_η that
+  meets both criteria is 0.3 w_n in Bragg (amplitude −0.1 to −1.4 %, period ≤ 0.9 %) and
+  0.1–0.3 w_n in Laue (amplitude −0.3 to −1.3 % at 0.1 w_n, −2.6 to −7.8 % at 0.3 w_n). In
+  angle that is **0.1–0.3 µrad at Si 440 / 17.48 keV (the poster's Laue case) and 0.6–1.4 µrad at
+  Si 400 / 8 keV Bragg**: the same sub-µrad class as the single-ray crystal factor of Entries 82–83,
+  as the pre-run expectation said (0.2–0.3 w_n).
+- The "period" metric (time of the first maximum, parabolic interpolation on a 1/60 grid) is noisy
+  where the maximum is broad: the +11 % at σ_η = 0.1 w_n for Laue (1.5, 4, 1) is a detection
+  artefact (amplitude −0.8 % there). A post-hoc metric computed from the saved traces, the
+  half-rise time t_1/2, gives ≤ 0.5 % at 0.1–0.3 w_n in Laue (−2.9 % for (1.5, 4, 1) at 0.3),
+  +1.6–4.6 % in Bragg at 0.3 w_n (the tanh² rise steepens off-centre), −3 to −29 % at 1 w_n, and
+  does not change the verdict. Labelled post hoc; the rule's metric stands in the table.
+- Bragg is the more tolerant geometry: the tanh² saturation makes the plateau height insensitive
+  to the beam (−1 % at 0.3 w_n) while Laue's sin² maximum is a narrow feature in η.
+- Check (closed form): the beam average of the independent-satellite slab form differs from the
+  TT beam average by 3–15 % in absolute intensity already at σ_η = 0, i.e. the single-phase
+  samples carry the fringe contamination the poster avoided by its grid offset (Entry 2); the
+  2 % tolerance fails and, as pre-registered, the closed form is not used for the verdict (TT only).
+- Reported: at σ_η = 3 w_n the Laue beam average is 12–15 % away from the ∫_0^{2πα_n t̃} J_0 law
+  (shape, after scaling); the integrated-population observable is divergence-tolerant but its
+  formation law is not that integral at this σ (the Gaussian is not flat over the satellite);
+  not pursued.
+
+**Answer to T2n.** The poster's centre-intensity formation law needs σ_η ≲ 0.3 w_n, i.e.
+0.1–0.3 µrad in the poster's Si 440 / 17.48 keV Laue geometry (0.6–1.4 µrad at Si 400 / 8 keV
+Bragg), so **P2 is not measurable with an ordinary beam as a centre observable** either; its
+beam-tolerant form is the integrated satellite population, whose formation law is a separate,
+uncomputed item. The E scores of P2 and P1 + P2 stay at 3 with this condition added; the shared
+GHz observable of Entries 82–83 (the beam-averaged factor) remains the ordinary-beam route.
+Class: **confirmed** (full TT beam average, eight case–geometry pairs, no fit). Prior art: the
+sensitivity of a Pendellösung-type oscillation to beam divergence is textbook; not searched for
+satellites.
+
+**Scope.** Step front, α_ac = 20, single carrier phase on the offset grid, Gaussian σ_η, t̃ ≤ 1,
+Laue lossless and Bragg lossless (no κ), first maximum only; the integrated population and the
+ramp regime (Entry 67) not covered.
+
+---
+
+## 2026-10-23 — Entry 85: one GHz-train case in one table, Si 440 at 17.48 keV, 1–2 GHz (T2o)
+
+**Why.** BACKLOG T2o: move the poster's conditions (Entry 62: symmetric Laue, L = 3Λ_P, bulk shear
+wave) to Si 440 / 17.48 keV / 1–2 GHz and put S, ν, the window numbers and the beam conditions in
+one table from the existing formulas and constants. No new physics, nothing pre-registered.
+Script `explore/nb/e85_si440_case.py` (1 s), data `e85_si440_case.json`, log `e85_si440_case.log`.
+Constants: X0h (Entry 20): Λ_P = 54.34 µm, θ_B = 21.68°, |χ_rh| = 1.213e-6, χ_i0 = 1.606e-8
+(g = 0.0132), d = 96.0 pm; v_T = 5846 m/s, c44 = 79.6 GPa (Entry 73). L = 163 µm, t_tr = 27.9 ns;
+Darwin half-width 1.77 µrad = 78 meV; symmetric-Bragg extinction length of the same reflection
+21.6 µm, f_D(Bragg, shear) = 0.271 GHz, so 1–2 GHz is x = 3.7–7.4.
+
+**Table (1 GHz; 2 GHz differs only where marked).** u0 = S d/2π, ε = S d/Λ_ac (Entry 73),
+I = v_T c44 ε²/2 (time-averaged, travelling wave), α_ac = L/Λ_ac, R = Λ_ac/Λ_P, ν = πα|J_1(S)|
+(first-order satellite amplitude of the filled Laue crystal, Entry 65's form with ℓ = L), τ_1 =
+t_tr/(2α|J_1(S)|) (first maximum of the formation law), β_qs = 2πfL/c (Entry 62); beam columns:
+the centre-law condition 0.3 w_1 = 0.3|J_1(S)| Darwin half-widths (Entry 84) and the single-ray
+ringing width g + 1/(2x) half-widths (Entries 82–83).
+
+| S | u0 pm | ε (1 / 2 GHz) | I W/cm² (1 / 2 GHz) | ν | τ_1 / t_tr | τ_1 ns | beam, centre law µrad | beam, ringing µrad (1 / 2 GHz) |
+|---|---|---|---|---|---|---|---|---|
+| 0.01 | 0.15 | 1.6e-7 / 3.3e-7 | 0.002 / 0.006 | 0.047 | 33 | 930 | 0.004 | 0.26 / 0.14 |
+| 0.02 | 0.31 | 3.3e-7 / 6.6e-7 | 0.003 / 0.01 | 0.094 | 17 | 465 | 0.01 | |
+| 0.1 | 1.5 | 1.6e-6 / 3.3e-6 | 0.06 / 0.25 | 0.47 | 3.3 | 93 | 0.03 | |
+| 0.3 | 4.6 | 4.9e-6 / 9.9e-6 | 0.56 / 2.3 | 1.40 | 1.12 | 31 | 0.08 | |
+| 0.5 | 7.6 | 8.2e-6 / 1.6e-5 | 1.6 / 6.3 | 2.28 | 0.69 | 19 | 0.13 | |
+| 1 | 15.3 | 1.6e-5 / 3.3e-5 | 6.3 / 25 | 4.15 | 0.38 | 10.6 | 0.23 | |
+| 1.5 | 22.9 | 2.5e-5 / 4.9e-5 | 14 / 56 | 5.26 | 0.30 | 8.3 | 0.30 | |
+| 2 | 30.6 | 3.3e-5 / 6.6e-5 | 25 / 100 | 5.44 | 0.29 | 8.1 | 0.31 | |
+
+α_ac = 27.9 / 41.8 / 55.8 and R = 0.108 / 0.072 / 0.054 at 1 / 1.5 / 2 GHz; β_qs = 3.4e-3 to
+6.8e-3 (Entry 62). Window law for the same reflection in symmetric Bragg [corrected, see the
+addendum: the shear wave along the normal has h·u = 0 in that geometry, so the Bragg counterpart
+uses a longitudinal [110] wave, v_L = 9136 m/s, x = 2.36 / 4.73 at 1 / 2 GHz] (CF-B, Entry 75,
+ratio H(1 GHz)/H(2 GHz), steady 0.484 with H = 0.059 / 0.123): T_flat 2 ns, T_half 5 ns,
+T_90 7 ns; 1/κ = 260 µm = 28 ns at v_L. (First version, withdrawn: shear v_T, x = 3.7 / 7.4,
+T_flat 7 / T_half 12 / T_90 17 ns.)
+
+**Reading.**
+- The two regimes of the P1 + P2 experiment sit at very different S: the linear regime (ν ≤ 0.1,
+  Entry 68) of a *filled* Laue crystal at α = 3 needs S ≤ 0.02, i.e. strain ≤ 7e-7 and
+  3–10 mW/cm², with a formation time of 0.5–1 µs that the transit cuts off (the satellite never
+  forms; it stays kinematic, which is the point); the poster's formation regime is S = 0.5–2,
+  strain 1–7e-5, 1.6–100 W/cm², τ_1 = 8–19 ns inside t_tr = 28 ns. Both are reachable with the
+  same drive at two amplitudes, which is the "one apparatus" of the recommendation.
+- The window numbers of the Bragg counterpart (longitudinal wave: 2–7 ns) are well inside one
+  transit, so a long-train measurement at Si 440 reaches the steady crystal factor within t_tr;
+  but the beam condition for that single-ray factor is 0.21–0.39 µrad (ringing width
+  g + 1/(2x) at x = 2.4–4.7), ≈ 0.1–0.2 µrad at the 5 % tolerance by the Entry 83 scaling, and
+  for the centre formation law 0.08–0.31 µrad (0.3 w_1): the GHz train at Si 440 is a sub-µrad
+  measurement on both counts, as Entries 83–84 found for Si 400.
+- The ordinary-beam observables for this case are therefore the beam-averaged factor of Entries
+  82–83 (x = 3.7–7.4, non-monotonic in σ_η; computable once σ_η is known) and the integrated
+  satellite population (T2p).
+
+**Scope.** Table only; no run beyond the 1 s closed-form window numbers; Laue absorption is not in
+the solver (the Laue contrast 1/cosh(2πα''J_1) of Entry 20 is 0.99 here); transducer output
+unverified (DotFiles#57).
+
+---
+
+## 2026-10-23 — Entry 86: does the integrated satellite population lift the beam condition? (T2p)
+
+**Why.** Entry 84: the centre formation law needs σ_η ≲ 0.3 w_n. A detector that integrates the
+whole satellite channel measures the population instead, which for a beam much wider than the
+satellite is the rocking-curve integral and should not care about σ_η. BACKLOG T2p. Script
+`explore/nb/e86_population_divergence.py`.
+
+**Observable and detector.** The n-th channel is |η − nq| ≤ q/2 (q = 2πα_ac = 126 at α_ac = 20,
+i.e. 6.7 main Darwin half-widths, 12 µrad at Si 440 / 17.48 keV); the detector accepts the whole
+channel and nothing else (an angle-resolving detector of that acceptance, or a slit). The beam
+has a Gaussian spread σ_η in detuning centred on nq. Measured population:
+P(t; σ_η) = ∫_channel p(δ) [I(nq + δ, t) − I(nq + δ, 0)] dδ / ∫_channel p(δ) dδ,
+with the t = 0 (unmodulated) intensity subtracted ray by ray, which a measurement can do (it is
+the pre-pump rocking curve). Reference: the flat-beam limit P_flat(t) = (1/q) ∫_channel [I(t) − I(0)] dδ.
+Full TT `rocking_cube` on the channel grid once per case and geometry (spacing w_n/40, ≤ 1600 rays),
+then every σ_η is a change of weights.
+
+**Pre-registered rule (BACKLOG T2p, written before the run).** Four poster cases, Laue and Bragg,
+α_ac = 20, step front, t̃ ≤ 1, σ_η = 0.3, 1, 3, 10 w_n. Metrics against P_flat: "period" = time of
+the first maximum (Laue; parabolic interpolation) or the half-rise time (Bragg, monotone);
+"amplitude" = P/P_flat at that time.
+- **"The integrated observable works with an ordinary beam"** if at σ_η = 1, 3 and 10 w_n both
+  |Δperiod| ≤ 1 % and |Δamplitude| ≤ 5 % in every case and geometry; otherwise the table of the
+  smallest σ_η from which both hold (the integrated observable converges to P_flat from above in
+  σ_η, the opposite direction to Entry 84), with w_n and q in µrad.
+- Reported, not judged: P_flat's own shape against the Laue integrated-intensity law
+  ∫_0^{2πα_n t̃} J_0(x) dx (normalised at t̃ = 1) and, for Bragg, against tanh²; and the signal size
+  P_flat(1)/q relative to the centre intensity.
+- Expectation written beforehand: at σ_η = 1 w_n the Gaussian still weights the satellite centre
+  and P/P_flat will be above 1 by ~10–30 % with the centre law's period; from σ_η ≳ 3 w_n (the
+  Gaussian flat over the satellite's ~2 w_n core) both criteria should hold; at 10 w_n the beam
+  is 3–6 half-widths wide and is cut by the channel edge, which the normalisation handles. So the
+  expected outcome is "condition table, σ_η ≳ 3 w_n", i.e. the integrated observable **does** lift
+  the sub-µrad condition, with the detector acceptance (one channel, ~12 µrad) as the new condition.
+- Convergence: δ-grid spacing halved at one case must change P/P_flat by < 0.2 %.
+
+**Run.** `uv run python explore/nb/e86_population_divergence.py run fig` (43 s); data
+`e86_population_divergence.json`, log `e86_population_divergence.log`, figure
+`figures/paper/e86_population_divergence.png`. 359–1652 rays per case; δ-grid halving changes
+P by 5e-5. Single carrier phase on the offset grid, as in Entries 1, 9, 84.
+
+**Results under the pre-registered metrics** (Δperiod = first-maximum time in Laue, half-rise time
+in Bragg, against the flat-beam channel integral P_flat; Δamp = P/P_flat at that time):
+
+| geometry | (S, α, n) | w_n (half-widths) | σ_η = 0.3 w_n: Δperiod / Δamp | 1 w_n | 3 w_n | 10 w_n | smallest σ_η meeting both |
+|---|---|---|---|---|---|---|---|
+| Laue | (0.5, 2, 1) | 0.24 | +7 % / +940 % | −1.1 % / +790 % | −0.9 % / +360 % | −0.4 % / +65 % | none ≤ 10 w_n |
+| Laue | (1.5, 2, 1) | 0.56 | +25 % / +580 % | +6 % / +380 % | −0.1 % / +113 % | 0.0 % / +12 % | none |
+| Laue | (2, 4, 2) | 0.35 | +39 % / +360 % | +20 % / +250 % | +0.4 % / +65 % | +0.1 % / +6 % | none |
+| Laue | (1.5, 4, 1) | 0.56 | +9 % / +290 % | −1.0 % / +160 % | −0.2 % / +28 % | 0.0 % / +2.4 % | 10 w_n |
+| Bragg | (0.5, 2, 1) | 0.24 | +88 % / +440 % | +69 % / +420 % | +34 % / +280 % | +16 % / +57 % | none |
+| Bragg | (1.5, 2, 1) | 0.56 | +65 % / +200 % | +43 % / +190 % | +10 % / +90 % | +1.4 % / +10 % | none |
+| Bragg | (2, 4, 2) | 0.35 | +43 % / +150 % | +37 % / +130 % | +5.5 % / +56 % | +0.8 % / +5.8 % | none |
+| Bragg | (1.5, 4, 1) | 0.56 | +82 % / +50 % | +69 % / +42 % | +9 % / +12 % | +0.9 % / +1.1 % | 10 w_n |
+
+- **Verdict under the rule: condition table; the integrated observable does not pass at
+  σ_η = 1, 3, 10 w_n.** Recorded as such, with the following caveat on the rule itself.
+- **The amplitude metric was mis-specified in the pre-registration.** P is normalised per unit of
+  beam inside the channel and P_flat per unit of channel width, so P/P_flat at a narrow beam is
+  the ratio of the satellite's peak to the channel mean (the +940 % at σ_η = 0.3 w_n is the
+  satellite peak being ten times the channel mean), i.e. it measures beam width over channel
+  width, not the physics. A rule about the shape should compare curves normalised at the same
+  time. This is a pre-registration flaw, stated, and the rule was not altered after the fact.
+- **Post hoc, labelled:** the shape-normalised amplitude A = [P(t_ref)/P(1)]/[P_flat(t_ref)/P_flat(1)] − 1
+  from the same traces, with the same 1 % / 5 % thresholds:
+
+| geometry | (S, α, n) | 0.3 w_n: Δperiod / A | 1 w_n | 3 w_n | 10 w_n | smallest σ_η meeting both |
+|---|---|---|---|---|---|---|
+| Laue | (0.5, 2, 1) | +7 % / −36 % | −1.1 % / −14 % | −0.9 % / +1.7 % | −0.4 % / +1.7 % | 3 w_n |
+| Laue | (1.5, 2, 1) | +25 % / +149 % | +6 % / +31 % | −0.1 % / +8 % | 0.0 % / +1.0 % | 10 w_n |
+| Laue | (2, 4, 2) | +39 % / −25 % | +20 % / −3 % | +0.4 % / −0.2 % | +0.1 % / −0.1 % | 3 w_n |
+| Laue | (1.5, 4, 1) | +9 % / +21 % | −1.0 % / +14 % | −0.2 % / +3.2 % | 0.0 % / +0.3 % | 3 w_n |
+| Bragg | (0.5, 2, 1) | +88 % / −57 % | +69 % / −50 % | +34 % / −25 % | +16 % / −8 % | none |
+| Bragg | (1.5, 2, 1) | +65 % / −52 % | +43 % / −42 % | +10 % / −15 % | +1.4 % / −2.3 % | none (10 w_n fails on period by 0.4 %) |
+| Bragg | (2, 4, 2) | +43 % / −49 % | +37 % / −39 % | +5.5 % / −12 % | +0.8 % / −1.4 % | 10 w_n |
+| Bragg | (1.5, 4, 1) | +82 % / −56 % | +69 % / −47 % | +9 % / −16 % | +0.9 % / −1.8 % | 10 w_n |
+
+  In Laue the integrated population's *shape* is the flat-beam one from σ_η ≈ 3 w_n (three of
+  four cases; 8 % at 3 w_n and 1 % at 10 w_n in the fourth): 3 w_n = 0.7–1.7 main Darwin
+  half-widths = **1.3–3 µrad at Si 440 / 17.48 keV**, a ten-fold relaxation of the centre law's
+  0.3 w_n and inside ordinary high-resolution beamline divergences, with the detector accepting
+  one channel (q = 5–10 half-widths, 9–18 µrad there). In Bragg the satellite's rocking curve has
+  1/δ² wings, the channel mean converges slowly, and even σ_η = 10 w_n (2.4–5.6 half-widths,
+  i.e. a beam comparable to the channel) leaves 1–16 % on the half-rise time: the Bragg population
+  is not a clean observable at any beam the channel can hold.
+- P_flat's own shape is not the textbook law: against ∫_0^{2πα_n t̃} J_0 (Laue) the maximum
+  deviation of the normalised curves is 13–25 %, against tanh² (Bragg) 25–38 %. The integrated
+  population has a formation curve of its own (the channel integral of TT, which these runs
+  tabulate) and no closed form here. Its signal is 5–29 % of the centre intensity per unit channel
+  (P_flat(1) = 0.053–0.29).
+
+**Answer to T2p.** Under the rule as written: no. In substance (post hoc, same traces): the
+Laue integrated population is beam-tolerant from σ_η ≈ 3 w_n (1.3–3 µrad at Si 440 / 17.48 keV)
+with a one-channel detector, which does lift the sub-µrad condition for the Laue train (P2); its
+formation curve must then be taken from TT, not from sin² or ∫J_0. Bragg does not. A corrected
+pre-registration (shape-normalised amplitude; Laue; σ_η = 3 w_n; the TT channel integral as the
+law) is the item to run if P2's experimental E is to be raised; the data here are its first map,
+not its test.
+
+**Scope.** Step front, α_ac = 20, single phase, t̃ ≤ 1, Gaussian beam centred on the channel,
+detector = one channel, t = 0 rocking curve subtracted ray by ray; lossless solvers; the ramp
+regime and the ±η structure of the satellite not covered.
+
+---
+
+## 2026-10-23 — Entry 87: the Laue integrated population at σ_η = 3 w_n, corrected pre-registration (T2q)
+
+**Why.** Entry 86's amplitude metric divided a beam-weighted mean by a channel mean, so it measured
+the beam width, not the shape. BACKLOG T2q: the same question with the metrics written as formulas
+first, normalisation denominators explicit. Script `explore/nb/e87_population_laue.py`.
+
+**Definitions (fixed before the run).** Laue, α_ac = 20, q = 2πα_ac. Channel C_n = {η : |η − nq| ≤ q/2};
+the detector accepts C_n and nothing else (q = 5–10 main Darwin half-widths for α = 4, 2, i.e.
+9–18 µrad at Si 440 / 17.48 keV). Ray intensity change ΔI(η, t) = I(η, t) − I(η, 0⁺) (full TT
+`rocking_cube`, the pre-pump rocking curve subtracted ray by ray). Beam p_σ(δ) ∝ exp(−δ²/2σ_η²),
+δ = η − nq, σ_η = 3 w_n with w_n = 2πα|J_n(S)|.
+
+    P_σ(t)  = ∫_{C_n} p_σ(δ) ΔI(nq + δ, t) dδ  /  ∫_{C_n} p_σ(δ) dδ          (beam-weighted population)
+    P_0(t)  = (1/q) ∫_{C_n} ΔI(nq + δ, t) dδ                                    (flat-beam channel integral, the law)
+    Ŝ_σ(t)  = P_σ(t) / P_σ(t_end),   Ŝ_0(t) = P_0(t) / P_0(t_end)                (shapes; denominator = value at the end of the trace, t_end = 1 t_tr for the step cases, 2 t_tr for the ramp)
+    t*      = time of the first maximum of Ŝ (parabolic interpolation on the 1/60 grid)
+    Δperiod = t*_σ / t*_0 − 1
+    A       = Ŝ_σ(t*_0) / Ŝ_0(t*_0) − 1                                          (shape amplitude at the reference time)
+
+**Pre-registered rule (BACKLOG T2q).** Four step cases (0.5, 2, 1), (1.5, 2, 1), (2, 4, 2),
+(1.5, 4, 1) with t̃ ∈ [0, 1], plus one ramp case (1.5, 2, 1) with rise = 1 t_tr and t̃ ∈ [0, 2].
+- **"The P2 integrated observable is measurable in the high-resolution beamline range
+  (σ_η = 3 w_n = 1.3–3 µrad at Si 440 / 17.48 keV, one-channel detector 9–18 µrad)"** if
+  |Δperiod| ≤ 1 % and |A| ≤ 5 % in all five runs; otherwise the condition table (σ_η = 3, 5, 10 w_n
+  scanned for it, the smallest passing value per case).
+- The law for the paper is the table P_0(t) itself (saved in the json), not sin² or ∫J_0.
+- Expectation written beforehand, from Entry 86's post-hoc numbers: three step cases pass at
+  3 w_n; (1.5, 2, 1) had A = +8 % there and may fail, passing near 5 w_n; the ramp is untested.
+  So the likely outcome is "condition table with σ_η ≈ 3–5 w_n", not a clean pass.
+- Convergence: δ spacing w_n/40 → w_n/80 at one case must change Ŝ_σ by < 0.2 %.
+
+**Addendum to Entry 85 (physics cross-review, same day): the Bragg counterpart cannot use the
+shear wave.** In symmetric Bragg 440 the reflection vector h is along the surface normal, and a
+bulk wave travelling along the normal with transverse polarisation has u ⊥ h, so h·u = 0 and the
+wave does not couple at all (the Laue poster geometry has h in-plane with u ∥ h, which is why it
+couples). The Bragg window block was recomputed with a longitudinal [110] wave,
+v_L = √((c11 + c12 + 2c44)/2ρ) = 9136 m/s (c11 = 165.7, c12 = 63.9, c44 = 79.6 GPa): f_D(Bragg)
+= 0.423 GHz, x = 2.36 / 4.73 at 1 / 2 GHz, steady H = 0.059 / 0.123 (ratio 0.484), T_flat 2,
+T_half 5, T_90 7 ns, 1/κ = 260 µm = 28 ns; the ringing-width column becomes 0.39 / 0.21 µrad
+(1 / 2 GHz). Agreed with the reviewer; `e85_si440_case.py` and its log/json updated
+(the Laue table is unchanged, since there the shear wave is the coupling one); the first
+version's numbers are kept above, marked withdrawn. The elastic numbers for a longitudinal
+[110] wave (ε = S d/Λ_ac with Λ_ac = v_L/f: 0.64× the shear strain at the same S and f; intensity
+with ρv_L² in place of c44) are not re-tabulated here.
+
+**Run.** `uv run python explore/nb/e87_population_laue.py run fig` (40 s); data
+`e87_population_laue.json` (contains the law tables P_0(t) for all five runs), log
+`e87_population_laue.log`, figure `figures/paper/e87_population_laue.png`. 359–1652 rays per run;
+δ-spacing halving changes Ŝ_σ by 3e-6. Single carrier phase on the offset grid (the ramp's P_0
+shows the carrier ripple; the metrics use the first maximum of the envelope-scale shape).
+
+**Results** (Si 440 / 17.48 keV angles: 1 main Darwin half-width = 1.77 µrad):
+
+| run (S, α, n, rise) | w_n (hw) | channel q | σ_η = 3 w_n: Δperiod / A | 5 w_n | 10 w_n | smallest passing σ_η |
+|---|---|---|---|---|---|---|
+| (0.5, 2, 1, step) | 0.24 | 10 hw = 18 µrad | −1.05 % / +2.7 % (period fails by 0.05 %) | −0.9 % / +2.9 % | −0.6 % / +1.9 % | 5 w_n = 2.1 µrad |
+| (1.5, 2, 1, step) | 0.56 | 18 µrad | −0.07 % / +8.1 % | −0.02 % / +3.6 % | 0.0 % / +1.0 % | 5 w_n = 4.9 µrad |
+| (2, 4, 2, step) | 0.35 | 5 hw = 9 µrad | +0.4 % / −0.2 % | +0.2 % / −0.2 % | +0.1 % / −0.1 % | 3 w_n = 1.9 µrad |
+| (1.5, 4, 1, step) | 0.56 | 9 µrad | −0.2 % / +3.2 % | −0.1 % / +1.3 % | 0.0 % / +0.3 % | 3 w_n = 3.0 µrad |
+| (1.5, 2, 1, ramp 1 t_tr) | 0.56 | 18 µrad | −0.6 % / +11.9 % | −0.2 % / +5.4 % (fails by 0.4 %) | 0.0 % / +1.5 % | 10 w_n = 9.9 µrad |
+
+- **Verdict under the rule: condition table** (two step runs and the ramp fail at 3 w_n, as the
+  pre-run expectation said for one of them). The table: every step run passes from σ_η = 5 w_n
+  (2–5 µrad at Si 440 / 17.48 keV), the α = 4 runs already at 3 w_n (2–3 µrad); the 1 t_tr ramp
+  needs 10 w_n (10 µrad, half the channel). The period is never the problem (≤ 1.05 % at 3 w_n,
+  ≤ 0.9 % beyond); the amplitude A is, and it converges from above as 1/σ² (8.1 → 3.6 → 1.0 % for
+  (1.5, 2, 1)), i.e. the residual weighting of the satellite core by the Gaussian.
+- So the Laue integrated population is a beam-tolerant observable of the formation dynamics at
+  **σ_η ≈ 5 w_n ≈ 2–5 µrad with a one-channel detector of 9–18 µrad** (step front), 10 µrad for a
+  slow ramp: the range of an ordinary high-resolution beamline, 10–30× looser than the centre law
+  (Entry 84) and 100× looser than the single-ray crystal factor (Entries 82–83). What is measured
+  is not sin²(πα_n t̃): the flat-beam shape has its first maximum at α_n t̃ ≈ 0.4 with 1.6× the
+  end value (step) and follows the TT channel integral P_0(t), tabulated in the json for the
+  five runs; that table (or a TT run per case) is the law to compare an experiment with.
+- The pre-registered threshold 3 w_n was too tight by a factor 1.7 for the α = 2 cases, where
+  the channel (10 hw) holds the Gaussian comfortably but the satellite core is broader relative
+  to q; the α = 4 cases pass. Not adjusted; recorded.
+
+**Answer to T2q.** Not at 3 w_n for all five runs; yes at 5 w_n (step) and 10 w_n (ramp), which
+is still within an ordinary high-resolution beam (2–10 µrad) and a 9–18 µrad detector channel.
+For the paper: P2 as an integrated-population measurement in Laue is feasible with an ordinary
+beam, with its formation curve supplied by TT; the E score of P2 can be raised to 4 on this
+basis if Isaac accepts the 5 w_n condition (not raised by me, since the pre-registered 3 w_n
+failed). Class: **confirmed, with a condition** (full TT beam average, five runs, metrics
+defined in advance, no fit).
+
+**Scope.** Laue, α_ac = 20, single phase, Gaussian beam centred on the channel, detector = one
+channel, t = 0⁺ rocking curve subtracted ray by ray; lossless; n = 1, 2; a slow ramp of 1 t_tr
+only. Bragg populations were shown unclean in Entry 86 and are not retested.
+
+---
+
+## 2026-10-23 — Entry 88: polarisation and the static Debye–Waller factor as rescalings (T2r)
+
+**Why.** `notes/referee_pass.md` objection 2 leaves two model limits open: the π polarisation
+component (DESIGN.md item 6) and the static Debye–Waller factor. BACKLOG T2r: do they reduce to a
+redefinition of S and κ (α), or do they need numbers in the limitations section? Script
+`explore/nb/e88_polarisation_dw.py`.
+
+**Algebra written before the run.**
+(a) Polarisation. The coupling carries C = 1 (σ) or |cos 2θ_B| (π); χ_0 does not. So for the π
+component c → C c (both couplings; with χ_ih, c = iπα + κ_h/2 → C(iπα + κ_h/2)), κ unchanged:
+α_π = C α_σ, g_π = g_σ/C, κ_h/κ unchanged, f_D,π = C f_D,σ so x_π = x_σ/C; the first-order
+amplitude ν_π = C ν_σ, the formation rate α_n → C α_n. For a pure polarisation this is the
+symmetric solver at another α: exact, as in Entry 81. An unpolarised beam adds the two
+polarisation intensities, both driven by the same strain, so the oscillating parts add
+deterministically: F_mix(ω) = F_σ(ω) + F_π(ω) (complex, each from CF-B with its own c), and the
+mixed crystal factor H_mix = |F_σ + F_π| / (N_σ + N_π) with N the kinematic laws (N_π/N_σ ≈ C²
+in the tail, since |R0| ∝ α there). For P2 the unpolarised centre intensity is
+½[sin²(πα_n t̃) + sin²(πCα_n t̃)], two periods, not one law. C = 0.348 for Si 400 at 8 keV
+(θ_B = 34.8°), 0.727 for Si 440 at 17.48 keV (21.7°), 0.866 for Si 400 at 17.48 keV (15.1°).
+(b) Static Debye–Waller. χ_h = χ_h⁰ e^{−M} for both χ_rh and χ_ih (same factor), χ_0 unchanged:
+α → α e^{−M}, κ unchanged, κ_h/κ ∝ e^{−M}. The X0h constants used throughout (Entry 20) are
+already the room-temperature values with e^{−M} (Si 400: e^{−M} = 0.94 with B = 0.47 Å²), so the
+model's Λ, g and χ_ih/χ_i0 already contain it; S = h·u is a phase and is untouched (the coherent
+displacement enters through J_n(S), Entry 33). What is not in the constants is a temperature
+change of M under drive: at the 1e-4 duty cycle of Entry 73 the average power is mW/cm² and the
+change is negligible; stated, not computed.
+
+**Pre-registered rule (BACKLOG T2r).** "Absorbed as a factor" if (i) the pure-π case is the σ
+closed form with (g/C, x/C) to machine precision against the TT run at α = C (identity check at
+one point), and (ii) the unpolarised H_mix from the closed-form sum agrees with the TT sum
+(σ run + π run, same packet, Entry 75 machinery with c = iπC for π) to 0.3 % at every (f, T_w) for
+Si 440 / 17.48 keV Bragg (longitudinal wave, x = 2.4–4.7, f = 1, 2 GHz, T_w = 7 and 300 ns) and
+Si 400 / 8 keV (f = 20, 40, 100 GHz, T_w = 14 and 300 ns); otherwise "numbers in the limitations
+section". Reported either way: H_π/H_σ, H_mix/H_σ, the window numbers T_flat/T_half/T_90 for σ,
+π and unpolarised, and ν_π/ν_σ = C; for (b) the e^{−M} values and the statement above. No new
+solver; the single-ray (σ-polarised) numbers of Entries 65–87 stand as the σ case.
+
+**Run.** `uv run python explore/nb/e88_polarisation_dw.py` (3 s); data `e88_polarisation_dw.json`,
+log `e88_polarisation_dw.log`. TT: Entry 81's `integrate` with c = iπ (σ) and c = iπC (π) on the
+same packet and detunings, continuation past the packet as in Entry 75; closed form: CF-B with
+the same two couplings; mixed = sum of the two complex Fourier components over the sum of the
+two kinematic laws. (The window block's first version divided raw weights without the kinematic
+normalisation and gave wrong steady ratios; fixed before the numbers below, rule unchanged.)
+
+**(a) Polarisation.** C = 0.727 (Si 440 / 17.48 keV, θ_B = 21.7°), 0.349 (Si 400 / 8 keV, 34.8°).
+
+| case | T_w | f | H_σ | H_π | H_π/H_σ | H_mix (unpolarised) | H_mix/H_σ | TT/CF (mix, π) |
+|---|---|---|---|---|---|---|---|---|
+| Si 440 / 17.48 keV, longitudinal | 7 ns | 1 GHz | 0.091 | 0.176 | 1.93 | 0.109 | 1.20 | 1.0000, 1.0000 |
+| | | 2 GHz | 0.182 | 0.207 | 1.13 | 0.186 | 1.02 | |
+| | 300 ns | 1 GHz | 0.059 | 0.115 | 1.93 | 0.078 | 1.32 | |
+| | | 2 GHz | 0.123 | 0.229 | 1.87 | 0.159 | 1.30 | |
+| Si 400 / 8 keV | 14 ns | 20 GHz | 0.911 | 0.950 | 1.04 | 0.911 | 1.000 | 0.9998, 0.9998 |
+| | | 100 GHz | 0.949 | 0.950 | 1.00 | 0.949 | 1.000 | |
+| | 300 ns | 20 GHz | 0.926 | 0.999 | 1.08 | 0.928 | 1.003 | |
+| | | 100 GHz | 0.997 | 1.000 | 1.00 | 0.997 | 1.000 | |
+
+Window numbers (CF-B, H(f_lo)/H(f_hi), targets 10 / 50 / 90 % of the way from 1 to steady):
+
+| case | polarisation | steady ratio | T_flat / T_half / T_90 ns |
+|---|---|---|---|
+| Si 440 / 17.48 keV, 1 vs 2 GHz | σ | 0.484 | < 0.3 / 4.6 / 6.7 |
+| | π | 0.501 | < 0.3 / 9.1 / 12.9 |
+| | unpolarised | 0.491 | < 0.3 / 5.1 / 7.4 |
+| Si 400 / 8 keV, 20 vs 100 GHz | σ | 0.929 | 5.0 / 12.9 / 24.6 |
+| | π | 0.999 (flat: g_π = 0.13) | not defined |
+| | unpolarised | 0.931 | 4.7 / 12.6 / 24.1 |
+
+- **Rule (i), pure π:** identity to machine precision (TT/CF = 1.0000 at Si 440, 0.9998 at 8 keV,
+  the latter the usual second-order residual at the packet amplitude used): the π component is
+  the σ closed form with (g/C, x/C), ν_π = C ν_σ, formation rate C α_n. **Rule (ii), unpolarised:**
+  closed-form sum against the TT sum, worst 0.021 % over all (f, T_w). **Verdict: absorbed as a
+  factor** for a pure polarisation and as a two-term closed-form sum for a mixed beam.
+- Size: at Si 400 / 8 keV the π component is 12 % of the weight (C² = 0.12) and H_mix is within
+  0.3 % of H_σ at every window; at Si 440 / 17.48 keV it is 53 % and H_mix is 20–32 % above H_σ
+  at 1–2 GHz, with window numbers 10 % longer than σ. So Si 400 / 8 keV can be measured with any
+  polarisation; the Si 440 train needs the polarisation state known (a synchrotron or XFEL beam
+  with a vertical diffraction plane is σ to better than 1 %, so this is a geometry choice, not a
+  measurement). The formation law of an unpolarised beam is the two-period sum
+  ½[sin²(πα_n t̃) + sin²(πCα_n t̃)], 0.3 % of a single law at 8 keV (C² weighting) and a visible
+  second period at Si 440 (C = 0.73): same remedy.
+
+**(b) Static Debye–Waller.** e^{−M} = 0.938 (Si 400), 0.880 (Si 440), 0.969 (Si 220) at 300 K
+(B = 0.47 Å²). Both χ_rh and χ_ih carry it; χ_0 does not; so α → α e^{−M}, g → g e^{M},
+χ_ih/χ_i0 → ×e^{−M}, and S = h·u is untouched. The X0h constants used since Entry 20 are the
+room-temperature values with e^{−M} included, so every number in Entries 59–87 already has it;
+nothing to re-tabulate. A change of M under drive heating at the 1e-4 duty cycle (mW/cm², Entry
+73) is below any quoted precision; stated in the limitations, not computed. **Absorbed in the
+constants.**
+
+**Answer to T2r.** Both limits are absorbed: polarisation as a rescaling (α → Cα, κ fixed) with the
+unpolarised case a two-term closed-form sum verified against TT to 0.02 %, Debye–Waller already
+inside the X0h constants. The limitations section keeps one sentence each (polarisation state must
+be known where C² is not small; DW is the room-temperature value). `notes/referee_pass.md`
+objection 2 is now answered on all its items except the lateral acoustic uniformity (DESIGN.md,
+not modelled). Class: **confirmed** (algebra + TT identity + 0.02 % mixed check).
+
+**Scope.** Symmetric Bragg, first order, centrosymmetric; the mixed-beam sum assumes the two
+polarisations see the same strain and detuning (true for a single ray; a divergent beam is
+Entry 82's question, independent of polarisation). The P2 (Laue) two-period statement is algebra
+from the rescaling, not run.

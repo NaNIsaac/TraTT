@@ -12,7 +12,8 @@ substitution removes it. Complex ``chi_0`` only leaves a common ``exp(-mu z)``,
 which cancels in every normalized observable.
 
 Absorption. In Laue a complex ``alpha`` carries the Borrmann (anomalous) part; in
-Bragg normal absorption enters as ``eta -> eta + i kappa`` (see ``solve_bragg``).
+Bragg absorption: normal (chi_0'') enters as ``eta -> eta + i kappa``, anomalous (chi_h'',
+Borrmann) as ``c -> c + kappa_h / 2`` (see ``solve_bragg``).
 A real ``alpha`` and ``kappa = 0`` are the non-absorbing case. See DESIGN.md for
 the full assumption list.
 
@@ -163,6 +164,7 @@ def solve_bragg(
     phi: PhaseField | None = None,
     n_z: int = 512,
     kappa: float = 0.0,
+    kappa_h: float = 0.0,
 ) -> NDArray[np.complex128]:
     """Integrate the Bragg Riccati equation backward from ``R(1)=0`` to ``zeta=0``.
 
@@ -173,18 +175,28 @@ def solve_bragg(
     out: the two beams travel in opposite directions, so it enters ``R`` as
     ``eta -> eta + i kappa``. A layer at depth ``zeta`` then contributes with weight
     ``exp(-kappa zeta)``, i.e. ``kappa`` is the round-trip amplitude attenuation per
-    unit depth (``mu L (1/gamma_0 + 1/gamma_h) / 2``). chi_h'' (anomalous absorption)
-    is not included. Thick slab, kappa > 0 -> the Darwin-Prins root of
-    ``c R^2 + i (eta + i kappa) R + c = 0`` (tests/test_core.py).
+    unit depth (``mu L (1/gamma_0 + 1/gamma_h) / 2``).
+
+    ``kappa_h >= 0`` is anomalous absorption (chi_h'', the Borrmann effect) in the
+    same units, ``kappa_h / kappa = chi_ih / chi_i0``. For a centrosymmetric crystal
+    ``chi_h = chi_hbar`` is one complex number, so both couplings become
+    ``c = i pi alpha + kappa_h / 2``: the two Bloch modes then absorb at different
+    rates, and the static reflectivity is higher on the ``eta < 0`` edge (the
+    low-absorption edge; the low-angle side when ``eta`` grows with ``theta -
+    theta_B``). Thick slab, kappa > 0 -> the Darwin-Prins root of
+    ``c R^2 + i (eta + i kappa) R + c = 0`` with this ``c`` (tests/test_core.py).
+    Laue has no ``kappa_h`` (notebook Entry 77; DESIGN.md item 4).
     """
     _check(alpha, n_z)
     if kappa < 0:
         raise ValueError(f"kappa must be non-negative, got {kappa}")
+    if kappa_h < 0:
+        raise ValueError(f"kappa_h must be non-negative, got {kappa_h}")
 
     eta_a = np.asarray(eta, dtype=np.float64)
     phase = ZERO_PHASE if phi is None else phi
     R = np.zeros(_state_shape(eta_a, phase), dtype=np.complex128)
-    c = 1j * np.pi * alpha
+    c = 1j * np.pi * alpha + 0.5 * kappa_h
     ie = 1j * (eta_a + 1j * kappa)
     h = -1.0 / n_z  # backward
 

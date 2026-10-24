@@ -171,7 +171,7 @@ The banner and the Sogang and CUPT logos are in `poster/assets/`.
 
 ```
 src/tratt/      solver package
-  core.py         Laue IVP and Bragg Riccati (RK4, vectorised over eta and time; Bragg absorption kappa)
+  core.py         Laue IVP and Bragg Riccati (RK4, vectorised over eta and time; Bragg absorption kappa, kappa_h)
   drive.py        travelling acoustic drive phi(zeta; t): front, rise, amplitude profile
   floquet.py      exact Floquet solver for a uniformly filled crystal (independent cross-check)
   observe.py      channel windows, formation time, peak width

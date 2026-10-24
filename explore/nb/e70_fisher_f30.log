@@ -1,0 +1,21 @@
+E=17.48 keV g=0.0100 S=0.714 T=140 ps: f_W = 84 GHz
+   S      argmax I_ii = 87 GHz, argmax marginal precision = 30 GHz
+   f0     argmax I_ii = 79 GHz, argmax marginal precision = 87 GHz
+   tau_d  argmax I_ii = 87 GHz, argmax marginal precision = 85 GHz
+   kinematic H=1 reference: f_W = 30 GHz; argmax D^2: S 30, f0 73, tau_d 86
+E=17.48 keV g=0.0100 S=0.714 T=1400 ps: f_W = 84 GHz
+   S      argmax I_ii = 87 GHz, argmax marginal precision = 30 GHz
+   f0     argmax I_ii = 80 GHz, argmax marginal precision = 88 GHz
+   tau_d  argmax I_ii = 87 GHz, argmax marginal precision = 49 GHz
+   finite-difference step 1 % vs 0.5 %: max relative change of I_ii = 4.62e-03
+E=8.0 keV g=0.0458 S=0.714 T=140 ps: f_W = 84 GHz
+   S      argmax I_ii = 87 GHz, argmax marginal precision = 30 GHz
+   f0     argmax I_ii = 79 GHz, argmax marginal precision = 87 GHz
+   tau_d  argmax I_ii = 87 GHz, argmax marginal precision = 85 GHz
+   kinematic H=1 reference: f_W = 30 GHz; argmax D^2: S 30, f0 73, tau_d 86
+E=8.0 keV g=0.0458 S=0.714 T=1400 ps: f_W = 84 GHz
+   S      argmax I_ii = 87 GHz, argmax marginal precision = 30 GHz
+   f0     argmax I_ii = 80 GHz, argmax marginal precision = 88 GHz
+   tau_d  argmax I_ii = 87 GHz, argmax marginal precision = 49 GHz
+   finite-difference step 1 % vs 0.5 %: max relative change of I_ii = 4.60e-03
+wrote D:\03_Develop\NaNIsaac\_wt\tratt-paper\figures\paper\e70_fisher_f30.png

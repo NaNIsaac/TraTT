@@ -1,0 +1,32 @@
+sigma = 0 Darwin half-widths (sigma_eta = 0.00, 1 rays, RK4 1987 steps):
+   T_w =   1.4 ns: H_conv TT 20:0.0621 40:0.0622 100:0.0620  | TT/CF 0.9998 0.9998 1.0001  | H(20)/H(100) = 1.001
+   T_w =    14 ns: H_conv TT 20:0.4477 40:0.4674 100:0.4731  | TT/CF 0.9998 0.9998 1.0000  | H(20)/H(100) = 0.946
+   T_w =    52 ns: H_conv TT 20:0.4971 40:0.7792 100:0.8864  | TT/CF 0.9998 0.9998 1.0000  | H(20)/H(100) = 0.561
+   T_w =   300 ns: H_conv TT 20:0.4802 40:0.7384 100:0.9394  | TT/CF 0.9998 0.9998 1.0000  | H(20)/H(100) = 0.511
+sigma = 0.3 Darwin half-widths (sigma_eta = 1.88, 527 rays, RK4 2013 steps):
+   T_w =   1.4 ns: H_conv TT 20:0.0386 40:0.0386 100:0.0386  | TT/CF 0.9998 0.9998 1.0001  | H(20)/H(100) = 0.999
+   T_w =    14 ns: H_conv TT 20:0.0406 40:0.0407 100:0.0407  | TT/CF 0.9998 0.9998 1.0001  | H(20)/H(100) = 0.998
+   T_w =    52 ns: H_conv TT 20:0.0406 40:0.0407 100:0.0407  | TT/CF 0.9998 0.9998 1.0001  | H(20)/H(100) = 0.998
+   T_w =   300 ns: H_conv TT 20:0.0406 40:0.0407 100:0.0407  | TT/CF 0.9998 0.9998 1.0001  | H(20)/H(100) = 0.998
+   expectation at 300 ns, flat: kappa sqrt(pi/2)/sigma_eta = 0.0418;  H_conv(300 ns) = 0.0406 0.0407 0.0407  (2 s)
+sigma = 1 Darwin half-widths (sigma_eta = 6.28, 624 rays, RK4 2075 steps):
+   T_w =   1.4 ns: H_conv TT 20:0.0124 40:0.0124 100:0.0124  | TT/CF 0.9998 0.9998 1.0001  | H(20)/H(100) = 1.000
+   T_w =    14 ns: H_conv TT 20:0.0124 40:0.0124 100:0.0124  | TT/CF 0.9998 0.9998 1.0001  | H(20)/H(100) = 1.000
+   T_w =    52 ns: H_conv TT 20:0.0125 40:0.0124 100:0.0124  | TT/CF 0.9998 0.9998 1.0001  | H(20)/H(100) = 1.004
+   T_w =   300 ns: H_conv TT 20:0.0124 40:0.0124 100:0.0124  | TT/CF 0.9998 0.9998 1.0001  | H(20)/H(100) = 1.000
+   expectation at 300 ns, flat: kappa sqrt(pi/2)/sigma_eta = 0.0125;  H_conv(300 ns) = 0.0124 0.0124 0.0124  (4 s)
+sigma = 3 Darwin half-widths (sigma_eta = 18.85, 711 rays, RK4 2245 steps):
+   T_w =   1.4 ns: H_conv TT 20:0.0042 40:0.0042 100:0.0042  | TT/CF 0.9998 0.9998 1.0001  | H(20)/H(100) = 1.007
+   T_w =    14 ns: H_conv TT 20:0.0042 40:0.0042 100:0.0042  | TT/CF 0.9998 0.9998 1.0001  | H(20)/H(100) = 1.009
+   T_w =    52 ns: H_conv TT 20:0.0042 40:0.0042 100:0.0042  | TT/CF 0.9998 0.9998 1.0001  | H(20)/H(100) = 1.013
+   T_w =   300 ns: H_conv TT 20:0.0042 40:0.0042 100:0.0042  | TT/CF 0.9998 0.9998 1.0001  | H(20)/H(100) = 1.007
+   expectation at 300 ns, flat: kappa sqrt(pi/2)/sigma_eta = 0.0042;  H_conv(300 ns) = 0.0042 0.0042 0.0042  (7 s)
+rule: worst |W_TT,conv / W_CF,conv - 1| = 0.021 % -> closed form retained
+convergence sigma = 1, 40 GHz, 14 ns, du = 0.1: 157 rays, W_conv = 6.612379e-09
+convergence sigma = 1, 40 GHz, 14 ns, du = 0.05: 312 rays, W_conv = 6.481241e-09
+convergence sigma = 1, 40 GHz, 14 ns, du = 0.025: 624 rays, W_conv = 6.478579e-09
+convergence sigma = 1, 40 GHz, 14 ns, du = 0.0125: 1246 rays, W_conv = 6.478583e-09
+E = 17.48 keV: Darwin half-width 3.18 urad; ringing width kappa = 0.0100 half-widths = 0.032 urad = 2.1 meV
+E = 8 keV: Darwin half-width 8.33 urad; ringing width kappa = 0.0458 half-widths = 0.382 urad = 4.4 meV
+wrote e82_divergence.json (8 s)
+wrote D:\03_Develop\NaNIsaac\_wt\tratt-paper\figures\paper\e82_divergence.png

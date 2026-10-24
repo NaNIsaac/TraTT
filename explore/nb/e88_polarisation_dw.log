@@ -1,0 +1,15 @@
+Si 440 / 17.48 keV Bragg, longitudinal: C = 0.727, Lambda = 21.6 um, g = 0.0132
+  Si440_17.48keV T_w = 7 ns: 1 GHz: H_s 0.091, H_pi 0.176 (1.931 x), H_mix 0.109 (1.199 x), TT/CF mix 1.0000, pi 1.0000 | 2 GHz: H_s 0.182, H_pi 0.207 (1.132 x), H_mix 0.186 (1.020 x), TT/CF mix 1.0000, pi 1.0000
+  Si440_17.48keV T_w = 300 ns: 1 GHz: H_s 0.059, H_pi 0.115 (1.930 x), H_mix 0.078 (1.316 x), TT/CF mix 1.0000, pi 1.0000 | 2 GHz: H_s 0.123, H_pi 0.229 (1.865 x), H_mix 0.159 (1.296 x), TT/CF mix 1.0000, pi 1.0000
+  Si440_17.48keV window law (sigma): H(1)/H(2) steady 0.484; T_flat 0.3 / T_half 4.6 / T_90 6.7 ns  (targets 10 % / 50 % / 90 % of the way from 1 to steady)
+  Si440_17.48keV window law (pi): H(1)/H(2) steady 0.501; T_flat 0.3 / T_half 9.1 / T_90 12.9 ns  (targets 10 % / 50 % / 90 % of the way from 1 to steady)
+  Si440_17.48keV window law (unpol): H(1)/H(2) steady 0.491; T_flat 0.3 / T_half 5.1 / T_90 7.4 ns  (targets 10 % / 50 % / 90 % of the way from 1 to steady)
+Si 400 / 8 keV Bragg: C = 0.349, Lambda = 11.33 um, g = 0.0458
+  Si400_8keV T_w = 14 ns: 20 GHz: H_s 0.911, H_pi 0.950 (1.042 x), H_mix 0.911 (1.000 x), TT/CF mix 0.9998, pi 0.9998 | 40 GHz: H_s 0.940, H_pi 0.950 (1.010 x), H_mix 0.940 (1.000 x), TT/CF mix 0.9998, pi 0.9998 | 100 GHz: H_s 0.949, H_pi 0.950 (1.002 x), H_mix 0.949 (1.000 x), TT/CF mix 1.0000, pi 1.0000
+  Si400_8keV T_w = 300 ns: 20 GHz: H_s 0.926, H_pi 0.999 (1.079 x), H_mix 0.928 (1.003 x), TT/CF mix 0.9998, pi 0.9998 | 40 GHz: H_s 0.980, H_pi 1.000 (1.020 x), H_mix 0.981 (1.001 x), TT/CF mix 0.9998, pi 0.9998 | 100 GHz: H_s 0.997, H_pi 1.000 (1.003 x), H_mix 0.997 (1.000 x), TT/CF mix 1.0000, pi 1.0000
+  Si400_8keV window law (sigma): H(20)/H(100) steady 0.929; T_flat 5.0 / T_half 12.9 / T_90 24.6 ns  (targets 10 % / 50 % / 90 % of the way from 1 to steady)
+  Si400_8keV window law (pi): H(20)/H(100) steady 0.999; T_flat 5.7 / T_half 13.5 / T_90 27.2 ns  (targets 10 % / 50 % / 90 % of the way from 1 to steady)
+  Si400_8keV window law (unpol): H(20)/H(100) steady 0.931; T_flat 4.7 / T_half 12.6 / T_90 24.1 ns  (targets 10 % / 50 % / 90 % of the way from 1 to steady)
+TT sum vs closed-form sum, worst: 0.021 % -> absorbed as a factor (pure pi = rescaling; unpolarised = closed-form sum, TT to 0.3 %)
+Debye-Waller e^{-M} (B = 0.47 A^2, 300 K): Si400 0.938, Si440 0.880, Si220 0.969  (already in the X0h chi_h used throughout)
+wrote e88_polarisation_dw.json

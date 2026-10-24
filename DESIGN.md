@@ -71,7 +71,9 @@ Full list:
 What 4 discards: uniform absorption (harmless — common factor) and the
 **Borrmann effect** (not harmless — `Im chi_h` gives the two Bloch modes
 different absorption, and mode-selective damping is itself a candidate extra
-timescale). Deliberately excluded from this model.
+timescale). Excluded from the Laue solver. The Bragg solver takes it as
+`kappa_h` (`c -> i pi alpha + kappa_h / 2`, centrosymmetric crystal; notebook
+Entry 77), next to the normal absorption `kappa`.
 
 Note that strain is *not* discarded by 7: `d phi/d zeta = h . du/d zeta` is the
 local lattice-spacing change, so it is already inside `phi`.

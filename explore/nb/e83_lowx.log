@@ -1,0 +1,45 @@
+Si 400 17.48 keV: g = 0.0100, Darwin half-width 3.18 urad = 205.6 meV; f = 0.73 1.46 3.65 7.30 GHz for x = 1, 2, 5, 10
+  T_w = 52 ns: H_single = 0.004 0.036 0.094 0.181
+     sigma = 0.03 hw: H_conv/H_single = 1.140 1.041 1.166 1.230
+     sigma =  0.1 hw: H_conv/H_single = 1.452 1.244 1.015 0.608
+     sigma =  0.2 hw: H_conv/H_single = 2.012 1.103 0.595 0.326
+     sigma =  0.3 hw: H_conv/H_single = 2.006 0.851 0.412 0.222
+     sigma =  0.5 hw: H_conv/H_single = 1.554 0.562 0.254 0.135
+     sigma =    1 hw: H_conv/H_single = 0.850 0.293 0.132 0.068
+     sigma =    2 hw: H_conv/H_single = 0.226 0.129 0.074 0.035
+     sigma_max (5 %) = x=1:0.000 hw (0.00 urad, 0.0 meV) x=2:0.033 hw (0.11 urad, 6.8 meV) x=5:0.000 hw (0.00 urad, 0.0 meV) x=10:0.000 hw (0.00 urad, 0.0 meV)   expected 0.25 (g + 1/2x) = 0.128 0.065 0.028 0.015
+  T_w = 300 ns: H_single = 0.004 0.037 0.099 0.196
+     sigma = 0.03 hw: H_conv/H_single = 1.140 1.014 1.115 1.140
+     sigma =  0.1 hw: H_conv/H_single = 1.452 1.212 0.971 0.564
+     sigma =  0.2 hw: H_conv/H_single = 2.014 1.075 0.569 0.302
+     sigma =  0.3 hw: H_conv/H_single = 2.002 0.830 0.394 0.206
+     sigma =  0.5 hw: H_conv/H_single = 1.559 0.548 0.243 0.125
+     sigma =    1 hw: H_conv/H_single = 0.852 0.286 0.126 0.064
+     sigma =    2 hw: H_conv/H_single = 0.225 0.126 0.070 0.033
+     sigma_max (5 %) = x=1:0.000 hw (0.00 urad, 0.0 meV) x=2:0.043 hw (0.14 urad, 8.8 meV) x=5:0.000 hw (0.00 urad, 0.0 meV) x=10:0.000 hw (0.00 urad, 0.0 meV)   expected 0.25 (g + 1/2x) = 0.128 0.065 0.028 0.015
+  (8 s)
+Si 400 8 keV: g = 0.0458, Darwin half-width 8.33 urad = 95.9 meV; f = 0.74 1.49 3.72 7.44 GHz for x = 1, 2, 5, 10
+  T_w = 52 ns: H_single = 0.031 0.167 0.412 0.673
+     sigma = 0.03 hw: H_conv/H_single = 1.005 1.013 1.039 0.954
+     sigma =  0.1 hw: H_conv/H_single = 1.074 1.127 0.856 0.588
+     sigma =  0.2 hw: H_conv/H_single = 1.278 0.988 0.549 0.353
+     sigma =  0.3 hw: H_conv/H_single = 1.240 0.782 0.395 0.250
+     sigma =  0.5 hw: H_conv/H_single = 0.964 0.535 0.252 0.158
+     sigma =    1 hw: H_conv/H_single = 0.511 0.292 0.135 0.082
+     sigma =    2 hw: H_conv/H_single = 0.142 0.124 0.077 0.043
+     sigma_max (5 %) = x=1:0.076 hw (0.63 urad, 7.3 meV) x=2:0.053 hw (0.44 urad, 5.1 meV) x=5:0.037 hw (0.31 urad, 3.6 meV) x=10:0.031 hw (0.26 urad, 2.9 meV)   expected 0.25 (g + 1/2x) = 0.136 0.074 0.036 0.024
+  T_w = 300 ns: H_single = 0.031 0.167 0.412 0.673
+     sigma = 0.03 hw: H_conv/H_single = 1.005 1.013 1.039 0.954
+     sigma =  0.1 hw: H_conv/H_single = 1.074 1.127 0.856 0.588
+     sigma =  0.2 hw: H_conv/H_single = 1.278 0.988 0.549 0.353
+     sigma =  0.3 hw: H_conv/H_single = 1.240 0.782 0.395 0.250
+     sigma =  0.5 hw: H_conv/H_single = 0.964 0.535 0.252 0.158
+     sigma =    1 hw: H_conv/H_single = 0.511 0.292 0.135 0.082
+     sigma =    2 hw: H_conv/H_single = 0.142 0.124 0.077 0.043
+     sigma_max (5 %) = x=1:0.076 hw (0.63 urad, 7.3 meV) x=2:0.053 hw (0.44 urad, 5.1 meV) x=5:0.037 hw (0.31 urad, 3.6 meV) x=10:0.031 hw (0.26 urad, 2.9 meV)   expected 0.25 (g + 1/2x) = 0.136 0.074 0.036 0.024
+  (14 s)
+convergence 8 keV, x = 2, sigma = 0.3, 300 ns, du = 0.025: 406 rays, W_conv = 3.598819e-07
+convergence 8 keV, x = 2, sigma = 0.3, 300 ns, du = 0.0125: 810 rays, W_conv = 3.598819e-07
+TT vs closed-form convolution, worst: 0.242 %
+wrote e83_lowx.json (14 s)
+wrote D:\03_Develop\NaNIsaac\_wt\tratt-paper\figures\paper\e83_lowx.png

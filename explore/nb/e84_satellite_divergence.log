@@ -1,0 +1,50 @@
+laue  S=0.5 a=2 n=1: sigma=  0 w_n (  0.00 eta): t_max 0.5790 (+0.00 %), I_max 0.6167 (+0.0 %), TT-vs-CF max|dI| 7.1e-02
+laue  S=0.5 a=2 n=1: sigma=0.1 w_n (  0.30 eta): t_max 0.5794 (+0.07 %), I_max 0.6147 (-0.3 %), TT-vs-CF max|dI| 7.0e-02
+laue  S=0.5 a=2 n=1: sigma=0.3 w_n (  0.91 eta): t_max 0.5832 (+0.73 %), I_max 0.6009 (-2.6 %), TT-vs-CF max|dI| 5.7e-02
+laue  S=0.5 a=2 n=1: sigma=  1 w_n (  3.04 eta): t_max 0.5387 (-6.95 %), I_max 0.4637 (-24.8 %), TT-vs-CF max|dI| 3.5e-02
+laue  S=0.5 a=2 n=1: sigma=  3 w_n (  9.13 eta): t_max 0.5397 (-6.79 %), I_max 0.2371 (-61.5 %), TT-vs-CF max|dI| 2.1e-02, population law err 0.145
+   largest sigma meeting both (scan): 0.3 w_n = 0.073 main half-widths; w_n = 0.242 half-widths = 0.43 urad (Si440_17.48keV_Laue), 2.02 urad (Si400_8keV_Bragg)
+laue  S=1.5 a=2 n=1: sigma=  0 w_n (  0.00 eta): t_max 0.4334 (+0.00 %), I_max 0.9972 (+0.0 %), TT-vs-CF max|dI| 3.5e-02
+laue  S=1.5 a=2 n=1: sigma=0.1 w_n (  0.70 eta): t_max 0.4370 (+0.83 %), I_max 0.9911 (-0.6 %), TT-vs-CF max|dI| 3.4e-02
+laue  S=1.5 a=2 n=1: sigma=0.3 w_n (  2.10 eta): t_max 0.4379 (+1.05 %), I_max 0.9303 (-6.7 %), TT-vs-CF max|dI| 2.9e-02
+laue  S=1.5 a=2 n=1: sigma=  1 w_n (  7.01 eta): t_max 0.3723 (-14.09 %), I_max 0.5964 (-40.2 %), TT-vs-CF max|dI| 2.5e-02
+laue  S=1.5 a=2 n=1: sigma=  3 w_n ( 21.03 eta): t_max 0.3506 (-19.10 %), I_max 0.2654 (-73.4 %), TT-vs-CF max|dI| 1.5e-02, population law err 0.126
+   largest sigma meeting both (scan): 0.1 w_n = 0.056 main half-widths; w_n = 0.558 half-widths = 0.99 urad (Si440_17.48keV_Laue), 4.65 urad (Si400_8keV_Bragg)
+laue  S=2 a=4 n=2: sigma=  0 w_n (  0.00 eta): t_max 0.3573 (+0.00 %), I_max 0.9688 (+0.0 %), TT-vs-CF max|dI| 9.3e-02
+laue  S=2 a=4 n=2: sigma=0.1 w_n (  0.89 eta): t_max 0.3534 (-1.07 %), I_max 0.9560 (-1.3 %), TT-vs-CF max|dI| 9.2e-02
+laue  S=2 a=4 n=2: sigma=0.3 w_n (  2.66 eta): t_max 0.3361 (-5.92 %), I_max 0.8945 (-7.7 %), TT-vs-CF max|dI| 8.5e-02
+laue  S=2 a=4 n=2: sigma=  1 w_n (  8.87 eta): t_max 0.2902 (-18.76 %), I_max 0.5966 (-38.4 %), TT-vs-CF max|dI| 6.6e-02
+laue  S=2 a=4 n=2: sigma=  3 w_n ( 26.60 eta): t_max 0.2429 (-32.00 %), I_max 0.2749 (-71.6 %), TT-vs-CF max|dI| 4.7e-02, population law err 0.141
+   largest sigma meeting both (scan): 0 w_n = 0.000 main half-widths; w_n = 0.353 half-widths = 0.62 urad (Si440_17.48keV_Laue), 2.94 urad (Si400_8keV_Bragg)
+laue  S=1.5 a=4 n=1: sigma=  0 w_n (  0.00 eta): t_max 0.2239 (+0.00 %), I_max 0.9912 (+0.0 %), TT-vs-CF max|dI| 1.5e-01
+laue  S=1.5 a=4 n=1: sigma=0.1 w_n (  1.40 eta): t_max 0.2491 (+11.26 %), I_max 0.9831 (-0.8 %), TT-vs-CF max|dI| 1.2e-01
+laue  S=1.5 a=4 n=1: sigma=0.3 w_n (  4.21 eta): t_max 0.2174 (-2.88 %), I_max 0.9139 (-7.8 %), TT-vs-CF max|dI| 6.4e-02
+laue  S=1.5 a=4 n=1: sigma=  1 w_n ( 14.02 eta): t_max 0.1976 (-11.72 %), I_max 0.6038 (-39.1 %), TT-vs-CF max|dI| 5.3e-02
+laue  S=1.5 a=4 n=1: sigma=  3 w_n ( 42.07 eta): t_max 0.1996 (-10.84 %), I_max 0.2847 (-71.3 %), TT-vs-CF max|dI| 4.4e-02, population law err 0.117
+   largest sigma meeting both (scan): 0 w_n = 0.000 main half-widths; w_n = 0.558 half-widths = 0.99 urad (Si440_17.48keV_Laue), 4.65 urad (Si400_8keV_Bragg)
+bragg S=0.5 a=2 n=1: sigma=  0 w_n (  0.00 eta): t_max 0.5772 (+0.00 %), I_max 0.5178 (+0.0 %), TT-vs-CF max|dI| 2.7e-02
+bragg S=0.5 a=2 n=1: sigma=0.1 w_n (  0.30 eta): t_max 0.5770 (-0.02 %), I_max 0.5169 (-0.2 %), TT-vs-CF max|dI| 2.7e-02
+bragg S=0.5 a=2 n=1: sigma=0.3 w_n (  0.91 eta): t_max 0.5760 (-0.21 %), I_max 0.5107 (-1.4 %), TT-vs-CF max|dI| 2.7e-02
+bragg S=0.5 a=2 n=1: sigma=  1 w_n (  3.04 eta): t_max 0.5707 (-1.12 %), I_max 0.4519 (-12.7 %), TT-vs-CF max|dI| 2.8e-02
+bragg S=0.5 a=2 n=1: sigma=  3 w_n (  9.13 eta): t_max 0.5698 (-1.28 %), I_max 0.2480 (-52.1 %), TT-vs-CF max|dI| 1.7e-02
+   largest sigma meeting both (scan): 0.3 w_n = 0.073 main half-widths; w_n = 0.242 half-widths = 0.43 urad (Si440_17.48keV_Laue), 2.02 urad (Si400_8keV_Bragg)
+bragg S=1.5 a=2 n=1: sigma=  0 w_n (  0.00 eta): t_max 0.5859 (+0.00 %), I_max 0.9388 (+0.0 %), TT-vs-CF max|dI| 3.5e-02
+bragg S=1.5 a=2 n=1: sigma=0.1 w_n (  0.70 eta): t_max 0.5854 (-0.08 %), I_max 0.9377 (-0.1 %), TT-vs-CF max|dI| 3.4e-02
+bragg S=1.5 a=2 n=1: sigma=0.3 w_n (  2.10 eta): t_max 0.5807 (-0.88 %), I_max 0.9293 (-1.0 %), TT-vs-CF max|dI| 3.2e-02
+bragg S=1.5 a=2 n=1: sigma=  1 w_n (  7.01 eta): t_max 0.5802 (-0.98 %), I_max 0.7512 (-20.0 %), TT-vs-CF max|dI| 2.8e-02
+bragg S=1.5 a=2 n=1: sigma=  3 w_n ( 21.03 eta): t_max 0.5799 (-1.02 %), I_max 0.3546 (-62.2 %), TT-vs-CF max|dI| 2.0e-02
+   largest sigma meeting both (scan): 0.3 w_n = 0.167 main half-widths; w_n = 0.558 half-widths = 0.99 urad (Si440_17.48keV_Laue), 4.65 urad (Si400_8keV_Bragg)
+bragg S=2 a=4 n=2: sigma=  0 w_n (  0.00 eta): t_max 0.5768 (+0.00 %), I_max 0.9765 (+0.0 %), TT-vs-CF max|dI| 3.2e-02
+bragg S=2 a=4 n=2: sigma=0.1 w_n (  0.89 eta): t_max 0.5767 (-0.01 %), I_max 0.9759 (-0.1 %), TT-vs-CF max|dI| 4.1e-02
+bragg S=2 a=4 n=2: sigma=0.3 w_n (  2.66 eta): t_max 0.5757 (-0.19 %), I_max 0.9701 (-0.7 %), TT-vs-CF max|dI| 6.1e-02
+bragg S=2 a=4 n=2: sigma=  1 w_n (  8.87 eta): t_max 0.5759 (-0.16 %), I_max 0.7729 (-20.9 %), TT-vs-CF max|dI| 5.3e-02
+bragg S=2 a=4 n=2: sigma=  3 w_n ( 26.60 eta): t_max 0.5806 (+0.67 %), I_max 0.3609 (-63.0 %), TT-vs-CF max|dI| 2.4e-02
+   largest sigma meeting both (scan): 0.3 w_n = 0.106 main half-widths; w_n = 0.353 half-widths = 0.62 urad (Si440_17.48keV_Laue), 2.94 urad (Si400_8keV_Bragg)
+bragg S=1.5 a=4 n=1: sigma=  0 w_n (  0.00 eta): t_max 0.5767 (+0.00 %), I_max 0.9991 (+0.0 %), TT-vs-CF max|dI| 1.4e-01
+bragg S=1.5 a=4 n=1: sigma=0.1 w_n (  1.40 eta): t_max 0.5764 (-0.05 %), I_max 0.9990 (-0.0 %), TT-vs-CF max|dI| 9.5e-02
+bragg S=1.5 a=4 n=1: sigma=0.3 w_n (  4.21 eta): t_max 0.5757 (-0.16 %), I_max 0.9980 (-0.1 %), TT-vs-CF max|dI| 6.8e-02
+bragg S=1.5 a=4 n=1: sigma=  1 w_n ( 14.02 eta): t_max 0.5631 (-2.35 %), I_max 0.7940 (-20.5 %), TT-vs-CF max|dI| 6.7e-02
+bragg S=1.5 a=4 n=1: sigma=  3 w_n ( 42.07 eta): t_max 0.5235 (-9.22 %), I_max 0.4027 (-59.7 %), TT-vs-CF max|dI| 7.0e-02
+   largest sigma meeting both (scan): 0.3 w_n = 0.167 main half-widths; w_n = 0.558 half-widths = 0.99 urad (Si440_17.48keV_Laue), 4.65 urad (Si400_8keV_Bragg)
+verdict: condition table applies (sigma_eta < w_n) (121 s)
+wrote D:\03_Develop\NaNIsaac\_wt\tratt-paper\figures\paper\e84_satellite_divergence.png

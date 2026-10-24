@@ -148,6 +148,47 @@ def test_bragg_absorption_gives_darwin_prins_root():
     assert np.all(np.abs(R) < 1.0)  # absorption: no total reflection
 
 
+def test_bragg_kappa_h_zero_is_bit_identical():
+    """kappa_h = 0 must leave every existing Bragg result unchanged."""
+    drive = Drive(S=1.0, alpha_ac=4.0)
+    eta = np.linspace(-20.0, 20.0, 41)
+    a = solve_bragg(2.0, eta, phi=drive.phi(0.6), n_z=800, kappa=3.0)
+    b = solve_bragg(2.0, eta, phi=drive.phi(0.6), n_z=800, kappa=3.0, kappa_h=0.0)
+    assert np.array_equal(a, b)
+
+
+def test_bragg_anomalous_absorption_gives_complex_darwin_prins_root():
+    """Anomalous absorption kappa_h: both couplings become c = i pi alpha + kappa_h / 2 and the thick
+    slab reaches the root |R| < 1 of c R^2 + i (eta + i kappa) R + c = 0 with that c (Entry 77).
+    kappa_h = kappa / 2 keeps the low-absorption mode at >= kappa / 2 per unit depth, so the back
+    face stays hidden (e^-6); at kappa_h -> kappa the Borrmann mode would see it."""
+    alpha, kappa, kappa_h = 4.0, 12.0, 6.0
+    eta = np.linspace(-60.0, 60.0, 25)
+    R = solve_bragg(alpha, eta, n_z=6000, kappa=kappa, kappa_h=kappa_h)
+    c = 1j * np.pi * alpha + 0.5 * kappa_h
+    roots = [np.roots([c, 1j * (e + 1j * kappa), c]) for e in eta]
+    R_dp = np.array([r[np.argmin(np.abs(r))] for r in roots])
+    assert np.max(np.abs(R - R_dp)) < 1e-5
+    assert np.all(np.abs(R) < 1.0)
+
+
+def test_bragg_anomalous_absorption_favours_the_eta_negative_edge():
+    """Borrmann: with kappa_h > 0 the static reflectivity is higher at eta = -pi alpha than at
+    +pi alpha; with kappa_h = 0 the curve is symmetric."""
+    alpha, kappa = 4.0, 6.0
+    eta = np.array([-np.pi * alpha, np.pi * alpha])
+    sym = np.abs(solve_bragg(alpha, eta, n_z=4000, kappa=kappa)) ** 2
+    asym = np.abs(solve_bragg(alpha, eta, n_z=4000, kappa=kappa, kappa_h=0.9 * kappa)) ** 2
+    assert abs(sym[0] - sym[1]) < 1e-6
+    assert asym[0] > asym[1] + 0.01
+    assert np.all(asym <= 1.0)
+
+
+def test_bragg_kappa_h_rejects_negative():
+    with pytest.raises(ValueError):
+        solve_bragg(1.0, 0.0, kappa=1.0, kappa_h=-0.1)
+
+
 def test_bragg_reflectivity_bounded_with_modulation():
     """Energy conservation: a lossless modulated Bragg crystal cannot reflect > 1."""
     drive = Drive(S=1.5, alpha_ac=4.0)

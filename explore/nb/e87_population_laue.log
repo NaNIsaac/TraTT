@@ -1,0 +1,8 @@
+S=0.5 a=2 n=1 rise=0 (1652 rays, w_n = 0.242 hw, q = 10 hw = 18 urad): s=3 w_n (1.28 urad): dperiod -1.05 %, A +2.67 % FAIL | s=5 w_n (2.14 urad): dperiod -0.92 %, A +2.87 % ok | s=10 w_n (4.28 urad): dperiod -0.60 %, A +1.86 % ok | smallest ok 5.0
+S=1.5 a=2 n=1 rise=0 (718 rays, w_n = 0.558 hw, q = 10 hw = 18 urad): s=3 w_n (2.96 urad): dperiod -0.07 %, A +8.07 % FAIL | s=5 w_n (4.93 urad): dperiod -0.02 %, A +3.61 % ok | s=10 w_n (9.86 urad): dperiod -0.00 %, A +1.01 % ok | smallest ok 5.0
+S=2 a=4 n=2 rise=0 (568 rays, w_n = 0.353 hw, q = 5 hw = 9 urad): s=3 w_n (1.87 urad): dperiod +0.40 %, A -0.18 % ok | s=5 w_n (3.12 urad): dperiod +0.20 %, A -0.22 % ok | s=10 w_n (6.23 urad): dperiod +0.06 %, A -0.09 % ok | smallest ok 3.0
+S=1.5 a=4 n=1 rise=0 (359 rays, w_n = 0.558 hw, q = 5 hw = 9 urad): s=3 w_n (2.96 urad): dperiod -0.22 %, A +3.23 % ok | s=5 w_n (4.93 urad): dperiod -0.08 %, A +1.28 % ok | s=10 w_n (9.86 urad): dperiod -0.02 %, A +0.33 % ok | smallest ok 3.0
+S=1.5 a=2 n=1 rise=1 (718 rays, w_n = 0.558 hw, q = 10 hw = 18 urad): s=3 w_n (2.96 urad): dperiod -0.64 %, A +11.85 % FAIL | s=5 w_n (4.93 urad): dperiod -0.19 %, A +5.38 % FAIL | s=10 w_n (9.86 urad): dperiod -0.04 %, A +1.53 % ok | smallest ok 10.0
+convergence (S=1.5 a=2 step, sigma = 3 w_n, w_n/40 -> w_n/80): max |dS^| = 2.69e-06
+verdict: condition table (smallest passing sigma per run) (38 s)
+wrote D:\03_Develop\NaNIsaac\_wt\tratt-paper\figures\paper\e87_population_laue.png

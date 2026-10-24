@@ -1,0 +1,37 @@
+
+1 - K interpolated at fixed nu (log-log within each series, S <= 1):
+  nu    min    max   max/min   n_series  (least / most saturating series)
+  0.1   0.0012 0.0175  14.09   24      g=0.046,x=2,n=30 / g=0.01,x=2,n=1
+  0.2   0.0050 0.0611  12.11   24      g=0.046,x=2,n=30 / g=0.01,x=5,n=1
+  0.3   0.0116 0.1116   9.58   21      g=0.046,x=2,n=30 / g=0.01,x=2,n=1
+  0.5   0.0370 0.2496   6.75   18      g=0.046,x=2,n=30 / g=0.01,x=5,n=3
+  0.8   0.1151 0.4227   3.67   14      g=0.046,x=2,n=30 / g=0.01,x=5,n=10
+
+1 - K / (2 J_1(S) / S) interpolated at fixed nu (log-log within each series, S <= 1):
+  nu    min    max   max/min   n_series  (least / most saturating series)
+  0.1   0.0005 0.0139  26.05   22      g=0.046,x=2,n=30 / g=0.01,x=2,n=1
+  0.2   0.0022 0.0425  19.24   22      g=0.046,x=2,n=30 / g=0.01,x=2,n=1
+  0.3   0.0053 0.0899  16.98   21      g=0.046,x=2,n=30 / g=0.01,x=5,n=3
+  0.5   0.0195 0.2134  10.96   18      g=0.046,x=2,n=30 / g=0.01,x=5,n=3
+  0.8   0.0740 0.4102   5.54   14      g=0.046,x=2,n=30 / g=0.01,x=5,n=10
+
+Same nu, different route (S <= 0.3 only): short vs long packet at g = 0.01, x = 5
+  ncyc=   1: (0.01,-0.000) (0.02,0.000) (0.03,0.001) (0.04,0.003) (0.06,0.005) (0.09,0.012)
+  ncyc=   3: (0.02,0.000) (0.05,0.002) (0.08,0.007) (0.12,0.017) (0.16,0.031) (0.24,0.069)
+  ncyc=  10: (0.06,0.003) (0.11,0.012) (0.19,0.033) (0.28,0.073) (0.38,0.127) (0.56,0.259)
+  ncyc=  30: (0.09,0.005) (0.18,0.019) (0.30,0.053) (0.45,0.119) (0.60,0.206) (0.90,0.404)
+wrote D:\03_Develop\NaNIsaac\_wt\tratt-paper\figures\paper\e68_nu_collapse.png
+Traceback (most recent call last):
+  File "D:\03_Develop\NaNIsaac\_wt\tratt-paper\explore\nb\e68_nu_collapse.py", line 211, in <module>
+    globals()[f"section_{sec}"]()
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^
+KeyError: 'section_fit2'
+fit 1 - K = a S^2 + b nu^2 over 144 points (S <= 0.3): a = 0.1129, b = 0.4901
+  pred / actual: median 0.875, 5-95 % [0.352, 4.031], min -4.013 (g=0.046,x=5,n=3,S=0.03), max 13.594 (g=0.12,x=5,n=1,S=0.06)
+  where 1 - K > 0.01 (61 points): pred / actual min 0.448, max 4.154
+  with b = 0.667 fixed (Bragg tanh law): a = -0.1454; pred / actual 5-95 % [-1.607, 2.597], where 1 - K > 0.01: [-0.666, 4.376]
+  nu-only fit b = 0.519: pred / actual 5-95 % [0.191, 2.534]
+ncyc=1 T=64.4: K = [0.99908983 0.98816435]  nu = [0.02942669 0.08828006]
+ncyc=1 T=128.8: K = [0.9989854  0.98776187]  nu = [0.02942669 0.08828006]
+ncyc=30 T=93.4: K = [0.94653038 0.59624639]  nu = [0.30111376 0.90334129]
+ncyc=30 T=186.8: K = [0.94643099 0.59628789]  nu = [0.30111398 0.90334193]

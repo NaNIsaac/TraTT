@@ -1,0 +1,12 @@
+law n=1: max|dI| in window 8.37e-11, outside 2.50e-02;  I range [0.000, 0.522]
+law n=2: max|dI| in window 1.25e-03, outside 5.82e-03;  I range [0.000, 0.085]
+envelopes at s = [0.  0.2 0.4 0.6 0.8 1.  1.2] 
+  A1 [0.  0.2 0.4 0.6 0.8 1.  1. ] 
+  A2 [0.    0.2   0.494 0.438 0.8   1.    1.   ]
+max |A2 - A1| = 0.167
+n_z = 2800
+TT n=1: max|dI_TT| in window 8.82e-07 (law 8.37e-11), outside 2.50e-02 (law 2.50e-02); max|dI_TT - dI_law| 2.46e-06; max|I_TT - I_law| env1 1.88e-05 env2 1.81e-05
+TT n=2: max|dI_TT| in window 1.25e-03 (law 1.25e-03), outside 5.82e-03 (law 5.82e-03); max|dI_TT - dI_law| 4.38e-06; max|I_TT - I_law| env1 6.73e-05 env2 6.29e-05
+convergence n=1 (phases 8->16, n_z x2): max change 5.68e-06
+convergence n=2 (phases 8->16, n_z x2): max change 5.25e-05
+wrote D:\03_Develop\NaNIsaac\_wt\tratt-paper\figures\paper\e72_history_degeneracy.png

@@ -1,0 +1,10 @@
+b = 0.5: chi = -5.15 deg, Lambda_asym/Lambda_sym = 0.939, g_asym = g (1.0607) = 0.01061; mapping: max|R_asym - sqrt(b) R~| = 7.3e-17; W_asym / (b W~) at 14 ns: 1.6e-12; H_TT(b) / CF-B(g_asym) worst 0.30 %  [H(20)/H(100) TT 0.9295, CF 0.9320]  (0 s)
+b = 2: chi = +5.15 deg, Lambda_asym/Lambda_sym = 0.939, g_asym = g (1.0607) = 0.01061; mapping: max|R_asym - sqrt(b) R~| = 1.4e-16; W_asym / (b W~) at 14 ns: 1.3e-12; H_TT(b) / CF-B(g_asym) worst 0.30 %  [H(20)/H(100) TT 0.9295, CF 0.9320]  (1 s)
+b = 4: chi = +9.22 deg, Lambda_asym/Lambda_sym = 0.790, g_asym = g (1.2500) = 0.01251; mapping: max|R_asym - sqrt(b) R~| = 0.0e+00; W_asym / (b W~) at 14 ns: 0.0e+00; H_TT(b) / CF-B(g_asym) worst 0.30 %  [H(20)/H(100) TT 0.8681, CF 0.8704]  (1 s)
+verdict: mapping exact (< 1e-6) / one geometry factor
+  b =  0.5: chi =  -5.15 deg, Lambda = 10.84 um, g = 0.01061, steady H(20) = 0.479, H(100) = 0.939, ratio 0.510, T_flat 17.3 / T_half 28.8 / T_90 46.2 ns
+  b =    1: chi =  +0.00 deg, Lambda = 11.54 um, g = 0.01001, steady H(20) = 0.480, H(100) = 0.939, ratio 0.511, T_flat 19.6 / T_half 32.7 / T_90 52.3 ns
+  b =    2: chi =  +5.15 deg, Lambda = 10.84 um, g = 0.01061, steady H(20) = 0.479, H(100) = 0.939, ratio 0.510, T_flat 17.3 / T_half 28.8 / T_90 46.2 ns
+  b =    4: chi =  +9.22 deg, Lambda = 9.12 um, g = 0.01251, steady H(20) = 0.475, H(100) = 0.938, ratio 0.507, T_flat 12.2 / T_half 20.5 / T_90 32.7 ns
+  b =   10: chi = +12.48 deg, Lambda = 6.48 um, g = 0.01740, steady H(20) = 0.471, H(100) = 0.937, ratio 0.503, T_flat 6.1 / T_half 10.4 / T_90 16.5 ns
+wrote e81_asym_map.json (5 s)

@@ -1,0 +1,32 @@
+Si 400 17.48 keV, g = 0.0100, kappa_h/kappa = 0.93
+  steady eta>0: H(kh)/H(0) = 5:0.9975 10:0.9953 20:0.9922 30:0.9910 40:0.9909 60:0.9919 87:0.9935 100:0.9941 150:0.9958 200:0.9968 300:0.9978   max|r-1| in band 0.91 %, outside 0.47 %
+  window 14 ns eta>0: H(kh)/H(0) = 5:0.9807 10:0.9816 20:0.9904 30:0.9936 40:0.9952 60:0.9968 87:0.9978 100:0.9981 150:0.9987 200:0.9991 300:0.9994   max|r-1| in band 0.96 %
+  window 52 ns eta>0: H(kh)/H(0) = 5:1.0020 10:0.9851 20:0.9894 30:0.9867 40:0.9887 60:0.9919 87:0.9943 100:0.9950 150:0.9966 200:0.9975 300:0.9983   max|r-1| in band 1.33 %
+  steady eta<0: H(kh)/H(0) = 5:1.0025 10:1.0047 20:1.0079 30:1.0092 40:1.0094 60:1.0084 87:1.0067 100:1.0061 150:1.0043 200:1.0033 300:1.0023   max|r-1| in band 0.94 %, outside 0.47 %
+  window 14 ns eta<0: H(kh)/H(0) = 5:1.0226 10:1.0191 20:1.0098 30:1.0066 40:1.0049 60:1.0033 87:1.0023 100:1.0020 150:1.0013 200:1.0010 300:1.0007   max|r-1| in band 0.98 %
+  window 52 ns eta<0: H(kh)/H(0) = 5:0.9975 10:1.0168 20:1.0111 30:1.0139 40:1.0117 60:1.0083 87:1.0059 100:1.0051 150:1.0035 200:1.0026 300:1.0018   max|r-1| in band 1.39 %
+  steady H(eta<0)/H(eta>0) with kh: 5:1.0050 10:1.0095 20:1.0158 30:1.0184 40:1.0187 60:1.0167 87:1.0134 100:1.0121 150:1.0086 200:1.0066 300:1.0045
+Si 400 8 keV, g = 0.0458, kappa_h/kappa = 0.93
+  steady eta>0: H(kh)/H(0) = 5:0.9638 10:0.9610 20:0.9722 30:0.9799 40:0.9846 60:0.9897 87:0.9931 100:0.9941 150:0.9963 200:0.9975 300:0.9986   max|r-1| in band 2.78 %, outside 3.90 %
+  window 14 ns eta>0: H(kh)/H(0) = 5:0.9665 10:0.9542 20:0.9736 30:0.9821 40:0.9867 60:0.9913 87:0.9943 100:0.9951 150:0.9970 200:0.9980 300:0.9990   max|r-1| in band 2.64 %
+  window 52 ns eta>0: H(kh)/H(0) = 5:0.9638 10:0.9610 20:0.9722 30:0.9799 40:0.9846 60:0.9897 87:0.9931 100:0.9941 150:0.9963 200:0.9975 300:0.9986   max|r-1| in band 2.78 %
+  steady eta<0: H(kh)/H(0) = 5:1.0397 10:1.0446 20:1.0317 30:1.0230 40:1.0179 60:1.0124 87:1.0089 100:1.0079 150:1.0055 200:1.0044 300:1.0032   max|r-1| in band 3.17 %, outside 4.46 %
+  window 14 ns eta<0: H(kh)/H(0) = 5:1.0369 10:1.0534 20:1.0299 30:1.0205 40:1.0156 60:1.0107 87:1.0077 100:1.0068 150:1.0048 200:1.0038 300:1.0029   max|r-1| in band 2.99 %
+  window 52 ns eta<0: H(kh)/H(0) = 5:1.0397 10:1.0446 20:1.0317 30:1.0230 40:1.0179 60:1.0124 87:1.0089 100:1.0078 150:1.0055 200:1.0044 300:1.0032   max|r-1| in band 3.17 %
+  steady H(eta<0)/H(eta>0) with kh: 5:1.0788 10:1.0869 20:1.0612 30:1.0439 40:1.0338 60:1.0229 87:1.0159 100:1.0138 150:1.0092 200:1.0069 300:1.0046
+verdict at g = 0.0100: max |H(kh)/H(0) - 1| over 20-150 GHz, steady and windows 14/52 ns, both signs: steady_eta>0 0.91 %, T14_eta>0 0.96 %, T52_eta>0 1.33 %, steady_eta<0 0.94 %, T14_eta<0 0.98 %, T52_eta<0 1.39 % -> max 1.39 % -> second parameter needed
+  g=0.0100 x=   3.0 eta>0 (n_z=18579): TT / closed form = 1.0000;  effect of kappa_h: TT 0.9991, closed form 0.9989 (2 s)
+  g=0.0100 x=  10.0 eta>0 (n_z=50644): TT / closed form = 1.0007;  effect of kappa_h: TT 0.9957, closed form 0.9964 (4 s)
+  g=0.0100 x=  30.0 eta>0 (n_z=142261): TT / closed form = 1.0001;  effect of kappa_h: TT 0.9913, closed form 0.9919 (12 s)
+  g=0.0100 x=  60.0 eta>0 (n_z=279685): TT / closed form = 0.9896;  effect of kappa_h: TT 0.9913, closed form 0.9910 (27 s)
+TT vs extended closed form: worst 1.04 %
+  g=0.0100 x=   3.0 eta<0 (n_z=18579): TT / closed form = 0.9982;  effect of kappa_h: TT 0.9996, closed form 1.0011 (2 s)
+  g=0.0100 x=  10.0 eta<0 (n_z=50644): TT / closed form = 1.0028;  effect of kappa_h: TT 1.0049, closed form 1.0036 (4 s)
+  g=0.0100 x=  30.0 eta<0 (n_z=142261): TT / closed form = 1.0015;  effect of kappa_h: TT 1.0091, closed form 1.0083 (12 s)
+  g=0.0100 x=  60.0 eta<0 (n_z=279685): TT / closed form = 0.9890;  effect of kappa_h: TT 1.0090, closed form 1.0093 (31 s)
+TT vs extended closed form: worst 1.10 %
+wrote figures/paper/e77_chi_ih.png
+  x=60 eta>0 48 steps/cycle (n_z=279685) kappa_h/kappa=0: TT / closed form = 0.9893 (12 s)
+  x=60 eta>0 48 steps/cycle (n_z=279685) kappa_h/kappa=0.93: TT / closed form = 0.9896 (12 s)
+  x=60 eta>0 96 steps/cycle (n_z=559114) kappa_h/kappa=0: TT / closed form = 0.9966 (23 s)
+  x=60 eta>0 96 steps/cycle (n_z=559114) kappa_h/kappa=0.93: TT / closed form = 0.9968 (24 s)
